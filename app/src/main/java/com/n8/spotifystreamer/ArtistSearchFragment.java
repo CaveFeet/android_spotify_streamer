@@ -18,8 +18,11 @@ import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.util.List;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import kaaes.spotify.webapi.android.models.Artist;
 
 /**
  * Fragment that allows user to serach for, and view, artists
@@ -40,9 +43,9 @@ public class ArtistSearchFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public ArtistSearchFragment() {
-        // Required empty public constructor
-    }
+    private List<Artist> mArtists;
+
+    public ArtistSearchFragment() { }
 
     @Override
     public void onAttach(Activity activity) {
@@ -62,6 +65,13 @@ public class ArtistSearchFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         BusProvider.getInstance().register(this);
 
@@ -74,6 +84,11 @@ public class ArtistSearchFragment extends Fragment {
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         mSearchView.setIconifiedByDefault(false);
 
+        // If view is being recreated after a rotation, there may be existing artist data to view
+        if (mArtists != null) {
+            bindArtists();
+        }
+
         return view;
     }
 
@@ -85,9 +100,14 @@ public class ArtistSearchFragment extends Fragment {
 
     @Subscribe
     public void onArtistSearchCompleted(ArtistSearchCompletedEvent event) {
+        mArtists = event.getArtistPager().artists.items;
+        bindArtists();
+    }
+
+    private void bindArtists() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mArtistRecyclerView.setLayoutManager(layoutManager);
-        mArtistRecyclerView.setAdapter(new ArtistsRecyclerAdapter(event.getArtistPager().artists.items));
+        mArtistRecyclerView.setAdapter(new ArtistsRecyclerAdapter(mArtists));
     }
 
 }

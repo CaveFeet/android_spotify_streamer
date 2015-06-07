@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Spotify Streamer</string>
+    <string name="error_searching_for_artist">Error searching for artist</string>
     <string name="search_for_artist">Search for artist</string>
     <string name="search_hint">@string/search_for_artist</string>
 </resources>

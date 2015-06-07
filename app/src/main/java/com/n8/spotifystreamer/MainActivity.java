@@ -2,9 +2,11 @@ package com.n8.spotifystreamer;
 
 import android.app.SearchManager;
 import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -17,13 +19,24 @@ public class MainActivity extends AppCompatActivity implements ArtistSearchFragm
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_activity_fragment_frame, new ArtistSearchFragment())
+        // If an instance of the ArtistSearchFragment doesn't already exist, create one and show it
+        // in the Activity's layout.  Adding the fragment in this way will retain the fragment
+        // across Activity recreation.
+        //
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager.findFragmentByTag(ARTIST_FRAGMENT_TAG) == null) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.main_activity_fragment_frame,
+                new ArtistSearchFragment(),
+                ARTIST_FRAGMENT_TAG)
                 .commit();
+        }
 
         processIntent(getIntent());
     }
@@ -56,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements ArtistSearchFragm
 
                 @Override
                 public void failure(RetrofitError error) {
-
+                    AndroidUtils.showToast(MainActivity.this, getString(R.string.error_searching_for_artist));
                 }
             });
         }

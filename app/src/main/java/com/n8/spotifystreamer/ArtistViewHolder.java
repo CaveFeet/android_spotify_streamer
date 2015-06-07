@@ -35,23 +35,12 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
 
     public void bindViewHolder(final Artist artist){
         mArtistTitleTextView.setText(artist.name);
+        mArtistImageView.setImageBitmap(null);
+
         List<Image> images = artist.images;
         if (images != null && images.size() > 0) {
             int index = images.size()-1;
-            Picasso.with(itemView.getContext()).load(images.get(index).url).into(mArtistImageView, new
-                    Callback() {
-                        @Override
-                        public void onSuccess() {
-                            Log.d(TAG, "Successfully loading image for artist " + artist.name);
-                        }
-
-                        @Override
-                        public void onError() {
-                            Log.d(TAG, "Failed to load image for artist " + artist.name);
-                        }
-                    });
-        }else {
-            Log.d(TAG, "No images to laod");
+            Picasso.with(itemView.getContext()).load(images.get(index).url).into(mArtistImageView);
         }
     }
 }
