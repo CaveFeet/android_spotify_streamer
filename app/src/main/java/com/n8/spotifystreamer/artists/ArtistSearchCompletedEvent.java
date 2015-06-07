@@ -1,4 +1,4 @@
-package com.n8.spotifystreamer;
+package com.n8.spotifystreamer.artists;
 
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;

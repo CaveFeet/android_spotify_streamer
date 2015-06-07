@@ -1,12 +1,19 @@
-package com.n8.spotifystreamer;
+package com.n8.spotifystreamer.artists;
 
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.support.v4.app.Fragment;
+import android.os.Handler;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
+
+import com.n8.spotifystreamer.AndroidUtils;
+import com.n8.spotifystreamer.BusProvider;
+import com.n8.spotifystreamer.R;
 
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -15,9 +22,9 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends AppCompatActivity implements ArtistSearchFragment.OnFragmentInteractionListener {
+public class ArtistSearchActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = ArtistSearchActivity.class.getSimpleName();
 
     private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
 
@@ -48,8 +55,14 @@ public class MainActivity extends AppCompatActivity implements ArtistSearchFragm
     }
 
     @Override
-    public void onArtistSelected() {
-        // no op
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void processIntent(Intent intent) {
@@ -59,17 +72,39 @@ public class MainActivity extends AppCompatActivity implements ArtistSearchFragm
                 return;
             }
 
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                ArtistSuggestionProvider.AUTHORITY, ArtistSuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
+
+            //TODO enable history clearing
+//            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+//                HelloSuggestionProvider.AUTHORITY, HelloSuggestionProvider.MODE);
+//            suggestions.clearHistory();
+
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Searching for " + query);
+            progressDialog.show();
+
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
+            final Handler handler = new Handler();
             spotify.searchArtists(query, new Callback<ArtistsPager>() {
                 @Override
                 public void success(ArtistsPager artistsPager, Response response) {
+                    progressDialog.cancel();
                     BusProvider.getInstance().post(new ArtistSearchCompletedEvent(artistsPager));
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
-                    AndroidUtils.showToast(MainActivity.this, getString(R.string.error_searching_for_artist));
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.cancel();
+                            AndroidUtils.showToast(ArtistSearchActivity.this,
+                                getString(R.string.error_searching_for_artist));
+                        }
+                    });
                 }
             });
         }

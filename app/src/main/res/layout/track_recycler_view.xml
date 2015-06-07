@@ -12,21 +12,21 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/artist_recycler_view_imageView"
+            android:id="@+id/track_recycler_view_imageView"
             android:layout_width="@dimen/recycler_view_thumbnail_size"
             android:layout_height="@dimen/recycler_view_thumbnail_size"
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
-            android:layout_marginStart="@dimen/keyline_1"
+            android:layout_marginStart="@dimen/keyline_0"
             android:layout_marginEnd="@dimen/keyline_1"
             />
 
         <TextView
-            android:id="@+id/artist_recycler_view_title_textView"
+            android:id="@+id/track_recycler_view_title_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/artist_recycler_view_imageView"/>
+            android:layout_toEndOf="@+id/track_recycler_view_imageView"/>
 
     </RelativeLayout>
 

@@ -3,4 +3,7 @@
     <string name="error_searching_for_artist">Error searching for artist</string>
     <string name="search_for_artist">Search for artist</string>
     <string name="search_hint">@string/search_for_artist</string>
+  <string name="title_activity_top_tracks">foo</string>
+  <string name="hello_world">Hello world!</string>
+  <string name="action_settings">Settings</string>
 </resources>

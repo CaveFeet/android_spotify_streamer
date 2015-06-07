@@ -1,33 +1,61 @@
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.n8.spotifystreamer.tracks.TopTracksActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="@dimen/activity_horizontal_margin"
-    tools:context="com.n8.spotifystreamer.ArtistSearchFragment">
+    >
 
-    <android.support.v7.widget.CardView
-        android:layout_height="?attr/actionBarSize"
+    <FrameLayout
+        android:id="@+id/fragment_artist_search_no_content_layout"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
         >
 
-        <android.support.v7.widget.SearchView
-            android:id="@+id/fragment_artis_search_searchView"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:queryHint="@string/search_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:text="Search for a musical artist"
             />
 
-    </android.support.v7.widget.CardView>
+    </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_artist_search_recyclerView"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:padding="@dimen/keyline_0"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
-</LinearLayout>
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/fragment_top_tracks_appBarLayout"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        >
+
+        <android.support.v7.widget.CardView
+            android:layout_height="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            >
+
+            <android.support.v7.widget.SearchView
+                android:id="@+id/fragment_artis_search_searchView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:queryHint="@string/search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                />
+
+        </android.support.v7.widget.CardView>
+
+    </android.support.design.widget.AppBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>
