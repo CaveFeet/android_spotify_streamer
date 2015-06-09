@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
@@ -56,6 +57,9 @@ public class ArtistSearchFragment extends Fragment implements ArtistsRecyclerAda
 
     @InjectView(R.id.fragment_artist_search_recyclerView)
     RecyclerView mArtistRecyclerView;
+
+    @InjectView(R.id.fragment_top_tracks_appBarLayout)
+    AppBarLayout mAppBarLayout;
 
     @InjectView(R.id.fragment_artist_search_toolbar)
     Toolbar mToolbar;

@@ -38,26 +38,34 @@
         android:layout_width="match_parent"
         >
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/fragment_artist_search_toolbar"
-            android:layout_height="match_parent"
+        <!-- TODO take another look at this when support design library is updated -->
+        <!-- Add a CollapsingToolbarLayout here as work around for bug in AppBarLayout where toolbar
+        was not visible when quick-returned back into view -->
+        <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:elevation="@dimen/toolbar_elevation"
             >
 
-            <android.support.v7.widget.SearchView
-                android:id="@+id/fragment_artis_search_searchView"
-                android:layout_width="match_parent"
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/fragment_artist_search_toolbar"
                 android:layout_height="match_parent"
-                android:queryHint="@string/search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:focusable="false"
-                style="@style/AppTheme.SearchView"
-                />
+                android:layout_width="match_parent"
+                >
 
-        </android.support.v7.widget.Toolbar>
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/fragment_artis_search_searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:queryHint="@string/search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:focusable="false"
+                    style="@style/AppTheme.SearchView"
+                    />
+
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.CollapsingToolbarLayout>
 
     </android.support.design.widget.AppBarLayout>
 
