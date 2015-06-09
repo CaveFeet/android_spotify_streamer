@@ -7,6 +7,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccentPrimary</item>
+        <item name="searchViewStyle">@style/AppTheme.SearchView</item>
+    </style>
+
+    <style name="AppTheme.SearchView" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@null</item>
+        <item name="submitBackground">@null</item>
     </style>
 
 </resources>

@@ -9,12 +9,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
+        android:name=".SpotifyStreamerApplication"
         >
         <provider android:name=".artists.ArtistSuggestionProvider"
                   android:authorities="com.n8.ArtistSuggestionProvider" />
 
         <activity
-            android:name=".artists.ArtistSearchActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
 
