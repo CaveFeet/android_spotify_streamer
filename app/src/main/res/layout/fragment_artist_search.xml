@@ -5,12 +5,14 @@
     tools:context="com.n8.spotifystreamer.tracks.TopTracksActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/primary_light"
     >
 
     <FrameLayout
-        android:id="@+id/fragment_artist_search_no_content_layout"
+        android:id="@+id/fragment_artist_search_initial_content_layout"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:visibility="visible"
         >
 
         <TextView
@@ -24,12 +26,30 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/fragment_artist_search_no_content_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:text="@string/no_results"
+            />
+
+    </FrameLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_artist_search_recyclerView"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:padding="@dimen/keyline_0"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:visibility="gone"
         />
 
     <android.support.design.widget.AppBarLayout

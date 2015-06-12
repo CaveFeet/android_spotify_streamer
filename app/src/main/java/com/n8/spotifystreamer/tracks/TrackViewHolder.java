@@ -9,6 +9,7 @@ import com.n8.spotifystreamer.artists.ArtistViewHolder;
 import com.n8.spotifystreamer.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -18,15 +19,21 @@ import kaaes.spotify.webapi.android.models.Track;
 
 public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-    public static int VIEW_ID = R.layout.track_recycler_view;
+    public static int VIEW_ID = R.layout.recycler_view_track;
 
     private static final String TAG = ArtistViewHolder.class.getSimpleName();
 
-    @InjectView(R.id.track_recycler_view_title_textView)
+    @InjectView(R.id.track_recycler_view_track_title_textView)
     TextView mTrackTitleTextView;
+
+    @InjectView(R.id.track_recycler_view_album_title_textView)
+    TextView mAlbumTitleTextView;
 
     @InjectView(R.id.track_recycler_view_imageView)
     ImageView mTrackImageView;
+
+    @InjectView(R.id.track_recycler_view_popularity_textView)
+    TextView mPopularityTextView;
 
     private Track mTrack;
 
@@ -40,7 +47,11 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
         mTrack = track;
         mTrackTitleTextView.setText(mTrack.name);
+        mAlbumTitleTextView.setText(mTrack.album.name);
         mTrackImageView.setImageBitmap(null);
+
+        DecimalFormat formatter = new DecimalFormat("#,###,###,###");
+        mPopularityTextView.setText(formatter.format(mTrack.popularity));
 
         List<Image> images = mTrack.album.images;
         if (images != null && images.size() > 0) {

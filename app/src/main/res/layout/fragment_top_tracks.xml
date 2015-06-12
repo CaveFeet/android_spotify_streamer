@@ -5,7 +5,7 @@
     tools:context="com.n8.spotifystreamer.tracks.TopTracksActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:background="@color/primary_light"
     >
 
   <android.support.v7.widget.RecyclerView
@@ -17,9 +17,8 @@
 
   <android.support.design.widget.AppBarLayout
       android:id="@+id/fragment_top_tracks_appBarLayout"
-      android:layout_height="192dp"
+      android:layout_height="200dp"
       android:layout_width="match_parent"
-      android:fitsSystemWindows="true"
       >
 
       <android.support.design.widget.CollapsingToolbarLayout
@@ -28,26 +27,42 @@
           android:layout_height="match_parent"
           app:layout_scrollFlags="scroll|exitUntilCollapsed"
           app:contentScrim="?attr/colorPrimary"
-          android:fitsSystemWindows="true"
+          android:layout_gravity="center"
           >
 
+
           <ImageView
-              android:id="@+id/fragment_top_tracks_artist_image"
-              android:transitionName="MyTransition"
+              android:id="@+id/fragment_top_tracks_artist_image_header_background"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:scaleType="centerCrop"
               app:layout_collapseMode="parallax"
               />
 
+          <ImageView
+              android:id="@+id/fragment_top_tracks_artist_image_thumbnail"
+              android:transitionName="@string/artist_thumbnail_transition_name"
+              android:layout_width="@dimen/top_tracks_header_thumbnail_size"
+              android:layout_height="@dimen/top_tracks_header_thumbnail_size"
+              android:layout_gravity="center"
+              android:scaleType="centerCrop"
+              app:layout_collapseMode="parallax"
+              />
           <android.support.v7.widget.Toolbar
-                android:id="@+id/fragment_top_tracks_toolbar"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_width="match_parent"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:layout_collapseMode="pin"
-                />
-
+              android:id="@+id/fragment_top_tracks_toolbar"
+              android:layout_height="?attr/actionBarSize"
+              android:layout_width="match_parent"
+              app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+              app:layout_collapseMode="pin"
+              >
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  style="@style/TextAppearance.AppCompat.Medium"
+                  android:text="@string/top_ten_tracks"
+                  android:layout_marginEnd="@dimen/keyline_1"
+                  />
+          </android.support.v7.widget.Toolbar>
 
       </android.support.design.widget.CollapsingToolbarLayout>
 

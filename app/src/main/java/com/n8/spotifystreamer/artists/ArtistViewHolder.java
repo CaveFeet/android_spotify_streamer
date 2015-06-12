@@ -2,14 +2,15 @@ package com.n8.spotifystreamer.artists;
 
 import android.os.Build;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
 import com.squareup.picasso.Picasso;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -19,7 +20,9 @@ import kaaes.spotify.webapi.android.models.Image;
 
 public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-    public static int VIEW_ID = R.layout.artist_recycler_view;
+    public static final int THUMBNAIL_SIZE = 200;
+
+    public static int VIEW_ID = R.layout.recycler_view_artist;
 
     private static final String TAG = ArtistViewHolder.class.getSimpleName();
 
@@ -28,6 +31,12 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
 
     @InjectView(R.id.artist_recycler_view_imageView)
     ImageView mArtistImageView;
+
+    @InjectView(R.id.artist_recycler_view_popularity_textView)
+    TextView mPopularityTextView;
+
+    @InjectView(R.id.artist_recycler_view_followers_textView)
+    TextView mFollowersTextView;
 
     private Artist mArtist;
 
@@ -51,23 +60,15 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         mArtistTitleTextView.setText(artist.name);
         mArtistImageView.setImageBitmap(null);
 
+        DecimalFormat formatter = new DecimalFormat("#,###,###,###");
+        mPopularityTextView.setText(formatter.format(mArtist.popularity));
+        mFollowersTextView.setText(formatter.format(mArtist.followers.total));
+
         List<Image> images = artist.images;
 
         if (images != null && images.size() > 0) {
-            double closestRatio = Math.abs(((double)images.get(0).height)/200f - 1);
-            int closesIndex = 0;
-
-            for (int i = 1; i < images.size(); i++) {
-                double ratio = Math.abs(((double)images.get(i).height)/200f - 1);
-                if (ratio < closestRatio) {
-                    closestRatio = ratio;
-                    closesIndex = i;
-                }
-            }
-
-            Log.d(TAG, "chose image with size height of " + images.get(closesIndex).height);
-            Picasso.with(itemView.getContext()).load(images.get(closesIndex).url).into(
-                mArtistImageView);
+            int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_SIZE);
+            Picasso.with(itemView.getContext()).load(images.get(index).url).into(mArtistImageView);
         }
     }
 

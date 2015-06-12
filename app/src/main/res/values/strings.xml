@@ -3,11 +3,18 @@
   <string name="clear_suggestions">Clear Suggestions</string>
   <string name="error_searching_for_artist">Error searching for artist</string>
   <string name="error_searching_no_query">Must enter an artist name to search</string>
+  <string name="followers">Followers: </string>
   <string name="fragment_artist_menu_search">Search artist</string>
+  <string name="no_results">No artists were found</string>
+  <string name="popularity">Popularity: </string>
   <string name="search_for_artist">Search for artist</string>
   <string name="search_hint">@string/search_for_artist</string>
-  <string name="search_for_a_musical_artist">Search for a musical artist</string>
+  <string name="search_for_a_musical_artist">Search for a musical artist to preview their top tracks</string>
+  <string name="top_ten_tracks">Top Ten Tracks</string>
   <string name="title_activity_top_tracks">foo</string>
   <string name="hello_world">Hello world!</string>
   <string name="action_settings">Settings</string>
+  <string name="remove_artist_search_result">Removed artist result</string>
+  <string name="undo">Undo</string>
+  <string name="searching_for">"Searching for "</string>
 </resources>

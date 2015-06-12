@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
-  <explode
-      android:duration="400"
-      />
   <changeTransform
-      android:duration="400"
+      android:duration="300"
       />
   <changeBounds
-      android:duration="400"
+      android:duration="300"
       />
   <changeImageTransform
-      android:duration="400"
+      android:duration="300"
       />
 </transitionSet>
