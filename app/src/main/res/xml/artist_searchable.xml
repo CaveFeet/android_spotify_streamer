@@ -4,5 +4,7 @@
             android:hint="@string/search_hint"
             android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"
             android:imeOptions="actionSearch"
+            android:searchSuggestAuthority="com.n8.ArtistSuggestionProvider"
+            android:searchSuggestSelection=" ?"
     >
 </searchable>

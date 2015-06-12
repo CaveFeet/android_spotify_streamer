@@ -1,33 +1,92 @@
-<LinearLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.n8.spotifystreamer.tracks.TopTracksActivityFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="@dimen/activity_horizontal_margin"
-    tools:context="com.n8.spotifystreamer.ArtistSearchFragment">
+    android:background="@color/primary_light"
+    >
 
-    <android.support.v7.widget.CardView
-        android:layout_height="?attr/actionBarSize"
+    <FrameLayout
+        android:id="@+id/fragment_artist_search_initial_content_layout"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
+        android:visibility="visible"
         >
 
-        <android.support.v7.widget.SearchView
-            android:id="@+id/fragment_artis_search_searchView"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:queryHint="@string/search_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:text="@string/search_for_a_musical_artist"
             />
 
-    </android.support.v7.widget.CardView>
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_artist_search_no_content_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:text="@string/no_results"
+            />
+
+    </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_artist_search_recyclerView"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:visibility="gone"
         />
 
-</LinearLayout>
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/fragment_top_tracks_appBarLayout"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_width="match_parent"
+        >
+
+        <!-- TODO take another look at this when support design library is updated -->
+        <!-- Add a CollapsingToolbarLayout here as work around for bug in AppBarLayout where toolbar
+        was not visible when quick-returned back into view -->
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            >
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/fragment_artist_search_toolbar"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                >
+
+                <android.support.v7.widget.SearchView
+                    android:id="@+id/fragment_artis_search_searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:queryHint="@string/search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:focusable="false"
+                    style="@style/AppTheme.SearchView"
+                    />
+
+            </android.support.v7.widget.Toolbar>
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>

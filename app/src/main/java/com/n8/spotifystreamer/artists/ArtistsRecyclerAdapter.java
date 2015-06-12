@@ -1,9 +1,10 @@
-package com.n8.spotifystreamer;
+package com.n8.spotifystreamer.artists;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import java.util.List;
 
@@ -11,17 +12,24 @@ import kaaes.spotify.webapi.android.models.Artist;
 
 public class ArtistsRecyclerAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
 
+    public interface ArtistClickListener{
+        void onArtistViewClicked(Artist artist, ImageView sharedImage);
+    }
+
     private List<Artist> mArtists;
 
-    public ArtistsRecyclerAdapter(List<Artist> artists) {
+    private ArtistClickListener mArtistClickListener;
+
+    public ArtistsRecyclerAdapter(List<Artist> artists, ArtistClickListener artistClickListener) {
         mArtists = artists;
+        mArtistClickListener = artistClickListener;
     }
 
     @Override
     public ArtistViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(ArtistViewHolder.VIEW_ID, parent, false);
 
-        return new ArtistViewHolder(v);
+        return new ArtistViewHolder(v, mArtistClickListener);
     }
 
     @Override
@@ -31,6 +39,6 @@ public class ArtistsRecyclerAdapter extends RecyclerView.Adapter<ArtistViewHolde
 
     @Override
     public int getItemCount() {
-        return mArtists.size();
+        return mArtists == null ? 0 : mArtists.size();
     }
 }

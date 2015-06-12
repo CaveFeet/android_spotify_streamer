@@ -12,10 +12,12 @@ email: contracts@esri.com
 package com.n8.spotifystreamer;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 public class AndroidUtils {
+
   public static void showToast(@NonNull Context context, String message) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
   }
