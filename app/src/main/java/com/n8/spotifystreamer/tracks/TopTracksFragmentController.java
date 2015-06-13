@@ -1,35 +1,28 @@
+/*
+COPYRIGHT 1995-2015 ESRI
+
+TRADE SECRETS: ESRI PROPRIETARY AND CONFIDENTIAL 
+Unpublished material - all rights reserved under the Copyright Laws of the United States.
+
+For additional information, contact: Environmental Systems Research Institute, Inc. 
+Attn: Contracts Dept 380 New York Street Redlands, California, USA 92373
+
+email: contracts@esri.com
+*/
 package com.n8.spotifystreamer.tracks;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.ViewAnimator;
 
 import com.n8.spotifystreamer.AndroidUtils;
-import com.n8.spotifystreamer.DividerItemDecoration;
+import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.ImageUtils;
-import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
-import com.squareup.okhttp.Call;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,10 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import butterknife.ButterKnife;
-import butterknife.InjectView;
-import kaaes.spotify.webapi.android.SpotifyApi;
-import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Image;
 import kaaes.spotify.webapi.android.models.Track;
@@ -50,96 +39,47 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class TopTracksActivityFragment extends Fragment {
-
-  private static final String TAG = TopTracksActivityFragment.class.getSimpleName();
+/**
+ * Handles the business logic for {@link TopTracksFragment}.  Listens and responds to events from
+ * {@link com.n8.spotifystreamer.tracks.TopTracksFragmentView}.
+ */
+public class TopTracksFragmentController extends BaseFragmentController<TopTracksFragmentView> implements TopTracksController {
 
   public static final int THUMBNAIL_IMAGE_SIZE = 200;
 
-  @InjectView(R.id.fragment_top_tracks_toolbar)
-  Toolbar mToolbar;
-
-  @InjectView(R.id.fragment_top_tracks_collapsingToolbarLayout)
-  CollapsingToolbarLayout mCollapsingToolbarLayout;
-
-  @InjectView(R.id.fragment_top_tracks_recyclerView)
-  RecyclerView mTopTracksRecyclerView;
-
-  @InjectView(R.id.fragment_top_tracks_artist_image_thumbnail)
-  ImageView mArtistThumbnailImageView;
-
-  @InjectView(R.id.fragment_top_tracks_artist_image_header_background)
-  ImageView mArtistHeaderBackgroundImageView;
+  private TopTracksFragmentView mView;
 
   private Artist mArtist;
 
   private List<Track> mTracks;
 
   private AnimatorSet mAnimatorSet;
+  private TracksRecyclerAdapter mAdapter;
 
-  public static TopTracksActivityFragment getInstance(Artist artist) {
-    TopTracksActivityFragment fragment = new TopTracksActivityFragment();
-    fragment.mArtist = artist;
-
-    return fragment;
-  }
-
-  public TopTracksActivityFragment() { }
-
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setRetainInstance(true);
+  public TopTracksFragmentController(@NonNull FragmentActivity activity, Artist artist) {
+    super(activity);
+    mArtist = artist;
   }
 
   @Override
-  public void onDetach() {
-    super.onDetach();
-    if (mAnimatorSet != null) {
-      mAnimatorSet.end();
-    }
-  }
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    View view = inflater.inflate(R.layout.fragment_top_tracks, container, false);
-    ButterKnife.inject(this, view);
-
-    mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
-    mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
-        PorterDuff.Mode.SRC_ATOP);
-    mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        getActivity().onBackPressed();
-      }
-    });
-    mToolbar.setSubtitle(R.string.top_ten_tracks);
-
-    mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL_LIST));
-    mTopTracksRecyclerView.setLayoutManager(getLinearLayoutManager());
-    mTopTracksRecyclerView.setHasFixedSize(true);
-
-    mCollapsingToolbarLayout.setTitle(mArtist.name);
-    mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.black));
-    mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.white));
+  public void onCreateView(@NonNull TopTracksFragmentView view){
+    mView = view;
 
     // Load artist thumbnail into thumbnail view in the collapsing toolbar header
     //
     List<Image> images = mArtist.images;
     if (images != null && images.size() > 0) {
       int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
-      Picasso.with(getActivity()).load(images.get(index).url).into(mArtistThumbnailImageView);
+      Picasso.with(mActivity).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
     }
 
     // If view is being recreated after a rotation, there may be existing artist data to view
     if (mTracks != null) {
-      bindTracks();
-      return view;
+      bindTracks(false);
+      return;
     }
 
-    Map<String, Object> map = new HashMap<>();
+    final Map<String, Object> map = new HashMap<>();
     map.put("country", Locale.getDefault().getCountry());
     final Handler handler = new Handler();
     SpotifyStreamerApplication
@@ -150,7 +90,7 @@ public class TopTracksActivityFragment extends Fragment {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            bindTracks();
+            bindTracks(true);
           }
         });
       }
@@ -160,26 +100,46 @@ public class TopTracksActivityFragment extends Fragment {
         handler.post(new Runnable() {
           @Override
           public void run() {
-            AndroidUtils.showToast(getActivity(), error.getLocalizedMessage());
+            AndroidUtils.showToast(mActivity, error.getLocalizedMessage());
           }
         });
       }
     });
+  }
 
-    return view;
+  @Override
+  public void onDetachView() {
+    if (mAnimatorSet != null) {
+      mAnimatorSet.end();
+    }
+  }
+
+  @Override
+  public void onNavIconClicked() {
+    mActivity.onBackPressed();
+  }
+
+  @Override
+  public LinearLayoutManager getLinearLayoutManager() {
+    return new LinearLayoutManager(mActivity);
+  }
+
+  @Override
+  public String getArtistName() {
+    return mArtist.name;
   }
 
   private void setupHeaderImages(final List<Image> images, final int index) {
     // Preload the next image to avoid any delay
     if (index != images.size()-1) {
-      Picasso.with(getActivity()).load(images.get(index + 1).url);
+      Picasso.with(mActivity).load(images.get(index + 1).url);
     }
 
-    Picasso.with(getActivity()).load(images.get(index).url)
-        .into(mArtistHeaderBackgroundImageView, new com.squareup.picasso.Callback() {
+    Picasso.with(mActivity).load(images.get(index).url)
+        .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
           @Override
           public void onSuccess() {
-            mArtistHeaderBackgroundImageView.setAlpha(.35f);
+            mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
 
             long duration = 7000;
             float transStartX;
@@ -197,14 +157,14 @@ public class TopTracksActivityFragment extends Fragment {
               transEndY = 50;
               scaleStart = 1.5f;
               scaleEnd = 1.75f;
-            }else if (state == 1) {
+            } else if (state == 1) {
               transStartX = 50;
               transEndX = 50;
               transStartY = 50;
               transEndY = -50;
               scaleStart = 1.75f;
               scaleEnd = 1.5f;
-            }else if (state == 2) {
+            } else if (state == 2) {
               transStartX = 50;
               transEndX = -50;
               transStartY = -50;
@@ -222,16 +182,16 @@ public class TopTracksActivityFragment extends Fragment {
             }
 
             ObjectAnimator transX = ObjectAnimator
-                .ofFloat(mArtistHeaderBackgroundImageView, "translationX", transStartX, transEndX)
+                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationX", transStartX, transEndX)
                 .setDuration(duration);
             ObjectAnimator transY = ObjectAnimator
-                .ofFloat(mArtistHeaderBackgroundImageView, "translationY", transStartY, transEndY)
+                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationY", transStartY, transEndY)
                 .setDuration(duration);
             ObjectAnimator scaleX = ObjectAnimator
-                .ofFloat(mArtistHeaderBackgroundImageView, "scaleX", scaleStart, scaleEnd).setDuration(
+                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleX", scaleStart, scaleEnd).setDuration(
                     duration);
             ObjectAnimator scaleY = ObjectAnimator
-                .ofFloat(mArtistHeaderBackgroundImageView, "scaleY", scaleStart, scaleEnd)
+                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleY", scaleStart, scaleEnd)
                 .setDuration(duration);
 
             mAnimatorSet = new AnimatorSet();
@@ -265,13 +225,11 @@ public class TopTracksActivityFragment extends Fragment {
         });
   }
 
-  @NonNull
-  private LinearLayoutManager getLinearLayoutManager() {
-    return new LinearLayoutManager(getActivity());
-  }
-
-  private void bindTracks() {
-    mTopTracksRecyclerView.setAdapter(new TracksRecyclerAdapter(mTracks));
+  private void bindTracks(boolean startFromScratch) {
+    if (startFromScratch) {
+      mAdapter = new TracksRecyclerAdapter(mTracks);
+    }
+    mView.getTopTracksRecyclerView().setAdapter(mAdapter);
 
     // Sets up the collapsing toolbar header to display the artist's top track images
     //
