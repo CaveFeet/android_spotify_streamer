@@ -14,13 +14,17 @@ package com.n8.spotifystreamer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 
-public abstract class FragmentController<T> {
+/**
+ * Abstract base class for an object that acts as a controller for a fragment's custom view.
+ * @param <T>
+ */
+public abstract class BaseFragmentController<T> {
 
   protected FragmentActivity mActivity;
 
   protected T mView;
 
-  public FragmentController(@NonNull FragmentActivity activity) {
+  public BaseFragmentController(@NonNull FragmentActivity activity) {
     mActivity = activity;
   }
 

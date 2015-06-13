@@ -30,7 +30,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.n8.spotifystreamer.AndroidUtils;
-import com.n8.spotifystreamer.FragmentController;
+import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
@@ -51,8 +51,8 @@ import retrofit.client.Response;
  * Handles the business logic for {@link ArtistSearchFragment}.  Listens and responds to events from
  * {@link ArtistSearchFragmentView}.
  */
-public class ArtistSearchFragmentController extends FragmentController<ArtistSearchFragmentView> implements
-    ArtistSearchFragmentView.Controller, ArtistsRecyclerAdapter.ArtistClickListener {
+public class ArtistSearchFragmentController extends BaseFragmentController<ArtistSearchFragmentView> implements
+    ArtistSearchController, ArtistsRecyclerAdapter.ArtistClickListener {
 
   private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 

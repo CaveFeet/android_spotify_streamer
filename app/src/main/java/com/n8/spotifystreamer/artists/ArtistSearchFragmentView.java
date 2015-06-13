@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
+import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
 
@@ -36,19 +37,7 @@ import butterknife.InjectView;
 /**
  * Custom view to encapsulate view setup/logic for {@link com.n8.spotifystreamer.tracks.TopTracksFragment}.
  */
-public class ArtistSearchFragmentView extends FrameLayout {
-
-  public interface Controller {
-    LinearLayoutManager getLinearLayoutManager();
-
-    void onClearSuggestions();
-
-    void onSubmitQuery(String query);
-
-    boolean onSuggestionClicked(int index);
-
-    void onRecyclerViewScrolled(RecyclerView recyclerView, int dx, int dy);
-  }
+public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchController> {
 
   @InjectView(R.id.fragment_artist_search_initial_content_layout)
   View mInitialContentView;
@@ -68,8 +57,6 @@ public class ArtistSearchFragmentView extends FrameLayout {
   @InjectView(R.id.fragment_artist_search_progressBar)
   ProgressBar mProgressBar;
 
-  private Controller mController;
-
   public ArtistSearchFragmentView(Context context) {
     super(context);
   }
@@ -87,12 +74,11 @@ public class ArtistSearchFragmentView extends FrameLayout {
     super(context, attrs, defStyleAttr, defStyleRes);
   }
 
-  public void setController(@NonNull Activity activity, @NonNull Controller controller) {
-    mController = controller;
+  @Override
+  protected void setupView() {
     ButterKnife.inject(this);
-
     setuptToolbar();
-    setupSearchView(activity);
+    setupSearchView();
     setupRecyclerView();
   }
 
@@ -140,12 +126,12 @@ public class ArtistSearchFragmentView extends FrameLayout {
     });
   }
 
-  private void setupSearchView(@NonNull Activity activity) {
+  private void setupSearchView() {
     mSearchView.setIconifiedByDefault(false);
 
-    SearchManager searchManager = (SearchManager) activity.getSystemService(
+    SearchManager searchManager = (SearchManager) mActivity.getSystemService(
         Context.SEARCH_SERVICE);
-    mSearchView.setSearchableInfo(searchManager.getSearchableInfo(activity.getComponentName()));
+    mSearchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
 
     // Get the SearchView close button so I can set a custom click listener
     View closeButton = mSearchView.findViewById(R.id.search_close_btn);

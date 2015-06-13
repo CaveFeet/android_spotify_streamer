@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
 
@@ -35,15 +36,7 @@ import butterknife.InjectView;
 /**
  * Custom view that encapsulates view specific setup/logic for {@link TopTracksFragment}
  */
-public class TopTracksFragmentView extends FrameLayout {
-
-  public interface Controller {
-    void onNavIconClicked();
-
-    LinearLayoutManager getLinearLayoutManager();
-
-    String getArtistName();
-  }
+public class TopTracksFragmentView extends BaseFragmentView<TopTracksController> {
 
   @InjectView(R.id.fragment_top_tracks_toolbar)
   Toolbar mToolbar;
@@ -59,10 +52,6 @@ public class TopTracksFragmentView extends FrameLayout {
 
   @InjectView(R.id.fragment_top_tracks_artist_image_header_background)
   ImageView mArtistHeaderBackgroundImageView;
-
-  private Activity mActivity;
-
-  private Controller mController;
 
   public TopTracksFragmentView(Context context) {
     super(context);
@@ -81,9 +70,8 @@ public class TopTracksFragmentView extends FrameLayout {
     super(context, attrs, defStyleAttr, defStyleRes);
   }
 
-  public void setController(@NonNull Activity activity, @NonNull Controller controller) {
-    mActivity = activity;
-    mController = controller;
+  @Override
+  protected void setupView() {
     ButterKnife.inject(this);
 
     mToolbar.setNavigationIcon(R.drawable.ic_menu_back);

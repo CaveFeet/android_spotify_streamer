@@ -14,17 +14,15 @@ package com.n8.spotifystreamer.tracks;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 
 import com.n8.spotifystreamer.AndroidUtils;
-import com.n8.spotifystreamer.FragmentController;
+import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
-import com.n8.spotifystreamer.artists.ArtistSearchFragmentView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import retrofit.client.Response;
  * Handles the business logic for {@link TopTracksFragment}.  Listens and responds to events from
  * {@link com.n8.spotifystreamer.tracks.TopTracksFragmentView}.
  */
-public class TopTracksFragmentController extends FragmentController<TopTracksFragmentView> implements TopTracksFragmentView.Controller {
+public class TopTracksFragmentController extends BaseFragmentController<TopTracksFragmentView> implements TopTracksController {
 
   public static final int THUMBNAIL_IMAGE_SIZE = 200;
 
