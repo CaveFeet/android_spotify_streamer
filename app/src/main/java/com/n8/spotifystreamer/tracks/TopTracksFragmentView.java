@@ -32,6 +32,9 @@ import com.n8.spotifystreamer.R;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+/**
+ * Custom view that encapsulates view specific setup/logic for {@link TopTracksFragment}
+ */
 public class TopTracksFragmentView extends FrameLayout {
 
   public interface Controller {

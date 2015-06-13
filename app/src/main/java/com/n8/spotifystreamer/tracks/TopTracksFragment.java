@@ -10,6 +10,9 @@ import com.n8.spotifystreamer.R;
 
 import kaaes.spotify.webapi.android.models.Artist;
 
+/**
+ * Fragment that displays the top ten spotify tracks for an artist.
+ */
 public class TopTracksFragment extends Fragment {
 
   private static final String TAG = TopTracksFragment.class.getSimpleName();

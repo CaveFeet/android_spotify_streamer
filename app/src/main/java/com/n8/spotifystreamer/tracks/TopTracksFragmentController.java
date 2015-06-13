@@ -42,7 +42,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 /**
- * Created by nate7313 on 6/13/15.
+ * Handles the business logic for {@link TopTracksFragment}.  Listens and responds to events from
+ * {@link com.n8.spotifystreamer.tracks.TopTracksFragmentView}.
  */
 public class TopTracksFragmentController extends FragmentController<TopTracksFragmentView> implements TopTracksFragmentView.Controller {
 

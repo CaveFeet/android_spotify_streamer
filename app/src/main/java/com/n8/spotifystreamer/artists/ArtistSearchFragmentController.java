@@ -47,9 +47,13 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class ArtistSearchFragmentController extends FragmentController<ArtistSearchFragmentView> implements ArtistSearchFragmentView.Controller,
-    ArtistsRecyclerAdapter
-    .ArtistClickListener {
+/**
+ * Handles the business logic for {@link ArtistSearchFragment}.  Listens and responds to events from
+ * {@link ArtistSearchFragmentView}.
+ */
+public class ArtistSearchFragmentController extends FragmentController<ArtistSearchFragmentView> implements
+    ArtistSearchFragmentView.Controller, ArtistsRecyclerAdapter.ArtistClickListener {
+
   private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 
   private static final int REQUEST_LIMIT = 20;
@@ -61,8 +65,6 @@ public class ArtistSearchFragmentController extends FragmentController<ArtistSea
   private List<Artist> mArtists;
 
   private ArtistsRecyclerAdapter mAdapter;
-
-  private LinearLayoutManager mLayoutManager;
 
   private String mCurrentQuery;
 
@@ -87,8 +89,7 @@ public class ArtistSearchFragmentController extends FragmentController<ArtistSea
 
   @Override
   public LinearLayoutManager getLinearLayoutManager() {
-    mLayoutManager = new LinearLayoutManager(mActivity);
-    return mLayoutManager;
+    return new LinearLayoutManager(mActivity);
   }
 
   @Override
@@ -113,7 +114,8 @@ public class ArtistSearchFragmentController extends FragmentController<ArtistSea
   @Override
   public void onRecyclerViewScrolled(RecyclerView recyclerView, int dx, int dy) {
     if (mAdapter.getItemCount() != mTotalCurrentSearchResults) {
-      if (mLayoutManager.findLastVisibleItemPosition() == mAdapter.getItemCount() - 1 && !mPagingNewResults) {
+      LinearLayoutManager manager = (LinearLayoutManager) mView.getArtistRecyclerView().getLayoutManager();
+      if (manager.findLastVisibleItemPosition() == mAdapter.getItemCount() - 1 && !mPagingNewResults) {
 
         mView.getProgressBar().setVisibility(View.VISIBLE);
         final Handler handler = new Handler();
