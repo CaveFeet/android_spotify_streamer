@@ -30,9 +30,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.n8.spotifystreamer.AndroidUtils;
+import com.n8.spotifystreamer.FragmentController;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
-import com.n8.spotifystreamer.tracks.TopTracksActivityFragment;
+import com.n8.spotifystreamer.tracks.TopTracksFragment;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +47,9 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class ArtistSearchFragmentHelper implements ArtistSearchFragmentView.Controller, ArtistsRecyclerAdapter.ArtistClickListener {
+public class ArtistSearchFragmentController extends FragmentController<ArtistSearchFragmentView> implements ArtistSearchFragmentView.Controller,
+    ArtistsRecyclerAdapter
+    .ArtistClickListener {
   private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 
   private static final int REQUEST_LIMIT = 20;
@@ -69,12 +72,11 @@ public class ArtistSearchFragmentHelper implements ArtistSearchFragmentView.Cont
 
   private boolean mPagingNewResults;
 
-  private FragmentActivity mActivity;
-
-  public ArtistSearchFragmentHelper(FragmentActivity activity) {
-    mActivity = activity;
+  public ArtistSearchFragmentController(FragmentActivity activity) {
+    super(activity);
   }
 
+  @Override
   public void onCreateView(@NonNull ArtistSearchFragmentView view){
     mView = view;
     // If view is being recreated after a rotation, there may be existing artist data to view
@@ -211,7 +213,7 @@ public class ArtistSearchFragmentHelper implements ArtistSearchFragmentView.Cont
     // devices are displaying some odd behavior with the transition element.
     //
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-      Fragment fragment = TopTracksActivityFragment.getInstance(artist);
+      Fragment fragment = TopTracksFragment.getInstance(artist);
       fragment.setSharedElementEnterTransition(TransitionInflater.from(mActivity)
           .inflateTransition(R.transition.artists_to_tracks_transition));
       fragment.setSharedElementReturnTransition(TransitionInflater.from(mActivity)
@@ -226,7 +228,7 @@ public class ArtistSearchFragmentHelper implements ArtistSearchFragmentView.Cont
 
     }
     else {
-      Fragment fragment = TopTracksActivityFragment.getInstance(artist);
+      Fragment fragment = TopTracksFragment.getInstance(artist);
 
       // Add Fragment B
       FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction()

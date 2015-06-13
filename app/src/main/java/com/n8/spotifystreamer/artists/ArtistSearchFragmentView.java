@@ -25,7 +25,6 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.n8.spotifystreamer.DividerItemDecoration;
@@ -33,7 +32,6 @@ import com.n8.spotifystreamer.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import kaaes.spotify.webapi.android.models.Artist;
 
 public class ArtistSearchFragmentView extends FrameLayout {
 

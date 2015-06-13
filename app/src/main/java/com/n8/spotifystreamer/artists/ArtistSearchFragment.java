@@ -14,7 +14,8 @@ import com.n8.spotifystreamer.R;
 public class ArtistSearchFragment extends Fragment {
 
   private static final String TAG = ArtistSearchFragment.class.getSimpleName();
-  private ArtistSearchFragmentHelper mController;
+
+  private ArtistSearchFragmentController mController;
 
   public ArtistSearchFragment() {
   }
@@ -30,7 +31,7 @@ public class ArtistSearchFragment extends Fragment {
     ArtistSearchFragmentView view = (ArtistSearchFragmentView) inflater.inflate(R.layout.fragment_artist_search, container, false);
 
     if (mController == null) {
-      mController = new ArtistSearchFragmentHelper(getActivity());
+      mController = new ArtistSearchFragmentController(getActivity());
     }
 
     view.setController(getActivity(), mController);
