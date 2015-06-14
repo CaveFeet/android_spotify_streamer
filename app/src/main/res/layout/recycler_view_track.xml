@@ -27,14 +27,14 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/track_recycler_view_imageView"
             android:orientation="vertical"
-            android:layout_marginEnd="@dimen/keyline_1"
+            android:layout_marginEnd="@dimen/keyline_2"
             >
 
             <TextView
                 android:id="@+id/track_recycler_view_track_title_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:singleLine="true"
                 android:ellipsize="end"
                />
 
@@ -42,7 +42,7 @@
                 android:id="@+id/track_recycler_view_album_title_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLines="1"
+                android:singleLine="true"
                 android:ellipsize="end"
                 />
 

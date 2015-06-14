@@ -64,11 +64,14 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
         mPopularityTextView.setText(formatter.format(mArtist.popularity));
         mFollowersTextView.setText(formatter.format(mArtist.followers.total));
 
+
         List<Image> images = artist.images;
 
         if (images != null && images.size() > 0) {
             int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_SIZE);
-            Picasso.with(itemView.getContext()).load(images.get(index).url).into(mArtistImageView);
+            Picasso.with(itemView.getContext()).load(images.get(index).url).error(R.drawable.ic_artist_placeholder_light).into(mArtistImageView);
+        }else {
+            Picasso.with(itemView.getContext()).load(R.drawable.ic_artist_placeholder_light).into(mArtistImageView);
         }
     }
 

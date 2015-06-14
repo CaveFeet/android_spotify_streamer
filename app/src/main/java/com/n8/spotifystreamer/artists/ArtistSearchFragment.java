@@ -2,6 +2,7 @@ package com.n8.spotifystreamer.artists;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,7 @@ public class ArtistSearchFragment extends Fragment {
     ArtistSearchFragmentView view = (ArtistSearchFragmentView) inflater.inflate(R.layout.fragment_artist_search, container, false);
 
     if (mController == null) {
-      mController = new ArtistSearchFragmentController(getActivity());
+      mController = new ArtistSearchFragmentController((AppCompatActivity)getActivity());
     }
 
     view.setController(getActivity(), mController);

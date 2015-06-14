@@ -2,6 +2,7 @@ package com.n8.spotifystreamer.tracks;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +43,7 @@ public class TopTracksFragment extends Fragment {
     TopTracksFragmentView view = (TopTracksFragmentView) inflater.inflate(R.layout.fragment_top_tracks, container, false);
 
     if (mController == null) {
-      mController = new TopTracksFragmentController(getActivity(), mArtist);
+      mController = new TopTracksFragmentController((AppCompatActivity)getActivity(), mArtist);
     }
 
     view.setController(getActivity(), mController);

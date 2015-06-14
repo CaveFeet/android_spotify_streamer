@@ -22,29 +22,21 @@
             android:layout_marginEnd="@dimen/keyline_1"
             />
 
-        <TextView
-            android:id="@+id/artist_recycler_view_title_textView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/artist_recycler_view_imageView"
-            android:layout_marginEnd="@dimen/keyline_1"
-            android:layout_centerVertical="true"
-            style="@style/TextAppearance.AppCompat.Medium"/>
-
         <LinearLayout
+            android:id="@+id/artist_recycler_view_badge_layout_container"
             android:orientation="vertical"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignBottom="@+id/artist_recycler_view_imageView"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="@dimen/keyline_1"
-            android:layout_toEndOf="@+id/artist_recycler_view_imageView"
             android:layout_alignTop="@+id/artist_recycler_view_imageView"
-            android:gravity="bottom">
+            android:gravity="bottom|right"
+            >
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|right">
 
@@ -65,7 +57,7 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|right">
 
@@ -84,6 +76,18 @@
 
             </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/artist_recycler_view_title_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:layout_toStartOf="@id/artist_recycler_view_badge_layout_container"
+            android:layout_toEndOf="@id/artist_recycler_view_imageView"
+            android:singleLine="true"
+            android:ellipsize="end"
+            />
 
     </RelativeLayout>
 

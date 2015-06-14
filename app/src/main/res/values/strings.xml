@@ -5,7 +5,8 @@
   <string name="error_searching_no_query">Must enter an artist name to search</string>
   <string name="followers">Followers: </string>
   <string name="fragment_artist_menu_search">Search artist</string>
-  <string name="no_results">No artists were found</string>
+  <string name="no_artist_results">No artists were found</string>
+  <string name="no_tracks_available">No tracks available</string>
   <string name="popularity">Popularity: </string>
   <string name="search_for_artist">Search for artist</string>
   <string name="search_hint">@string/search_for_artist</string>
