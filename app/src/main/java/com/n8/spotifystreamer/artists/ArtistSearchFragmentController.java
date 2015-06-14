@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -74,7 +75,7 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
 
   private boolean mPagingNewResults;
 
-  public ArtistSearchFragmentController(FragmentActivity activity) {
+  public ArtistSearchFragmentController(AppCompatActivity activity) {
     super(activity);
   }
 

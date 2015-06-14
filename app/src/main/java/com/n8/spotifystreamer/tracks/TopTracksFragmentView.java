@@ -41,6 +41,9 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
   @InjectView(R.id.fragment_top_tracks_toolbar)
   Toolbar mToolbar;
 
+  @InjectView(R.id.fragment_top_tracks_no_content_layout)
+  View mNoContentView;
+
   @InjectView(R.id.fragment_top_tracks_collapsingToolbarLayout)
   CollapsingToolbarLayout mCollapsingToolbarLayout;
 
@@ -84,7 +87,6 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
         mController.onNavIconClicked();
       }
     });
-    mToolbar.setSubtitle(R.string.top_ten_tracks);
 
     mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));
     mTopTracksRecyclerView.setLayoutManager(mController.getLinearLayoutManager());
@@ -113,5 +115,9 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
   public ImageView getArtistHeaderBackgroundImageView() {
     return mArtistHeaderBackgroundImageView;
+  }
+
+  public View getNoContentView(){
+    return mNoContentView;
   }
 }

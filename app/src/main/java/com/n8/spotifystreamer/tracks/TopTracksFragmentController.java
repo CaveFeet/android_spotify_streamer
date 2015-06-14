@@ -17,11 +17,14 @@ import android.animation.ObjectAnimator;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.View;
 
 import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.ImageUtils;
+import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.squareup.picasso.Picasso;
 
@@ -45,203 +48,218 @@ import retrofit.client.Response;
  */
 public class TopTracksFragmentController extends BaseFragmentController<TopTracksFragmentView> implements TopTracksController {
 
-  public static final int THUMBNAIL_IMAGE_SIZE = 200;
+    public static final int THUMBNAIL_IMAGE_SIZE = 200;
 
-  private TopTracksFragmentView mView;
+    private TopTracksFragmentView mView;
 
-  private Artist mArtist;
+    private Artist mArtist;
 
-  private List<Track> mTracks;
+    private List<Track> mTracks;
 
-  private AnimatorSet mAnimatorSet;
-  private TracksRecyclerAdapter mAdapter;
+    private AnimatorSet mAnimatorSet;
+    private TracksRecyclerAdapter mAdapter;
 
-  public TopTracksFragmentController(@NonNull FragmentActivity activity, Artist artist) {
-    super(activity);
-    mArtist = artist;
-  }
-
-  @Override
-  public void onCreateView(@NonNull TopTracksFragmentView view){
-    mView = view;
-
-    // Load artist thumbnail into thumbnail view in the collapsing toolbar header
-    //
-    List<Image> images = mArtist.images;
-    if (images != null && images.size() > 0) {
-      int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
-      Picasso.with(mActivity).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
+    public TopTracksFragmentController(@NonNull AppCompatActivity activity, Artist artist) {
+        super(activity);
+        mArtist = artist;
     }
 
-    // If view is being recreated after a rotation, there may be existing artist data to view
-    if (mTracks != null) {
-      bindTracks(false);
-      return;
-    }
+    @Override
+    public void onCreateView(@NonNull TopTracksFragmentView view) {
+        mView = view;
 
-    final Map<String, Object> map = new HashMap<>();
-    map.put("country", Locale.getDefault().getCountry());
-    final Handler handler = new Handler();
-    SpotifyStreamerApplication
-        .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
-      @Override
-      public void success(Tracks tracks, Response response) {
-        mTracks = tracks.tracks;
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            bindTracks(true);
-          }
-        });
-      }
+        // Load artist thumbnail into thumbnail view in the collapsing toolbar header
+        //
+        List<Image> images = mArtist.images;
+        if (images != null && images.size() > 0) {
+            int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
+            Picasso.with(mActivity).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
+        } else {
+            Picasso.with(mActivity).load(R.drawable.ic_artist_placeholder_light).into(mView.getArtistThumbnailImageView());
+        }
 
-      @Override
-      public void failure(final RetrofitError error) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            AndroidUtils.showToast(mActivity, error.getLocalizedMessage());
-          }
-        });
-      }
-    });
-  }
+        // If view is being recreated after a rotation, there may be existing artist data to view
+        if (mTracks != null) {
+            bindTracks(false);
+            return;
+        }
 
-  @Override
-  public void onDetachView() {
-    if (mAnimatorSet != null) {
-      mAnimatorSet.end();
-    }
-  }
-
-  @Override
-  public void onNavIconClicked() {
-    mActivity.onBackPressed();
-  }
-
-  @Override
-  public LinearLayoutManager getLinearLayoutManager() {
-    return new LinearLayoutManager(mActivity);
-  }
-
-  @Override
-  public String getArtistName() {
-    return mArtist.name;
-  }
-
-  private void setupHeaderImages(final List<Image> images, final int index) {
-    // Preload the next image to avoid any delay
-    if (index != images.size()-1) {
-      Picasso.with(mActivity).load(images.get(index + 1).url);
-    }
-
-    Picasso.with(mActivity).load(images.get(index).url)
-        .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
-          @Override
-          public void onSuccess() {
-            mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
-
-            long duration = 7000;
-            float transStartX;
-            float transStartY;
-            float transEndX;
-            float transEndY;
-            float scaleStart;
-            float scaleEnd;
-
-            int state = index % 4;
-            if (state == 0) {
-              transStartX = -50;
-              transEndX = 50;
-              transStartY = -50;
-              transEndY = 50;
-              scaleStart = 1.5f;
-              scaleEnd = 1.75f;
-            } else if (state == 1) {
-              transStartX = 50;
-              transEndX = 50;
-              transStartY = 50;
-              transEndY = -50;
-              scaleStart = 1.75f;
-              scaleEnd = 1.5f;
-            } else if (state == 2) {
-              transStartX = 50;
-              transEndX = -50;
-              transStartY = -50;
-              transEndY = 50;
-              scaleStart = 1.5f;
-              scaleEnd = 1.75f;
-            } else {
-              transStartX = -50;
-              transEndX = -50;
-              transStartY = 50;
-              transEndY = -50;
-              scaleStart = 1.75f;
-              scaleEnd = 1.5f;
-
+        final Map<String, Object> map = new HashMap<>();
+        map.put("country", Locale.getDefault().getCountry());
+        final Handler handler = new Handler();
+        SpotifyStreamerApplication
+                .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
+            @Override
+            public void success(Tracks tracks, Response response) {
+                mTracks = tracks.tracks;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        bindTracks(true);
+                    }
+                });
             }
 
-            ObjectAnimator transX = ObjectAnimator
-                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationX", transStartX, transEndX)
-                .setDuration(duration);
-            ObjectAnimator transY = ObjectAnimator
-                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationY", transStartY, transEndY)
-                .setDuration(duration);
-            ObjectAnimator scaleX = ObjectAnimator
-                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleX", scaleStart, scaleEnd).setDuration(
-                    duration);
-            ObjectAnimator scaleY = ObjectAnimator
-                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleY", scaleStart, scaleEnd)
-                .setDuration(duration);
-
-            mAnimatorSet = new AnimatorSet();
-            mAnimatorSet.playTogether(transX, transY, scaleX, scaleY);
-            mAnimatorSet.addListener(new Animator.AnimatorListener() {
-              @Override
-              public void onAnimationStart(Animator animation) {
-              }
-
-              @Override
-              public void onAnimationEnd(Animator animation) {
-                int newindex = index == (images.size() - 1) ? 0 : (index + 1);
-                setupHeaderImages(images, newindex);
-
-              }
-
-              @Override
-              public void onAnimationCancel(Animator animation) {
-              }
-
-              @Override
-              public void onAnimationRepeat(Animator animation) {
-              }
-            });
-            mAnimatorSet.start();
-          }
-
-          @Override
-          public void onError() {
-          }
+            @Override
+            public void failure(final RetrofitError error) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidUtils.showToast(mActivity, error.getLocalizedMessage());
+                    }
+                });
+            }
         });
-  }
+    }
 
-  private void bindTracks(boolean startFromScratch) {
-    if (startFromScratch) {
-      mAdapter = new TracksRecyclerAdapter(mTracks);
+    @Override
+    public void onDetachView() {
+        if (mAnimatorSet != null) {
+            mAnimatorSet.end();
+        }
     }
-    mView.getTopTracksRecyclerView().setAdapter(mAdapter);
 
-    // Sets up the collapsing toolbar header to display the artist's top track images
-    //
-    List<Image> trackImages = new ArrayList<>();
-    for (Track track : mTracks) {
-      List<Image> imgs = track.album.images;
-      if (imgs != null && imgs.size() > 0) {
-        trackImages.add(imgs.get(0));
-      }
+    @Override
+    public void onNavIconClicked() {
+        mActivity.onBackPressed();
     }
-    if (!trackImages.isEmpty()) {
-      setupHeaderImages(trackImages, 0);
+
+    @Override
+    public LinearLayoutManager getLinearLayoutManager() {
+        return new LinearLayoutManager(mActivity);
     }
-  }
+
+    @Override
+    public String getArtistName() {
+        if (mArtist != null) {
+            return mArtist.name;
+        }
+        return null;
+    }
+
+    private void setupHeaderImages(final List<Image> images, final int index) {
+        // Preload the next image to avoid any delay
+        if (index != images.size() - 1) {
+            Picasso.with(mActivity).load(images.get(index + 1).url);
+        }
+
+        Picasso.with(mActivity).load(images.get(index).url)
+                .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
+
+                        long duration = 7000;
+                        float transStartX;
+                        float transStartY;
+                        float transEndX;
+                        float transEndY;
+                        float scaleStart;
+                        float scaleEnd;
+
+                        int state = index % 4;
+                        if (state == 0) {
+                            transStartX = -50;
+                            transEndX = 50;
+                            transStartY = -50;
+                            transEndY = 50;
+                            scaleStart = 1.5f;
+                            scaleEnd = 1.75f;
+                        } else if (state == 1) {
+                            transStartX = 50;
+                            transEndX = 50;
+                            transStartY = 50;
+                            transEndY = -50;
+                            scaleStart = 1.75f;
+                            scaleEnd = 1.5f;
+                        } else if (state == 2) {
+                            transStartX = 50;
+                            transEndX = -50;
+                            transStartY = -50;
+                            transEndY = 50;
+                            scaleStart = 1.5f;
+                            scaleEnd = 1.75f;
+                        } else {
+                            transStartX = -50;
+                            transEndX = -50;
+                            transStartY = 50;
+                            transEndY = -50;
+                            scaleStart = 1.75f;
+                            scaleEnd = 1.5f;
+
+                        }
+
+                        ObjectAnimator transX = ObjectAnimator
+                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationX", transStartX, transEndX)
+                                .setDuration(duration);
+                        ObjectAnimator transY = ObjectAnimator
+                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationY", transStartY, transEndY)
+                                .setDuration(duration);
+                        ObjectAnimator scaleX = ObjectAnimator
+                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleX", scaleStart, scaleEnd).setDuration(
+                                        duration);
+                        ObjectAnimator scaleY = ObjectAnimator
+                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleY", scaleStart, scaleEnd)
+                                .setDuration(duration);
+
+                        mAnimatorSet = new AnimatorSet();
+                        mAnimatorSet.playTogether(transX, transY, scaleX, scaleY);
+                        mAnimatorSet.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                int newindex = index == (images.size() - 1) ? 0 : (index + 1);
+                                setupHeaderImages(images, newindex);
+
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+                            }
+                        });
+                        mAnimatorSet.start();
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+    }
+
+    private void bindTracks(boolean startFromScratch) {
+        if (startFromScratch) {
+            mAdapter = new TracksRecyclerAdapter(mTracks);
+        }
+        mView.getTopTracksRecyclerView().setAdapter(mAdapter);
+        if (mTracks != null && mTracks.size() > 0) {
+            mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
+            mView.getNoContentView().setVisibility(View.GONE);
+        } else {
+            mView.getTopTracksRecyclerView().setVisibility(View.GONE);
+            mView.getNoContentView().setVisibility(View.VISIBLE);
+        }
+
+        // Sets up the collapsing toolbar header to display the artist's top track images
+        //
+        List<Image> trackImages = new ArrayList<>();
+        for (Track track : mTracks) {
+            List<Image> imgs = track.album.images;
+            if (imgs != null && imgs.size() > 0) {
+                trackImages.add(imgs.get(0));
+            }
+        }
+        if (!trackImages.isEmpty()) {
+            setupHeaderImages(trackImages, 0);
+        } else {
+            Picasso.with(mActivity).load(R.drawable.header_background)
+                    .into(mView.getArtistHeaderBackgroundImageView());
+        }
+    }
 }

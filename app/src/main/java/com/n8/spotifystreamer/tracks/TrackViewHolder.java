@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.artists.ArtistViewHolder;
 import com.n8.spotifystreamer.R;
 import com.squareup.picasso.Picasso;
@@ -22,6 +23,8 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
     public static int VIEW_ID = R.layout.recycler_view_track;
 
     private static final String TAG = ArtistViewHolder.class.getSimpleName();
+
+    private static final int THUMBNAIL_SIZE = 200;
 
     @InjectView(R.id.track_recycler_view_track_title_textView)
     TextView mTrackTitleTextView;
@@ -55,8 +58,10 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
         List<Image> images = mTrack.album.images;
         if (images != null && images.size() > 0) {
-            int index = images.size()-1;
-            Picasso.with(itemView.getContext()).load(images.get(index).url).into(mTrackImageView);
+            int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_SIZE);
+            Picasso.with(itemView.getContext()).load(images.get(index).url).error(R.drawable.ic_track_placeholder_light).into(mTrackImageView);
+        } else {
+            Picasso.with(itemView.getContext()).load(R.drawable.ic_track_placeholder_light).into(mTrackImageView);
         }
     }
 
