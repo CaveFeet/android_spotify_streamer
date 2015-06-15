@@ -59,8 +59,8 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
     private AnimatorSet mAnimatorSet;
     private TracksRecyclerAdapter mAdapter;
 
-    public TopTracksFragmentController(@NonNull AppCompatActivity activity, Artist artist) {
-        super(activity);
+    public TopTracksFragmentController(Artist artist) {
+        super();
         mArtist = artist;
     }
 

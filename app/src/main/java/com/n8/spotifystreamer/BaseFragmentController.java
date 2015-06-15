@@ -12,7 +12,6 @@ email: contracts@esri.com
 package com.n8.spotifystreamer;
 
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 
 /**
@@ -25,10 +24,13 @@ public abstract class BaseFragmentController<T> {
 
   protected T mView;
 
-  public BaseFragmentController(@NonNull AppCompatActivity activity) {
-    mActivity = activity;
+  public BaseFragmentController() {
+
   }
 
+  public void setActivity(@NonNull AppCompatActivity activity) {
+    mActivity = activity;
+  }
   public void onCreateView(@NonNull T view){
     mView = view;
   }

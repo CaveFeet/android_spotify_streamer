@@ -29,10 +29,11 @@ public class CoachmarkFragment extends Fragment {
         CoachmarkFragmentView view = (CoachmarkFragmentView) inflater.inflate(R.layout.fragment_coachmark, container, false);
 
         if (mController == null) {
-            mController = new CoachmarkFragmentController((AppCompatActivity)getActivity());
+            mController = new CoachmarkFragmentController();
         }
+        mController.setActivity((AppCompatActivity)getActivity());
 
-        view.setController(getActivity(), mController);
+        view.setController((AppCompatActivity)getActivity(), mController);
         mController.onCreateView(view);
 
         return view;

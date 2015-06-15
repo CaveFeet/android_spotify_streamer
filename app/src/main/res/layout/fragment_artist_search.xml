@@ -66,19 +66,11 @@
         android:layout_height="?attr/actionBarSize"
         >
 
-      <!-- TODO take another look at this when support design library is updated -->
-      <!-- Add a CollapsingToolbarLayout here as work around for bug in AppBarLayout where toolbar
-      was not visible when quick-returned back into view -->
-      <android.support.design.widget.CollapsingToolbarLayout
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          app:layout_scrollFlags="scroll|enterAlways"
-          >
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/fragment_artist_search_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
             >
 
           <android.support.v7.widget.SearchView
@@ -91,10 +83,7 @@
               android:inputType="text"
               android:queryHint="@string/search_hint"
               />
-
         </android.support.v7.widget.Toolbar>
-      </android.support.design.widget.CollapsingToolbarLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout

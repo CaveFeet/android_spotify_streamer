@@ -23,7 +23,5 @@ public interface ArtistSearchController extends BaseFragmentView.Controller {
 
   void onSubmitQuery(String query);
 
-  boolean onSuggestionClicked(int index);
-
   void onRecyclerViewScrolled(RecyclerView recyclerView, int dx, int dy);
 }

@@ -1,6 +1,9 @@
 package com.n8.spotifystreamer;
 
+import android.app.SearchManager;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -9,9 +12,11 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.n8.spotifystreamer.artists.ArtistSearchFragment;
+import com.n8.spotifystreamer.artists.ArtistSuggestionProvider;
 import com.n8.spotifystreamer.coachmarks.CoachmarkFragment;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
+import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.squareup.otto.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,13 +41,25 @@ public class MainActivity extends AppCompatActivity {
                 showFragment(new CoachmarkFragment(), COACHMARK_FRAGMENT_TAG);
                 return;
             }
+
+            // If an instance of the ArtistSearchFragment doesn't already exist, create one and show it
+            // in the Activity's layout.  Adding the fragment in this way will retain the fragment
+            // across Activity recreation.
+            //
+            showFragment(new ArtistSearchFragment(), ARTIST_FRAGMENT_TAG);
         }
 
-        // If an instance of the ArtistSearchFragment doesn't already exist, create one and show it
-        // in the Activity's layout.  Adding the fragment in this way will retain the fragment
-        // across Activity recreation.
-        //
-        showFragment(new ArtistSearchFragment(), ARTIST_FRAGMENT_TAG);
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            BusProvider.getInstance().post(new SearchIntentReceivedEvent(query));
+        }
     }
 
     @Override

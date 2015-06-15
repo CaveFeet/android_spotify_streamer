@@ -43,10 +43,11 @@ public class TopTracksFragment extends Fragment {
     TopTracksFragmentView view = (TopTracksFragmentView) inflater.inflate(R.layout.fragment_top_tracks, container, false);
 
     if (mController == null) {
-      mController = new TopTracksFragmentController((AppCompatActivity)getActivity(), mArtist);
+      mController = new TopTracksFragmentController(mArtist);
     }
+    mController.setActivity((AppCompatActivity)getActivity());
 
-    view.setController(getActivity(), mController);
+    view.setController((AppCompatActivity)getActivity(), mController);
     mController.onCreateView(view);
 
     return view;
