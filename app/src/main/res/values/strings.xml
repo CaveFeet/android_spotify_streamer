@@ -18,4 +18,5 @@
   <string name="remove_artist_search_result">Removed artist result</string>
   <string name="undo">Undo</string>
   <string name="searching_for">"Searching for "</string>
+  <string name="coachmark_title">Welcome to %s</string>
 </resources>
