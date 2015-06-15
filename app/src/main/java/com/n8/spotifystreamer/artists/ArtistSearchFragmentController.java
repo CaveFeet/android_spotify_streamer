@@ -35,6 +35,7 @@ import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
+import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Bus;
@@ -58,8 +59,6 @@ import retrofit.client.Response;
  */
 public class ArtistSearchFragmentController extends BaseFragmentController<ArtistSearchFragmentView> implements
     ArtistSearchController, ArtistsRecyclerAdapter.ArtistClickListener {
-
-  private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 
   private static final int REQUEST_LIMIT = 20;
 
@@ -209,33 +208,7 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
   }
 
   public void onArtistViewClicked(Artist artist, ImageView sharedImageView) {
-    // If using api 22 or better, use a shared element transition.  For some reason api 21
-    // devices are displaying some odd behavior with the transition element.
-    //
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-      Fragment fragment = TopTracksFragment.getInstance(artist);
-      fragment.setSharedElementEnterTransition(TransitionInflater.from(mActivity)
-          .inflateTransition(R.transition.artists_to_tracks_transition));
-      fragment.setSharedElementReturnTransition(TransitionInflater.from(mActivity)
-          .inflateTransition(R.transition.artists_to_tracks_transition));
-
-      // Add Fragment B
-      FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_activity_fragment_frame, fragment, TRACK_FRAGMENT_TAG)
-          .addToBackStack(null)
-          .addSharedElement(sharedImageView, mActivity.getString(R.string.artist_thumbnail_transition_name));
-      ft.commit();
-
-    }
-    else {
-      Fragment fragment = TopTracksFragment.getInstance(artist);
-
-      // Add Fragment B
-      FragmentTransaction ft = mActivity.getSupportFragmentManager().beginTransaction()
-          .replace(R.id.main_activity_fragment_frame, fragment, TRACK_FRAGMENT_TAG)
-          .addToBackStack(null);
-      ft.commit();
-    }
+    BusProvider.getInstance().post(new ArtistClickedEvent(artist, sharedImageView));
   }
 
   private void clearSearchSuggestions(){

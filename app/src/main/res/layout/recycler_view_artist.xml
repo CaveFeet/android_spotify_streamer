@@ -6,6 +6,7 @@
     android:layout_gravity="center"
     android:background="@color/primary_light"
     android:elevation="4dp"
+    android:foreground="?attr/selectableItemBackground"
     >
 
     <RelativeLayout

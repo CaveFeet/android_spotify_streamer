@@ -3,20 +3,25 @@ package com.n8.spotifystreamer;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.TransitionInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.n8.spotifystreamer.artists.ArtistSearchFragment;
 import com.n8.spotifystreamer.artists.ArtistSuggestionProvider;
 import com.n8.spotifystreamer.coachmarks.CoachmarkFragment;
+import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
 
     private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
+
+    private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +105,47 @@ public class MainActivity extends AppCompatActivity {
     @Subscribe
     public void onCoachmarkShowAgainButtonChecked(CoachmarkShowAgainEvent event) {
         getSharedPreferences().edit().putBoolean(PREFS_COACHMARK_KEY, event.isShowCoachmarksAgain()).apply();
+    }
+
+    @Subscribe
+    public void onArtistClicked(ArtistClickedEvent event) {
+        int containerLayoutId = 0;
+        if (UiUtils.isTablet(this) && UiUtils.isLandscape(this)) {
+            containerLayoutId = R.id.main_activity_fragment_detail_frame;
+        } else {
+            containerLayoutId = R.id.main_activity_fragment_frame;
+        }
+
+        View view = findViewById(R.id.main_activity_fragment_detail_toolbar_placeholder);
+        view.setVisibility(View.GONE);
+
+        // If using api 22 or better, use a shared element transition.  For some reason api 21
+        // devices are displaying some odd behavior with the transition element.
+        //
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            Fragment fragment = TopTracksFragment.getInstance(event.mArtist);
+            fragment.setSharedElementEnterTransition(TransitionInflater.from(this)
+                    .inflateTransition(R.transition.artists_to_tracks_transition));
+            fragment.setSharedElementReturnTransition(TransitionInflater.from(this)
+                    .inflateTransition(R.transition.artists_to_tracks_transition));
+
+            // Add Fragment B
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
+                    .replace(containerLayoutId, fragment, TRACK_FRAGMENT_TAG)
+                    .addToBackStack(null)
+                    .addSharedElement(event.mThumbnailView, getString(R.string.artist_thumbnail_transition_name));
+            ft.commit();
+
+        }
+        else {
+            Fragment fragment = TopTracksFragment.getInstance(event.mArtist);
+
+            // Add Fragment B
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
+                    .replace(containerLayoutId, fragment, TRACK_FRAGMENT_TAG)
+                    .addToBackStack(null);
+            ft.commit();
+        }
     }
 
     private void showFragment(Fragment fragment, String tag) {
