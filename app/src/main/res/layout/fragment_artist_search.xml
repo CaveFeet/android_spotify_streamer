@@ -79,7 +79,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:focusable="false"
-              android:imeOptions="actionSearch|flagNoExtractUi"
               android:inputType="text"
               android:queryHint="@string/search_hint"
               />

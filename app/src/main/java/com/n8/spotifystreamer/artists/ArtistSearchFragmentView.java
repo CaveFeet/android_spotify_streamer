@@ -24,6 +24,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
@@ -132,6 +133,8 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
     SearchManager searchManager = (SearchManager) mActivity.getSystemService(
         Context.SEARCH_SERVICE);
     mSearchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
+
+    mSearchView.setImeOptions(mSearchView.getImeOptions() | EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NO_EXTRACT_UI | EditorInfo.IME_FLAG_NO_FULLSCREEN);
 
     // Get the SearchView close button so I can set a custom click listener
     View closeButton = mSearchView.findViewById(R.id.search_close_btn);
