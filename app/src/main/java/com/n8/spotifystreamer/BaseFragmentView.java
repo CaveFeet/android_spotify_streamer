@@ -16,6 +16,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
@@ -28,7 +29,7 @@ import butterknife.ButterKnife;
  * Abstract base class for a custom view used to encapsulate view specific logic.
  * <p>
  *   Concrete implementations of this class should be used as a root level layout element.  Define the remaining layout
- *   as normal within the custom view.  {@link #setController(Activity, ArtistSearchController)} should be
+ *   as normal within the custom view.  {@link #setController(AppCompatActivity, Controller)} should be
  *   called to supply a {@link com.n8.spotifystreamer.BaseFragmentView.Controller} that will be notified of view events
  *   such as button or menu item clicks.
  * </p>
@@ -57,11 +58,11 @@ public abstract class BaseFragmentView<T extends ArtistSearchFragmentView.Contro
     super(context, attrs, defStyleAttr, defStyleRes);
   }
 
-  protected Activity mActivity;
+  protected AppCompatActivity mActivity;
 
   protected T mController;
 
-  public void setController(@NonNull Activity activity, @NonNull T controller) {
+  public void setController(@NonNull AppCompatActivity activity, @NonNull T controller) {
     mActivity = activity;
     mController = controller;
 

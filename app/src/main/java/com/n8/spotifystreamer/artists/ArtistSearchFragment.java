@@ -32,10 +32,12 @@ public class ArtistSearchFragment extends Fragment {
     ArtistSearchFragmentView view = (ArtistSearchFragmentView) inflater.inflate(R.layout.fragment_artist_search, container, false);
 
     if (mController == null) {
-      mController = new ArtistSearchFragmentController((AppCompatActivity)getActivity());
+      mController = new ArtistSearchFragmentController();
     }
 
-    view.setController(getActivity(), mController);
+    mController.setActivity((AppCompatActivity)getActivity());
+
+    view.setController((AppCompatActivity)getActivity(), mController);
     mController.onCreateView(view);
 
     return view;

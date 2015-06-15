@@ -32,9 +32,13 @@ import android.widget.ImageView;
 
 import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BaseFragmentController;
+import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
+import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
+import com.squareup.otto.Bus;
+import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,8 +65,6 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
 
   public static final String SUGGESTIONS_PREFERENCES_KEY = "suggestions_preferences_key";
 
-  private ArtistSearchFragmentView mView;
-
   private List<Artist> mArtists;
 
   private ArtistsRecyclerAdapter mAdapter;
@@ -75,17 +77,24 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
 
   private boolean mPagingNewResults;
 
-  public ArtistSearchFragmentController(AppCompatActivity activity) {
-    super(activity);
+  public ArtistSearchFragmentController() {
+
   }
 
   @Override
-  public void onCreateView(@NonNull ArtistSearchFragmentView view){
-    mView = view;
+  public void onCreateView(@NonNull ArtistSearchFragmentView view) {
+    super.onCreateView(view);
+    BusProvider.getInstance().register(this);
     // If view is being recreated after a rotation, there may be existing artist data to view
     if (mArtists != null && mArtists.size() > 0) {
       bindArtists(false);
     }
+  }
+
+  @Override
+  public void onDetachView() {
+    super.onDetachView();
+    BusProvider.getInstance().unregister(this);
   }
 
   @Override
@@ -104,15 +113,6 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
   }
 
   @Override
-  public boolean onSuggestionClicked(int index) {
-    Set<String> suggestions = getSharedPreferences().getStringSet(SUGGESTIONS_PREFERENCES_KEY, null);
-    if (suggestions != null) {
-      submitQuery((String) suggestions.toArray()[index]);
-    }
-    return true;
-  }
-
-  @Override
   public void onRecyclerViewScrolled(RecyclerView recyclerView, int dx, int dy) {
     if (mAdapter.getItemCount() != mTotalCurrentSearchResults) {
       LinearLayoutManager manager = (LinearLayoutManager) mView.getArtistRecyclerView().getLayoutManager();
@@ -127,6 +127,11 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
     }
   }
 
+  @Subscribe
+  public void onSearchIntentReceived(SearchIntentReceivedEvent event) {
+    submitQuery(event.getQuery());
+  }
+
   private void submitQuery(String query) {
     mCurrentQuery = query;
     mTotalCurrentSearchResults = 0;
@@ -139,14 +144,6 @@ public class ArtistSearchFragmentController extends BaseFragmentController<Artis
     SearchRecentSuggestions suggestions = new SearchRecentSuggestions(mActivity,
         ArtistSuggestionProvider.AUTHORITY, ArtistSuggestionProvider.MODE);
     suggestions.saveRecentQuery(query, null);
-
-    // Use shared preferences to track suggestions so I can handle suggestion clicks without
-    // going through activity.
-    //
-    SharedPreferences sharedPreferences = getSharedPreferences();
-    Set<String> savedQueries = sharedPreferences.getStringSet(SUGGESTIONS_PREFERENCES_KEY, new HashSet<String>());
-    savedQueries.add(query);
-    sharedPreferences.edit().putStringSet(SUGGESTIONS_PREFERENCES_KEY, savedQueries).apply();
 
     final ProgressDialog progressDialog = new ProgressDialog(mActivity);
     progressDialog.setTitle(mActivity.getString(R.string.searching_for) + query);

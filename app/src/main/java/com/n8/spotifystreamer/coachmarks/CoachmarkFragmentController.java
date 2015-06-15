@@ -10,8 +10,8 @@ import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 
 public class CoachmarkFragmentController extends BaseFragmentController<CoachmarkFragmentView> implements CoachmarkController {
 
-    public CoachmarkFragmentController(@NonNull AppCompatActivity activity) {
-        super(activity);
+    public CoachmarkFragmentController() {
+        super();
     }
 
     @Override

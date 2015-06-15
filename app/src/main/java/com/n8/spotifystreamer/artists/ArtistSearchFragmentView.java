@@ -157,18 +157,6 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
         return false;
       }
     });
-
-    mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-      @Override
-      public boolean onSuggestionSelect(int position) {
-        return false;
-      }
-
-      @Override
-      public boolean onSuggestionClick(int position) {
-        return mController.onSuggestionClicked(position);
-      }
-    });
   }
 
   private void setupRecyclerView() {
