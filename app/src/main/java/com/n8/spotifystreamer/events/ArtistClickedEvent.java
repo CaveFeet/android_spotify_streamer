@@ -4,6 +4,9 @@ import android.widget.ImageView;
 
 import kaaes.spotify.webapi.android.models.Artist;
 
+/**
+ * Event posted when the user clicks on an Artist search result
+ */
 public class ArtistClickedEvent {
 
     public ImageView mThumbnailView;

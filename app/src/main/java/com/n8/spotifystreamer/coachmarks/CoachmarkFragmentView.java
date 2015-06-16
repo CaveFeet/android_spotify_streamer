@@ -22,7 +22,12 @@ import com.viewpagerindicator.LinePageIndicator;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
+/**
+ * Custom view to handle showing of other coachmark views in a viewpager
+ */
 public class CoachmarkFragmentView extends BaseFragmentView<CoachmarkController> {
+
+    private static final int NUMBER_OF_COACHMARKS = 2;
 
     @InjectView(R.id.fragment_coachmark_viewPager)
     ViewPager mViewPager;
@@ -79,22 +84,18 @@ public class CoachmarkFragmentView extends BaseFragmentView<CoachmarkController>
         mViewPagerIndicator.setSelectedColor(mActivity.getResources().getColor(R.color.primary));
         mViewPagerIndicator.setLineWidth(UiUtils.dipsToPixels(15));
         mViewPagerIndicator.setViewPager(mViewPager);
-
-        String title = String.format(mActivity.getString(R.string.coachmark_title), mActivity.getString(R.string.app_name));
-        mToolbar.setTitle(title);
     }
 
     private class CoachmarkPagerAdapter extends PagerAdapter {
-
 
         public Object instantiateItem(ViewGroup collection, int position) {
             View view = null;
             LayoutInflater layoutInflater = mActivity.getLayoutInflater();
 
             if (position == 0) {
-                view = layoutInflater.inflate(R.layout.coachmark_1, collection, false);
+                view = layoutInflater.inflate(R.layout.coachmark_search, collection, false);
             }else if (position == 1) {
-                view = layoutInflater.inflate(R.layout.coachmark_2, collection, false);
+                view = layoutInflater.inflate(R.layout.coachmark_results, collection, false);
             }
 
             ((ViewPager) collection).addView(view,position);
@@ -114,7 +115,7 @@ public class CoachmarkFragmentView extends BaseFragmentView<CoachmarkController>
 
         @Override
         public int getCount() {
-            return 2;
+            return NUMBER_OF_COACHMARKS;
         }
 
         @Override

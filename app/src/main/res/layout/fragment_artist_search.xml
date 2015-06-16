@@ -72,7 +72,7 @@
             android:layout_height="match_parent"
             app:layout_scrollFlags="scroll|enterAlways"
             android:background="@color/primary"
-            android:elevation="4dp"
+            android:elevation="@dimen/toolbar_elevation"
             >
 
           <android.support.v7.widget.SearchView

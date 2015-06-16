@@ -71,7 +71,39 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
     @Override
     public void onCreateView(@NonNull TopTracksFragmentView view) {
         mView = view;
+        bindArtist();
+    }
 
+    @Override
+    public void onDetachView() {
+        BusProvider.getInstance().unregister(this);
+        if (mAnimatorSet != null) {
+            mAnimatorSet.end();
+        }
+    }
+
+    @Override
+    public void onNavIconClicked() {
+        mActivity.onBackPressed();
+    }
+
+    @Override
+    public LinearLayoutManager getLinearLayoutManager() {
+        return new LinearLayoutManager(mActivity);
+    }
+
+    @Override
+    public String getArtistName() {
+        if (mArtist != null) {
+            return mArtist.name;
+        }
+        return null;
+    }
+
+    @Subscribe
+    public void onArtistClicked(ArtistClickedEvent event) {
+        mArtist = event.mArtist;
+        mTracks = null;
         bindArtist();
     }
 
@@ -98,9 +130,52 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
         // If view is being recreated after a rotation, there may be existing artist data to view
         if (mTracks != null) {
             bindTracks(false);
+            updateContentViews();
+            setupToolbarHeader();
             return;
         }
 
+        requestTopTracks();
+
+        mView.invalidate();
+    }
+
+    private void bindTracks(boolean startFromScratch) {
+        if (startFromScratch) {
+            mAdapter = new TracksRecyclerAdapter(mTracks);
+        }
+        mView.getTopTracksRecyclerView().setAdapter(mAdapter);
+    }
+
+    private void setupToolbarHeader() {
+        // Sets up the collapsing toolbar header to display the artist's top track images
+        //
+        List<Image> trackImages = new ArrayList<>();
+        for (Track track : mTracks) {
+            List<Image> imgs = track.album.images;
+            if (imgs != null && imgs.size() > 0) {
+                trackImages.add(imgs.get(0));
+            }
+        }
+        if (!trackImages.isEmpty()) {
+            setupHeaderImages(trackImages, 0);
+        } else {
+            Picasso.with(mActivity).load(R.drawable.header_background)
+                .into(mView.getArtistHeaderBackgroundImageView());
+        }
+    }
+
+    private void updateContentViews() {
+        if (mTracks != null && mTracks.size() > 0) {
+            mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
+            mView.getNoContentView().setVisibility(View.GONE);
+        } else {
+            mView.getTopTracksRecyclerView().setVisibility(View.GONE);
+            mView.getNoContentView().setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void requestTopTracks() {
         final Map<String, Object> map = new HashMap<>();
         map.put("country", Locale.getDefault().getCountry());
         final Handler handler = new Handler();
@@ -113,6 +188,8 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
                     @Override
                     public void run() {
                         bindTracks(true);
+                        updateContentViews();
+                        setupToolbarHeader();
                     }
                 });
             }
@@ -127,43 +204,14 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
                 });
             }
         });
-
-        mView.invalidate();
     }
 
-    @Override
-    public void onDetachView() {
-        BusProvider.getInstance().unregister(this);
-        if (mAnimatorSet != null) {
-            mAnimatorSet.end();
-        }
-    }
-
-    @Subscribe
-    public void onArtistClicked(ArtistClickedEvent event) {
-        mArtist = event.mArtist;
-        mTracks = null;
-        bindArtist();
-    }
-
-    @Override
-    public void onNavIconClicked() {
-        mActivity.onBackPressed();
-    }
-
-    @Override
-    public LinearLayoutManager getLinearLayoutManager() {
-        return new LinearLayoutManager(mActivity);
-    }
-
-    @Override
-    public String getArtistName() {
-        if (mArtist != null) {
-            return mArtist.name;
-        }
-        return null;
-    }
-
+    /**
+     * Sets up animation of track images that plays in the expanded toolbar header.
+     *
+     * @param images
+     * @param index
+     */
     private void setupHeaderImages(final List<Image> images, final int index) {
         // Preload the next image to avoid any delay
         if (index != images.size() - 1) {
@@ -258,35 +306,5 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
                     public void onError() {
                     }
                 });
-    }
-
-    private void bindTracks(boolean startFromScratch) {
-        if (startFromScratch) {
-            mAdapter = new TracksRecyclerAdapter(mTracks);
-        }
-        mView.getTopTracksRecyclerView().setAdapter(mAdapter);
-        if (mTracks != null && mTracks.size() > 0) {
-            mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
-            mView.getNoContentView().setVisibility(View.GONE);
-        } else {
-            mView.getTopTracksRecyclerView().setVisibility(View.GONE);
-            mView.getNoContentView().setVisibility(View.VISIBLE);
-        }
-
-        // Sets up the collapsing toolbar header to display the artist's top track images
-        //
-        List<Image> trackImages = new ArrayList<>();
-        for (Track track : mTracks) {
-            List<Image> imgs = track.album.images;
-            if (imgs != null && imgs.size() > 0) {
-                trackImages.add(imgs.get(0));
-            }
-        }
-        if (!trackImages.isEmpty()) {
-            setupHeaderImages(trackImages, 0);
-        } else {
-            Picasso.with(mActivity).load(R.drawable.header_background)
-                    .into(mView.getArtistHeaderBackgroundImageView());
-        }
     }
 }

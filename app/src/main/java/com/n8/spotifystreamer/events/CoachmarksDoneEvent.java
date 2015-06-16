@@ -1,7 +1,6 @@
 package com.n8.spotifystreamer.events;
 
 /**
- * Created by lcballa44 on 6/14/15.
+ * Posted to bus when user has finished viewing coachmarks
  */
-public class CoachmarksDoneEvent {
-}
+public class CoachmarksDoneEvent { }
