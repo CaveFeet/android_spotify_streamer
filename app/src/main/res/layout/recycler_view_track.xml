@@ -5,6 +5,8 @@
     android:layout_height="@dimen/recycler_view_height"
     android:layout_gravity="center"
     android:background="@color/primary_light"
+    android:foreground="?attr/selectableItemBackground"
+    android:elevation="4dp"
     >
 
     <RelativeLayout

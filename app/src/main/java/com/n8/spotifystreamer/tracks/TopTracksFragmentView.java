@@ -25,6 +25,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
@@ -78,7 +79,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
   protected void setupView() {
     ButterKnife.inject(this);
 
-    if (!UiUtils.isLandscape(mActivity) && !UiUtils.isTablet(mActivity)) {
+    if (!UiUtils.isTablet(mActivity)) {
       mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
       mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
               PorterDuff.Mode.SRC_ATOP);
@@ -95,7 +96,6 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
     mTopTracksRecyclerView.setLayoutManager(mController.getLinearLayoutManager());
     mTopTracksRecyclerView.setHasFixedSize(true);
 
-    mCollapsingToolbarLayout.setTitle(mController.getArtistName());
     mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.black));
     mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.white));
   }

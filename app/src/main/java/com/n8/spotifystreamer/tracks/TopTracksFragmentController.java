@@ -23,9 +23,12 @@ import android.view.View;
 
 import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BaseFragmentController;
+import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
+import com.n8.spotifystreamer.events.ArtistClickedEvent;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -62,11 +65,25 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
     public TopTracksFragmentController(Artist artist) {
         super();
         mArtist = artist;
+        BusProvider.getInstance().register(this);
     }
 
     @Override
     public void onCreateView(@NonNull TopTracksFragmentView view) {
         mView = view;
+
+        bindArtist();
+    }
+
+    private void bindArtist() {
+        if (mArtist == null) {
+            mView.getNoContentView().setVisibility(View.VISIBLE);
+            return;
+        }
+
+        mView.getNoContentView().setVisibility(View.GONE);
+
+        mView.getCollapsingToolbarLayout().setTitle(mArtist.name);
 
         // Load artist thumbnail into thumbnail view in the collapsing toolbar header
         //
@@ -88,7 +105,7 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
         map.put("country", Locale.getDefault().getCountry());
         final Handler handler = new Handler();
         SpotifyStreamerApplication
-                .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
+            .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
             @Override
             public void success(Tracks tracks, Response response) {
                 mTracks = tracks.tracks;
@@ -110,13 +127,23 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
                 });
             }
         });
+
+        mView.invalidate();
     }
 
     @Override
     public void onDetachView() {
+        BusProvider.getInstance().unregister(this);
         if (mAnimatorSet != null) {
             mAnimatorSet.end();
         }
+    }
+
+    @Subscribe
+    public void onArtistClicked(ArtistClickedEvent event) {
+        mArtist = event.mArtist;
+        mTracks = null;
+        bindArtist();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.n8.spotifystreamer.tracks;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ public class TopTracksFragment extends Fragment {
   }
 
   public TopTracksFragment() { }
+
 
   @Override
   public void onCreate(Bundle savedInstanceState) {

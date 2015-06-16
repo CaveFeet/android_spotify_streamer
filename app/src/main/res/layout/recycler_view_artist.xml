@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/recycler_view_height"
     android:layout_gravity="center"
-    android:background="@color/primary_light"
-    android:elevation="4dp"
+    android:background="@drawable/viewholder_selector"
     android:foreground="?attr/selectableItemBackground"
+    android:elevation="4dp"
     >
 
     <RelativeLayout
