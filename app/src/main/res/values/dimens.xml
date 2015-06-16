@@ -12,5 +12,11 @@
 
     <dimen name="recycler_view_thumbnail_size">80dp</dimen>
 
+    <dimen name="recycler_view_item_elevation">4dp</dimen>
+
     <dimen name="top_tracks_header_thumbnail_size">100dp</dimen>
+
+    <dimen name="coachmark_image_size">200dp</dimen>
+    <dimen name="expanded_toolbar_height">200dp</dimen>
+    <dimen name="recycler_view_artist_badge_icon_size">25dp</dimen>
 </resources>

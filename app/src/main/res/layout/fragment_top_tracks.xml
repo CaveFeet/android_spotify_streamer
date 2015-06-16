@@ -37,7 +37,7 @@
 
       <android.support.design.widget.AppBarLayout
           android:id="@+id/fragment_top_tracks_appBarLayout"
-          android:layout_height="200dp"
+          android:layout_height="@dimen/expanded_toolbar_height"
           android:layout_width="match_parent"
           >
 
@@ -49,7 +49,6 @@
               app:contentScrim="?attr/colorPrimary"
               android:layout_gravity="center"
               >
-
 
               <ImageView
                   android:id="@+id/fragment_top_tracks_artist_image_header_background"

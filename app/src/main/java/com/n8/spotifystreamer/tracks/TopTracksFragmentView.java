@@ -25,10 +25,12 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -77,22 +79,23 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
   protected void setupView() {
     ButterKnife.inject(this);
 
-    mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
-    mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
-        PorterDuff.Mode.SRC_ATOP);
-    mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        //getActivity().onBackPressed();
-        mController.onNavIconClicked();
-      }
-    });
+    if (!UiUtils.isTablet(mActivity)) {
+      mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
+      mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
+              PorterDuff.Mode.SRC_ATOP);
+      mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          //getActivity().onBackPressed();
+          mController.onNavIconClicked();
+        }
+      });
+    }
 
     mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));
     mTopTracksRecyclerView.setLayoutManager(mController.getLinearLayoutManager());
     mTopTracksRecyclerView.setHasFixedSize(true);
 
-    mCollapsingToolbarLayout.setTitle(mController.getArtistName());
     mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.black));
     mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.white));
   }

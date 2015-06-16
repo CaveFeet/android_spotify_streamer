@@ -18,7 +18,7 @@ import butterknife.InjectView;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Image;
 
-public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+public class ArtistViewHolder extends RecyclerView.ViewHolder {
 
     public static final int THUMBNAIL_SIZE = 200;
 
@@ -40,13 +40,9 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
 
     private Artist mArtist;
 
-    private ArtistsRecyclerAdapter.ArtistClickListener mArtistClickListener;
-
-    public ArtistViewHolder(View itemView, ArtistsRecyclerAdapter.ArtistClickListener artistClickListener) {
+    public ArtistViewHolder(View itemView) {
         super(itemView);
         ButterKnife.inject(this, itemView);
-        mArtistClickListener = artistClickListener;
-        itemView.setOnClickListener(this);
     }
 
     public void bindViewHolder(final Artist artist){
@@ -72,13 +68,6 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder implements View.On
             Picasso.with(itemView.getContext()).load(images.get(index).url).error(R.drawable.ic_artist_placeholder_light).into(mArtistImageView);
         }else {
             Picasso.with(itemView.getContext()).load(R.drawable.ic_artist_placeholder_light).into(mArtistImageView);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (mArtistClickListener != null) {
-            mArtistClickListener.onArtistViewClicked(mArtist, mArtistImageView);
         }
     }
 }

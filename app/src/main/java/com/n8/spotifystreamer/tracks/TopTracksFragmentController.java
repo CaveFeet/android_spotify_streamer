@@ -23,9 +23,12 @@ import android.view.View;
 
 import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BaseFragmentController;
+import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
+import com.n8.spotifystreamer.events.ArtistClickedEvent;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -62,58 +65,18 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
     public TopTracksFragmentController(Artist artist) {
         super();
         mArtist = artist;
+        BusProvider.getInstance().register(this);
     }
 
     @Override
     public void onCreateView(@NonNull TopTracksFragmentView view) {
         mView = view;
-
-        // Load artist thumbnail into thumbnail view in the collapsing toolbar header
-        //
-        List<Image> images = mArtist.images;
-        if (images != null && images.size() > 0) {
-            int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
-            Picasso.with(mActivity).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
-        } else {
-            Picasso.with(mActivity).load(R.drawable.ic_artist_placeholder_light).into(mView.getArtistThumbnailImageView());
-        }
-
-        // If view is being recreated after a rotation, there may be existing artist data to view
-        if (mTracks != null) {
-            bindTracks(false);
-            return;
-        }
-
-        final Map<String, Object> map = new HashMap<>();
-        map.put("country", Locale.getDefault().getCountry());
-        final Handler handler = new Handler();
-        SpotifyStreamerApplication
-                .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
-            @Override
-            public void success(Tracks tracks, Response response) {
-                mTracks = tracks.tracks;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        bindTracks(true);
-                    }
-                });
-            }
-
-            @Override
-            public void failure(final RetrofitError error) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        AndroidUtils.showToast(mActivity, error.getLocalizedMessage());
-                    }
-                });
-            }
-        });
+        bindArtist();
     }
 
     @Override
     public void onDetachView() {
+        BusProvider.getInstance().unregister(this);
         if (mAnimatorSet != null) {
             mAnimatorSet.end();
         }
@@ -137,6 +100,118 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
         return null;
     }
 
+    @Subscribe
+    public void onArtistClicked(ArtistClickedEvent event) {
+        mArtist = event.mArtist;
+        mTracks = null;
+        bindArtist();
+    }
+
+    private void bindArtist() {
+        if (mArtist == null) {
+            mView.getNoContentView().setVisibility(View.VISIBLE);
+            return;
+        }
+
+        mView.getNoContentView().setVisibility(View.GONE);
+
+        mView.getCollapsingToolbarLayout().setTitle(mArtist.name);
+
+        // Load artist thumbnail into thumbnail view in the collapsing toolbar header
+        //
+        List<Image> images = mArtist.images;
+        if (images != null && images.size() > 0) {
+            int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
+            Picasso.with(mActivity).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
+        } else {
+            Picasso.with(mActivity).load(R.drawable.ic_artist_placeholder_light).into(mView.getArtistThumbnailImageView());
+        }
+
+        // If view is being recreated after a rotation, there may be existing artist data to view
+        if (mTracks != null) {
+            bindTracks(false);
+            updateContentViews();
+            setupToolbarHeader();
+            return;
+        }
+
+        requestTopTracks();
+
+        mView.invalidate();
+    }
+
+    private void bindTracks(boolean startFromScratch) {
+        if (startFromScratch) {
+            mAdapter = new TracksRecyclerAdapter(mTracks);
+        }
+        mView.getTopTracksRecyclerView().setAdapter(mAdapter);
+    }
+
+    private void setupToolbarHeader() {
+        // Sets up the collapsing toolbar header to display the artist's top track images
+        //
+        List<Image> trackImages = new ArrayList<>();
+        for (Track track : mTracks) {
+            List<Image> imgs = track.album.images;
+            if (imgs != null && imgs.size() > 0) {
+                trackImages.add(imgs.get(0));
+            }
+        }
+        if (!trackImages.isEmpty()) {
+            setupHeaderImages(trackImages, 0);
+        } else {
+            Picasso.with(mActivity).load(R.drawable.header_background)
+                .into(mView.getArtistHeaderBackgroundImageView());
+        }
+    }
+
+    private void updateContentViews() {
+        if (mTracks != null && mTracks.size() > 0) {
+            mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
+            mView.getNoContentView().setVisibility(View.GONE);
+        } else {
+            mView.getTopTracksRecyclerView().setVisibility(View.GONE);
+            mView.getNoContentView().setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void requestTopTracks() {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("country", Locale.getDefault().getCountry());
+        final Handler handler = new Handler();
+        SpotifyStreamerApplication
+            .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
+            @Override
+            public void success(Tracks tracks, Response response) {
+                mTracks = tracks.tracks;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        bindTracks(true);
+                        updateContentViews();
+                        setupToolbarHeader();
+                    }
+                });
+            }
+
+            @Override
+            public void failure(final RetrofitError error) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        AndroidUtils.showToast(mActivity, error.getLocalizedMessage());
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * Sets up animation of track images that plays in the expanded toolbar header.
+     *
+     * @param images
+     * @param index
+     */
     private void setupHeaderImages(final List<Image> images, final int index) {
         // Preload the next image to avoid any delay
         if (index != images.size() - 1) {
@@ -231,35 +306,5 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
                     public void onError() {
                     }
                 });
-    }
-
-    private void bindTracks(boolean startFromScratch) {
-        if (startFromScratch) {
-            mAdapter = new TracksRecyclerAdapter(mTracks);
-        }
-        mView.getTopTracksRecyclerView().setAdapter(mAdapter);
-        if (mTracks != null && mTracks.size() > 0) {
-            mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
-            mView.getNoContentView().setVisibility(View.GONE);
-        } else {
-            mView.getTopTracksRecyclerView().setVisibility(View.GONE);
-            mView.getNoContentView().setVisibility(View.VISIBLE);
-        }
-
-        // Sets up the collapsing toolbar header to display the artist's top track images
-        //
-        List<Image> trackImages = new ArrayList<>();
-        for (Track track : mTracks) {
-            List<Image> imgs = track.album.images;
-            if (imgs != null && imgs.size() > 0) {
-                trackImages.add(imgs.get(0));
-            }
-        }
-        if (!trackImages.isEmpty()) {
-            setupHeaderImages(trackImages, 0);
-        } else {
-            Picasso.with(mActivity).load(R.drawable.header_background)
-                    .into(mView.getArtistHeaderBackgroundImageView());
-        }
     }
 }

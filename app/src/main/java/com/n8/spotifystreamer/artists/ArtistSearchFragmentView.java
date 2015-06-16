@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;

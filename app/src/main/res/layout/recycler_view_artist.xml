@@ -4,8 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/recycler_view_height"
     android:layout_gravity="center"
-    android:background="@color/primary_light"
-    android:elevation="4dp"
+    android:background="@drawable/viewholder_selector"
+    android:foreground="?attr/selectableItemBackground"
+    android:elevation="@dimen/recycler_view_item_elevation"
     >
 
     <RelativeLayout
@@ -48,8 +49,8 @@
                     />
 
                 <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="@dimen/recycler_view_artist_badge_icon_size"
+                    android:layout_height="@dimen/recycler_view_artist_badge_icon_size"
                     android:src="@drawable/ic_popularity_light"
                     />
 
@@ -69,8 +70,8 @@
                     />
 
                 <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="@dimen/recycler_view_artist_badge_icon_size"
+                    android:layout_height="@dimen/recycler_view_artist_badge_icon_size"
                     android:src="@drawable/ic_followers_light"
                     />
 
