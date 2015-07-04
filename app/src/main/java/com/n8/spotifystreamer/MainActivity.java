@@ -24,6 +24,7 @@ import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackFragment;
+import com.n8.spotifystreamer.playback.PlaybackService;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
@@ -156,7 +157,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onTrackClicked(TrackClickedEvent event) {
+        // Show the playback fragment to interact with the media controls
         PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
         playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
+
+        Intent playbackIntent = new Intent(this, PlaybackService.class);
+        playbackIntent.setAction(PlaybackService.ACTION_PLAY);
+        playbackIntent.putExtra("url", event.getClickedTrack().preview_url);
+        startService(playbackIntent);
     }
 }

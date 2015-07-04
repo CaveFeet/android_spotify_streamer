@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.ImageButton;
+import android.widget.MediaController;
 
 import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.R;
@@ -48,7 +49,7 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   }
 
   @OnClick(R.id.fragment_playback_pause_imageButton)
-  void onPauseClicked(ImageButton button){
+  void onPauseClicked(ImageButton button) {
     mController.onPauseClicked();
   }
 }

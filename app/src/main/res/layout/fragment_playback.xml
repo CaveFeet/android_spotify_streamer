@@ -4,24 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+      <LinearLayout
+          android:orientation="horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          >
+          <ImageButton
+              android:id="@+id/fragment_playback_play_imageButton"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:src="@android:drawable/ic_media_play"
+              />
 
-  <LinearLayout
-      android:orientation="horizontal"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      >
-      <ImageButton
-          android:id="@+id/fragment_playback_play_imageButton"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@android:drawable/ic_media_play"
-          />
-      <ImageButton
-          android:id="@+id/fragment_playback_pause_imageButton"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@android:drawable/ic_media_pause"
-          />
-  </LinearLayout>
+          <ImageButton
+              android:id="@+id/fragment_playback_pause_imageButton"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:src="@android:drawable/ic_media_pause"
+              />
+      </LinearLayout>
+
+    </LinearLayout>
 
 </com.n8.spotifystreamer.playback.PlaybackFragmentView>

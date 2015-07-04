@@ -6,34 +6,47 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
+        android:name=".SpotifyStreamerApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".SpotifyStreamerApplication"
-        >
-        <provider android:name=".artists.ArtistSuggestionProvider"
-                  android:authorities="com.n8.ArtistSuggestionProvider" />
+        android:theme="@style/AppTheme" >
+        <provider
+            android:name=".artists.ArtistSuggestionProvider"
+            android:authorities="com.n8.ArtistSuggestionProvider" />
 
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/artist_searchable" />
         </activity>
 
+        <service
+            android:name=".playback.PlaybackService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <receiver
+            android:name=".playback.MediaControlReceiver"
+            android:enabled="true"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="ANDROID.INTENT.ACTION.MEDIA_BUTTON"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
