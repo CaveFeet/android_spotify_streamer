@@ -28,7 +28,10 @@ import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
+import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
+import com.n8.spotifystreamer.events.TrackClickedEvent;
+import com.n8.spotifystreamer.playback.PlaybackFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -49,7 +52,7 @@ import retrofit.client.Response;
  * Handles the business logic for {@link TopTracksFragment}.  Listens and responds to events from
  * {@link com.n8.spotifystreamer.tracks.TopTracksFragmentView}.
  */
-public class TopTracksFragmentController extends BaseFragmentController<TopTracksFragmentView> implements TopTracksController {
+public class TopTracksFragmentController extends BaseFragmentController<TopTracksFragmentView> implements TopTracksController, TracksRecyclerAdapter.TrackClickListener {
 
     public static final int THUMBNAIL_IMAGE_SIZE = 200;
 
@@ -107,6 +110,11 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
         bindArtist();
     }
 
+    @Override
+    public void onTrackViewClicked(Track track) {
+        BusProvider.getInstance().post(new TrackClickedEvent(mArtist, mTracks, track));
+    }
+
     private void bindArtist() {
         if (mArtist == null) {
             mView.getNoContentView().setVisibility(View.VISIBLE);
@@ -142,7 +150,7 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
 
     private void bindTracks(boolean startFromScratch) {
         if (startFromScratch) {
-            mAdapter = new TracksRecyclerAdapter(mTracks);
+            mAdapter = new TracksRecyclerAdapter(mTracks, this);
         }
         mView.getTopTracksRecyclerView().setAdapter(mAdapter);
     }
@@ -219,92 +227,92 @@ public class TopTracksFragmentController extends BaseFragmentController<TopTrack
         }
 
         Picasso.with(mActivity).load(images.get(index).url)
-                .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
+            .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
+                    mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
 
-                        long duration = 7000;
-                        float transStartX;
-                        float transStartY;
-                        float transEndX;
-                        float transEndY;
-                        float scaleStart;
-                        float scaleEnd;
+                    long duration = 7000;
+                    float transStartX;
+                    float transStartY;
+                    float transEndX;
+                    float transEndY;
+                    float scaleStart;
+                    float scaleEnd;
 
-                        int state = index % 4;
-                        if (state == 0) {
-                            transStartX = -50;
-                            transEndX = 50;
-                            transStartY = -50;
-                            transEndY = 50;
-                            scaleStart = 1.5f;
-                            scaleEnd = 1.75f;
-                        } else if (state == 1) {
-                            transStartX = 50;
-                            transEndX = 50;
-                            transStartY = 50;
-                            transEndY = -50;
-                            scaleStart = 1.75f;
-                            scaleEnd = 1.5f;
-                        } else if (state == 2) {
-                            transStartX = 50;
-                            transEndX = -50;
-                            transStartY = -50;
-                            transEndY = 50;
-                            scaleStart = 1.5f;
-                            scaleEnd = 1.75f;
-                        } else {
-                            transStartX = -50;
-                            transEndX = -50;
-                            transStartY = 50;
-                            transEndY = -50;
-                            scaleStart = 1.75f;
-                            scaleEnd = 1.5f;
+                    int state = index % 4;
+                    if (state == 0) {
+                        transStartX = -50;
+                        transEndX = 50;
+                        transStartY = -50;
+                        transEndY = 50;
+                        scaleStart = 1.5f;
+                        scaleEnd = 1.75f;
+                    } else if (state == 1) {
+                        transStartX = 50;
+                        transEndX = 50;
+                        transStartY = 50;
+                        transEndY = -50;
+                        scaleStart = 1.75f;
+                        scaleEnd = 1.5f;
+                    } else if (state == 2) {
+                        transStartX = 50;
+                        transEndX = -50;
+                        transStartY = -50;
+                        transEndY = 50;
+                        scaleStart = 1.5f;
+                        scaleEnd = 1.75f;
+                    } else {
+                        transStartX = -50;
+                        transEndX = -50;
+                        transStartY = 50;
+                        transEndY = -50;
+                        scaleStart = 1.75f;
+                        scaleEnd = 1.5f;
+
+                    }
+
+                    ObjectAnimator transX = ObjectAnimator
+                        .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationX", transStartX, transEndX)
+                        .setDuration(duration);
+                    ObjectAnimator transY = ObjectAnimator
+                        .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationY", transStartY, transEndY)
+                        .setDuration(duration);
+                    ObjectAnimator scaleX = ObjectAnimator
+                        .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleX", scaleStart, scaleEnd).setDuration(
+                            duration);
+                    ObjectAnimator scaleY = ObjectAnimator
+                        .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleY", scaleStart, scaleEnd)
+                        .setDuration(duration);
+
+                    mAnimatorSet = new AnimatorSet();
+                    mAnimatorSet.playTogether(transX, transY, scaleX, scaleY);
+                    mAnimatorSet.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            int newindex = index == (images.size() - 1) ? 0 : (index + 1);
+                            setupHeaderImages(images, newindex);
 
                         }
 
-                        ObjectAnimator transX = ObjectAnimator
-                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationX", transStartX, transEndX)
-                                .setDuration(duration);
-                        ObjectAnimator transY = ObjectAnimator
-                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "translationY", transStartY, transEndY)
-                                .setDuration(duration);
-                        ObjectAnimator scaleX = ObjectAnimator
-                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleX", scaleStart, scaleEnd).setDuration(
-                                        duration);
-                        ObjectAnimator scaleY = ObjectAnimator
-                                .ofFloat(mView.getArtistHeaderBackgroundImageView(), "scaleY", scaleStart, scaleEnd)
-                                .setDuration(duration);
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                        }
 
-                        mAnimatorSet = new AnimatorSet();
-                        mAnimatorSet.playTogether(transX, transY, scaleX, scaleY);
-                        mAnimatorSet.addListener(new Animator.AnimatorListener() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                            }
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                        }
+                    });
+                    mAnimatorSet.start();
+                }
 
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                int newindex = index == (images.size() - 1) ? 0 : (index + 1);
-                                setupHeaderImages(images, newindex);
-
-                            }
-
-                            @Override
-                            public void onAnimationCancel(Animator animation) {
-                            }
-
-                            @Override
-                            public void onAnimationRepeat(Animator animation) {
-                            }
-                        });
-                        mAnimatorSet.start();
-                    }
-
-                    @Override
-                    public void onError() {
-                    }
-                });
+                @Override
+                public void onError() {
+                }
+            });
     }
 }

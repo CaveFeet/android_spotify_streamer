@@ -22,6 +22,8 @@ import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.events.TrackClickedEvent;
+import com.n8.spotifystreamer.playback.PlaybackFragment;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
 
     private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
+    public static final String PLAYBACK_FRAGMENT_TAG = "playback_fragment_tag";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,9 +115,9 @@ public class MainActivity extends AppCompatActivity {
         if(fragmentManager.findFragmentByTag(tag) == null) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(layoutId,
-                    fragment,
-                    tag)
-                    .commit();
+                fragment,
+                tag)
+                .commit();
         }
     }
 
@@ -149,5 +152,11 @@ public class MainActivity extends AppCompatActivity {
                 .addToBackStack(null);
             ft.commit();
         }
+    }
+
+    @Subscribe
+    public void onTrackClicked(TrackClickedEvent event) {
+        PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
+        playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
     }
 }

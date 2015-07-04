@@ -40,8 +40,11 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     private Track mTrack;
 
-    public TrackViewHolder(View itemView) {
+    private TracksRecyclerAdapter.TrackClickListener mListener;
+
+    public TrackViewHolder(View itemView, TracksRecyclerAdapter.TrackClickListener listener) {
         super(itemView);
+        mListener = listener;
         ButterKnife.inject(this, itemView);
         itemView.setOnClickListener(this);
     }
@@ -67,6 +70,8 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     @Override
     public void onClick(View v) {
-
+        if (mListener != null) {
+            mListener.onTrackViewClicked(mTrack);
+        }
     }
 }
