@@ -25,6 +25,7 @@ import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackFragment;
 import com.n8.spotifystreamer.playback.PlaybackService;
+import com.n8.spotifystreamer.playback.TopTracksPlaylist;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
@@ -171,9 +172,13 @@ public class MainActivity extends AppCompatActivity {
         PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
         playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
 
+        TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
+
         Intent playbackIntent = new Intent(this, PlaybackService.class);
         playbackIntent.setAction(PlaybackService.ACTION_PLAY);
-        playbackIntent.putExtra("url", event.getClickedTrack().preview_url);
+        playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
+        playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().indexOf(event.getClickedTrack()));
+
         startService(playbackIntent);
     }
 }

@@ -9,6 +9,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -19,9 +20,13 @@ import android.os.ResultReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.widget.ImageView;
 
+import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -29,6 +34,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     .OnBufferingUpdateListener, MediaPlayer.OnErrorListener, AudioManager.OnAudioFocusChangeListener {
 
   private static final String TAG = PlaybackService.class.getSimpleName();
+
+  public static final String KEY_PLAYLIST = "key_playlist";
+
+  public static final String KEY_TRACK_INDEX = "key_track_index";
 
   public static final String ACTION_PLAY = "com.n8.spotifystreamer.PLAY";
 
@@ -53,7 +62,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private MediaPlayer mMediaPlayer;
   private WifiManager.WifiLock mWifiLock;
   private BroadcastReceiver mMusicIntentReceiver;
-  private Intent mIntent;
+
+  private int mTrackIndex;
+
+  private Bitmap mNotificationImage;
+
+  private TopTracksPlaylist mTopTracksPlaylist;
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -90,18 +104,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   @Override
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.d(TAG, "onStartCommand");
-    mIntent = intent;
-    if (mIntent.getAction().equals(ACTION_PLAY)) {
-      Log.d(TAG, "Action_Play");
-      if (mMediaPlayer == null) {
-        initMediaPlayer(mIntent);
-      } else {
-        play();
-      }
-    } else if (mIntent.getAction().equals(ACTION_PAUSE)) {
-      Log.d(TAG, "Action_Pause");
+
+    String action = intent.getAction();
+
+    if (action.equals(ACTION_PLAY)) {
+      handlePlayIntent(intent);
+    } else if (action.equals(ACTION_PAUSE)) {
       pause();
-    } else if (mIntent.getAction().equals(ACTION_STOP)) {
+    } else if (action.equals(ACTION_STOP)) {
       stop();
     }
 
@@ -130,15 +140,19 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       case AudioManager.AUDIOFOCUS_GAIN:
         // resume playback
         if (mMediaPlayer == null) {
-          initMediaPlayer(mIntent);
+          initMediaPlayer();
         }
-        else if (!mMediaPlayer.isPlaying()) mMediaPlayer.start();
+        else if (!mMediaPlayer.isPlaying()) {
+          mMediaPlayer.start();
+        }
         mMediaPlayer.setVolume(1.0f, 1.0f);
         break;
 
       case AudioManager.AUDIOFOCUS_LOSS:
         // Lost focus for an unbounded amount of time: stop playback and release media player
-        if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
+        if (mMediaPlayer.isPlaying()) {
+          mMediaPlayer.stop();
+        }
         mMediaPlayer.release();
         mMediaPlayer = null;
         break;
@@ -147,7 +161,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         // Lost focus for a short time, but we have to stop
         // playback. We don't release the media player because playback
         // is likely to resume
-        if (mMediaPlayer.isPlaying()) mMediaPlayer.pause();
+        if (mMediaPlayer.isPlaying()) {
+          mMediaPlayer.pause();
+        }
         break;
 
       case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -158,9 +174,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
   }
 
-  private void initMediaPlayer(Intent intent) {
-    String url = intent.getStringExtra("url");
+  private void handlePlayIntent(Intent intent) {
+    Log.d(TAG, "Action_Play");
 
+    // Check for new playlist info.  If it exists in the bundle, update the service's members
+    //
+    TopTracksPlaylist playlist = intent.getParcelableExtra(KEY_PLAYLIST);
+    if (playlist != null) {
+      mTopTracksPlaylist = playlist;
+      mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
+      mNotificationImage = null;
+      initMediaPlayer();
+      return;
+    }
+
+    play();
+  }
+
+  private void initMediaPlayer() {
     if (mMediaPlayer == null) {
       mMediaPlayer = new MediaPlayer();
       mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -176,11 +207,23 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
 
       try {
+        String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
+        if (url == null) {
+          return;
+        }
+
         mMediaPlayer.setDataSource(url);
         mMediaPlayer.prepareAsync();
       } catch (IOException e) {
         Log.d(TAG, "Failed to prepare media playter " + e.getMessage());
       }
+    } else {
+      if (mMediaPlayer.isPlaying()) {
+        mMediaPlayer.stop();
+      }
+      mMediaPlayer.release();
+      mMediaPlayer = null;
+      initMediaPlayer();
     }
   }
 
@@ -199,6 +242,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void pause(){
+    Log.d(TAG, "Action_Pause");
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
@@ -208,6 +252,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void stop() {
+    Log.d(TAG, "Action_Stop");
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
@@ -219,12 +264,36 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     stopSelf();
   }
 
-  private void showPauseNotification(){
+  private void showPauseNotification() {
+    if (mNotificationImage != null) {
+      showPauseNotification(mNotificationImage);
+      return;
+    }
+
+    final ImageView imageView = new ImageView(this);
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)).into(imageView, new Callback() {
+      @Override
+      public void onSuccess() {
+        mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
+        showPauseNotification(mNotificationImage);
+      }
+
+      @Override
+      public void onError() {
+
+      }
+    });
+
+    showPauseNotification(null);
+  }
+
+  private void showPauseNotification(Bitmap bitmap){
 
     Notification notification = new NotificationCompat.Builder(this)
         // show controls on lockscreen even when user hides sensitive content.
         .setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.notification_icon)
+        .setLargeIcon(bitmap)
             // Add media control buttons that invoke intents in your media service
         .addAction(android.R.drawable.ic_media_previous, "Previous", null) // #0
         .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPlayPendingIntent())  // #1
@@ -233,21 +302,46 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(1 /* #1: pause button */)
         )
-        .setContentTitle("Wonderful music")
-        .setContentText("My Awesome Band")
+        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
+        .setContentText(mTopTracksPlaylist.getArtistName())
+        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
         .setContentIntent(createNotificationContentPendingIntent())
         .setOngoing(false)
         .build();
 
-    startForeground(NOTIFICATION_ID, notification);
+    NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+    notificationManager.notify( NOTIFICATION_ID, notification );
   }
 
-  private void showPlayNotification(){
+  private void showPlayNotification() {
+    if (mNotificationImage != null) {
+      showPlayNotification(mNotificationImage);
+      return;
+    }
 
+    final ImageView imageView = new ImageView(this);
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)).into(imageView, new Callback() {
+      @Override
+      public void onSuccess() {
+        mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
+        showPlayNotification(mNotificationImage);
+      }
+
+      @Override
+      public void onError() {
+
+      }
+    });
+
+    showPlayNotification(null);
+  }
+
+  private void showPlayNotification(Bitmap bitmap) {
     Notification notification = new NotificationCompat.Builder(this)
         // show controls on lockscreen even when user hides sensitive content.
         .setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.notification_icon)
+        .setLargeIcon(bitmap)
             // Add media control buttons that invoke intents in your media service
         .addAction(android.R.drawable.ic_media_previous, "Previous", null) // #0
         .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPausePendingIntent())  // #1
@@ -256,8 +350,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(1 /* #1: pause button */)
         )
-        .setContentTitle("Wonderful music")
-        .setContentText("My Awesome Band")
+        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
+        .setContentText(mTopTracksPlaylist.getArtistName())
+        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
         .setContentIntent(createNotificationContentPendingIntent())
         .setOngoing(true)
         .build();
