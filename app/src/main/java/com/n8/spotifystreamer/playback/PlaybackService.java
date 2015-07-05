@@ -1,6 +1,7 @@
 package com.n8.spotifystreamer.playback;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -54,8 +55,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private BroadcastReceiver mMusicIntentReceiver;
   private Intent mIntent;
 
-  private MediaSessionCompat mSession;
-
   @Override
   public IBinder onBind(Intent intent) {
     return null;
@@ -80,7 +79,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mMediaPlayer.release();
     }
     if (mWifiLock != null) {
-      mWifiLock.release();
+      if (mWifiLock.isHeld()) {
+        mWifiLock.release();
+      }
       mWifiLock = null;
     }
     unregisterReceiver(mMusicIntentReceiver);
@@ -160,17 +161,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private void initMediaPlayer(Intent intent) {
     String url = intent.getStringExtra("url");
 
-    if (mSession == null) {
-      PendingIntent pi = PendingIntent.getService(this, 99, new Intent(ACTION_MEDIA_BUTTONS), PendingIntent.FLAG_UPDATE_CURRENT);
-      ComponentName receiver = new ComponentName(getPackageName(), MediaControlReceiver.class.getName());
-
-      mSession = new MediaSessionCompat(this, "media_session", receiver, pi);
-      mSession.setCallback(new MediaSessionCallback());
-      mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-      mSession.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
-      mSession.setActive(true);
-    }
-
     if (mMediaPlayer == null) {
       mMediaPlayer = new MediaPlayer();
       mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -209,16 +199,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void pause(){
-    mWifiLock.release();
+    if (mWifiLock.isHeld()) {
+      mWifiLock.release();
+    }
     stopForeground(false);
     mMediaPlayer.pause();
     showPauseNotification();
   }
 
-  private void stop(){
-    mWifiLock.release();
+  private void stop() {
+    if (mWifiLock.isHeld()) {
+      mWifiLock.release();
+    }
     stopForeground(true);
     mMediaPlayer.stop();
+    mMediaPlayer.release();
+    mMediaPlayer = null;
+
+    stopSelf();
   }
 
   private void showPauseNotification(){
@@ -234,11 +232,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
             // Apply the media style template
         .setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(1 /* #1: pause button */)
-                .setMediaSession(mSession.getSessionToken())
         )
         .setContentTitle("Wonderful music")
         .setContentText("My Awesome Band")
         .setContentIntent(createNotificationContentPendingIntent())
+        .setOngoing(false)
         .build();
 
     startForeground(NOTIFICATION_ID, notification);
@@ -257,11 +255,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
             // Apply the media style template
         .setStyle(new NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(1 /* #1: pause button */)
-                .setMediaSession(mSession.getSessionToken())
         )
         .setContentTitle("Wonderful music")
         .setContentText("My Awesome Band")
         .setContentIntent(createNotificationContentPendingIntent())
+        .setOngoing(true)
         .build();
 
     startForeground(NOTIFICATION_ID, notification);
@@ -306,59 +304,5 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         resultIntent,
         PendingIntent.FLAG_UPDATE_CURRENT
     );
-  }
-
-  private class MediaSessionCallback extends MediaSessionCompat.Callback {
-    @Override
-    public void onCommand(String command, Bundle extras, ResultReceiver cb) {
-      super.onCommand(command, extras, cb);
-    }
-
-    @Override
-    public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
-      return super.onMediaButtonEvent(mediaButtonEvent);
-    }
-
-    @Override
-    public void onPlay() {
-      super.onPlay();
-    }
-
-    @Override
-    public void onPause() {
-      super.onPause();
-      Log.d(TAG, "onPause");
-      mMediaPlayer.pause();
-    }
-
-    @Override
-    public void onSkipToNext() {
-      super.onSkipToNext();
-    }
-
-    @Override
-    public void onSkipToPrevious() {
-      super.onSkipToPrevious();
-    }
-
-    @Override
-    public void onFastForward() {
-      super.onFastForward();
-    }
-
-    @Override
-    public void onRewind() {
-      super.onRewind();
-    }
-
-    @Override
-    public void onStop() {
-      super.onStop();
-    }
-
-    @Override
-    public void onSeekTo(long pos) {
-      super.onSeekTo(pos);
-    }
   }
 }

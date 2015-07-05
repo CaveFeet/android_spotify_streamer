@@ -31,10 +31,6 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
   @Override
   public void onCreateView(@NonNull PlaybackFragmentView view) {
     super.onCreateView(view);
-
-    //mView.mPlayButton.setEnabled(false);
-
-    //mView.mPauseButton.setEnabled(false);
   }
 
   @Override
