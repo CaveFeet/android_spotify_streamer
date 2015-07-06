@@ -170,7 +170,9 @@ public class MainActivity extends AppCompatActivity {
     public void onTrackClicked(TrackClickedEvent event) {
         // Show the playback fragment to interact with the media controls
         PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
-        playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_activity_playback_frame, playbackFragment)
+            .addToBackStack(null).commit();
 
         TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
 

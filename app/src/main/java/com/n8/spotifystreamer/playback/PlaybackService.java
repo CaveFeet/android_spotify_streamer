@@ -22,9 +22,12 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.TrackPausedEvent;
+import com.n8.spotifystreamer.events.TrackStartedEvent;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -60,14 +63,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private static final int NOTIFICATION_ID = 001;
 
   private MediaPlayer mMediaPlayer;
+
   private WifiManager.WifiLock mWifiLock;
-  private BroadcastReceiver mMusicIntentReceiver;
+
+  private TopTracksPlaylist mTopTracksPlaylist;
 
   private int mTrackIndex;
 
   private Bitmap mNotificationImage;
-
-  private TopTracksPlaylist mTopTracksPlaylist;
 
   @Override
   public IBinder onBind(Intent intent) {
@@ -75,30 +78,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   @Override
-  public void onCreate() {
-    super.onCreate();
-
-    mMusicIntentReceiver = new BroadcastReceiver() {
-      @Override
-      public void onReceive(Context context, Intent intent) {
-
-      }
-    };
-    registerReceiver(mMusicIntentReceiver, new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY));
-  }
-
-  @Override
   public void onDestroy() {
-    if (mMediaPlayer != null) {
-      mMediaPlayer.release();
-    }
-    if (mWifiLock != null) {
-      if (mWifiLock.isHeld()) {
-        mWifiLock.release();
-      }
-      mWifiLock = null;
-    }
-    unregisterReceiver(mMusicIntentReceiver);
+    cleanupMediaPlayer();
+    cleanupWifiLock();
   }
 
   @Override
@@ -115,7 +97,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       stop();
     }
 
-    return super.onStartCommand(intent, flags, startId);
+    return START_STICKY;
   }
 
   @Override
@@ -150,28 +132,70 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
       case AudioManager.AUDIOFOCUS_LOSS:
         // Lost focus for an unbounded amount of time: stop playback and release media player
-        if (mMediaPlayer.isPlaying()) {
-          mMediaPlayer.stop();
-        }
-        mMediaPlayer.release();
-        mMediaPlayer = null;
+        stop();
+        cleanupMediaPlayer();
         break;
 
       case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-        // Lost focus for a short time, but we have to stop
-        // playback. We don't release the media player because playback
-        // is likely to resume
-        if (mMediaPlayer.isPlaying()) {
-          mMediaPlayer.pause();
-        }
+        // Lost focus for a short time, but we have to stop playback. We don't release the media player because playback is
+        // likely to resume
+        pause();
         break;
 
       case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-        // Lost focus for a short time, but it's ok to keep playing
-        // at an attenuated level
-        if (mMediaPlayer.isPlaying()) mMediaPlayer.setVolume(0.1f, 0.1f);
+        // Lost focus for a short time, but it's ok to keep playing at an attenuated level
+        if (mMediaPlayer.isPlaying()) {
+          mMediaPlayer.setVolume(0.1f, 0.1f);
+        }
         break;
     }
+  }
+
+  private void initMediaPlayer() {
+    if (mMediaPlayer == null) {
+      mMediaPlayer = new MediaPlayer();
+      mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+      mMediaPlayer.setOnPreparedListener(this);
+      mMediaPlayer.setOnBufferingUpdateListener(this);
+      mMediaPlayer.setOnErrorListener(this);
+
+      // Set wake lock to ensue cpu doesn't sleep while playing.
+      // Is managed by media player so when music is paused or stopped, the lock is removed
+      mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+
+      // Get a wifi lock that we can set when music is playing
+      cleanupWifiLock();
+      mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
+
+      try {
+        String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
+        if (url == null) {
+          return;
+        }
+
+        mMediaPlayer.setDataSource(url);
+        mMediaPlayer.prepareAsync();
+      } catch (IOException e) {
+        Log.d(TAG, "Failed to prepare media playter " + e.getMessage());
+      }
+    } else {
+      stop();
+      initMediaPlayer();
+    }
+  }
+
+  private void cleanupMediaPlayer(){
+    if (mMediaPlayer != null) {
+      mMediaPlayer.release();
+    }
+    mMediaPlayer = null;
+  }
+
+  private void cleanupWifiLock(){
+    if (mWifiLock != null && mWifiLock.isHeld()) {
+      mWifiLock.release();
+    }
+    mWifiLock = null;
   }
 
   private void handlePlayIntent(Intent intent) {
@@ -191,46 +215,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     play();
   }
 
-  private void initMediaPlayer() {
-    if (mMediaPlayer == null) {
-      mMediaPlayer = new MediaPlayer();
-      mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-      mMediaPlayer.setOnPreparedListener(this);
-      mMediaPlayer.setOnBufferingUpdateListener(this);
-      mMediaPlayer.setOnErrorListener(this);
-
-      // Set wake lock to ensue cpu doesn't sleep while playing.
-      // Is managed by media player so when music is paused or stopped, the lock is removed
-      mMediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-
-      // Get a wifi lock that we can set when music is playing
-      mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
-
-      try {
-        String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
-        if (url == null) {
-          return;
-        }
-
-        mMediaPlayer.setDataSource(url);
-        mMediaPlayer.prepareAsync();
-      } catch (IOException e) {
-        Log.d(TAG, "Failed to prepare media playter " + e.getMessage());
-      }
-    } else {
-      if (mMediaPlayer.isPlaying()) {
-        mMediaPlayer.stop();
-      }
-      mMediaPlayer.release();
-      mMediaPlayer = null;
-      initMediaPlayer();
-    }
-  }
-
   private void play(){
     AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-    int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
-        AudioManager.AUDIOFOCUS_GAIN);
+    int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
     if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
       Log.d(TAG, "Failed to get audio focus");
@@ -238,6 +225,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mWifiLock.acquire();
       showPlayNotification();
       mMediaPlayer.start();
+      BusProvider.getInstance().post(
+          new TrackStartedEvent(
+              mTopTracksPlaylist.getTrackName(mTrackIndex),
+              mTopTracksPlaylist.getTrackAlbumName(mTrackIndex),
+              mTopTracksPlaylist.getArtistName(),
+              mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)
+          )
+      );
     }
   }
 
@@ -246,20 +241,26 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
+
+    if (mMediaPlayer.isPlaying()) {
+      mMediaPlayer.pause();
+      BusProvider.getInstance().post(new TrackPausedEvent());
+    }
+
     stopForeground(false);
-    mMediaPlayer.pause();
     showPauseNotification();
   }
 
   private void stop() {
     Log.d(TAG, "Action_Stop");
-    if (mWifiLock.isHeld()) {
-      mWifiLock.release();
+
+    if (mMediaPlayer != null &&  mMediaPlayer.isPlaying()) {
+      mMediaPlayer.stop();
     }
+
     stopForeground(true);
-    mMediaPlayer.stop();
-    mMediaPlayer.release();
-    mMediaPlayer = null;
+    cleanupMediaPlayer();
+    cleanupWifiLock();
 
     stopSelf();
   }
@@ -295,12 +296,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .setSmallIcon(R.drawable.notification_icon)
         .setLargeIcon(bitmap)
             // Add media control buttons that invoke intents in your media service
-        .addAction(android.R.drawable.ic_media_previous, "Previous", null) // #0
-        .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPlayPendingIntent())  // #1
-        .addAction(android.R.drawable.ic_media_next, "Next", null)     // #2
+        .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
+        .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPendingIntent(ACTION_PAUSE))
+        .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
             // Apply the media style template
         .setStyle(new NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(1 /* #1: pause button */)
+                .setShowActionsInCompactView(1)
         )
         .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
         .setContentText(mTopTracksPlaylist.getArtistName())
@@ -343,12 +344,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .setSmallIcon(R.drawable.notification_icon)
         .setLargeIcon(bitmap)
             // Add media control buttons that invoke intents in your media service
-        .addAction(android.R.drawable.ic_media_previous, "Previous", null) // #0
-        .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPausePendingIntent())  // #1
-        .addAction(android.R.drawable.ic_media_next, "Next", null)     // #2
+        .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
+        .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPendingIntent(ACTION_PAUSE))
+        .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
             // Apply the media style template
         .setStyle(new NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(1 /* #1: pause button */)
+                .setShowActionsInCompactView(1)
         )
         .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
         .setContentText(mTopTracksPlaylist.getArtistName())
@@ -363,8 +364,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private PendingIntent createNotificationContentPendingIntent() {
     Intent resultIntent = new Intent(this, MainActivity.class);
 
-// Because clicking the notification opens a new ("special") activity, there's
-// no need to create an artificial back stack.
     return PendingIntent.getActivity(
         this,
         0,
@@ -373,26 +372,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     );
   }
 
-  private PendingIntent createNotificationPausePendingIntent(){
+  private PendingIntent createNotificationPendingIntent(String action) {
     Intent resultIntent = new Intent(this, PlaybackService.class);
-    resultIntent.setAction(ACTION_PAUSE);
+    resultIntent.setAction(action);
 
-// Because clicking the notification opens a new ("special") activity, there's
-// no need to create an artificial back stack.
-    return PendingIntent.getService(
-        this,
-        0,
-        resultIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
-    );
-  }
-
-  private PendingIntent createNotificationPlayPendingIntent(){
-    Intent resultIntent = new Intent(this, PlaybackService.class);
-    resultIntent.setAction(ACTION_PLAY);
-
-// Because clicking the notification opens a new ("special") activity, there's
-// no need to create an artificial back stack.
     return PendingIntent.getService(
         this,
         0,

@@ -4,8 +4,13 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.DragEvent;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -44,7 +49,7 @@ public class PlaybackFragment extends DialogFragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    PlaybackFragmentView view = (PlaybackFragmentView) inflater.inflate(R.layout.fragment_playback, container, false);
+    final PlaybackFragmentView view = (PlaybackFragmentView) inflater.inflate(R.layout.fragment_playback, container, false);
 
     if (mController == null) {
       mController = new PlaybackFragmentController(mTracks, mTrack);
@@ -60,14 +65,6 @@ public class PlaybackFragment extends DialogFragment {
   @Override
   public void onDetach() {
     super.onDetach();
-    if (mController != null) {
-      mController.onDetachView();
-    }
-  }
-
-  @Override
-  public void onDismiss(DialogInterface dialog) {
-    super.onDismiss(dialog);
     if (mController != null) {
       mController.onDetachView();
     }
