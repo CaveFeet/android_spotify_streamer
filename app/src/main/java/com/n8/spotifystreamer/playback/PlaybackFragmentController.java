@@ -1,5 +1,6 @@
 package com.n8.spotifystreamer.playback;
 
+import android.animation.Animator;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -91,6 +92,8 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
   class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
     private static final String DEBUG_TAG = "Gestures";
 
+    boolean mAnimating;
+
     @Override
     public boolean onDown(MotionEvent event) {
       //Log.d(DEBUG_TAG, "onDown: " + event.toString());
@@ -108,7 +111,30 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
 
       Log.d(TAG, "delta = " + delta);
 
-      mView.animate().translationYBy(delta).start();
+      if (!mAnimating) {
+        mView.setY(mView.getY() + delta);
+//        mView.animate().translationYBy(delta).setListener(new Animator.AnimatorListener() {
+//          @Override
+//          public void onAnimationStart(Animator animation) {
+//            mAnimating = true;
+//          }
+//
+//          @Override
+//          public void onAnimationEnd(Animator animation) {
+//            mAnimating = false;
+//          }
+//
+//          @Override
+//          public void onAnimationCancel(Animator animation) {
+//            mAnimating = false;
+//          }
+//
+//          @Override
+//          public void onAnimationRepeat(Animator animation) {
+//
+//          }
+//        });
+      }
       return super.onScroll(e1, e2, distanceX, distanceY);
     }
 
