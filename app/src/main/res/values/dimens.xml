@@ -19,4 +19,6 @@
     <dimen name="coachmark_image_size">200dp</dimen>
     <dimen name="expanded_toolbar_height">200dp</dimen>
     <dimen name="recycler_view_artist_badge_icon_size">25dp</dimen>
+
+    <dimen name="toolbar_height">?android:attr/actionBarSize</dimen>
 </resources>

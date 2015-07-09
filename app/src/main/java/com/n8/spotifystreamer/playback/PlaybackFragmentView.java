@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.ProgressBar;
 
@@ -27,6 +28,9 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
 
   @InjectView(R.id.fragment_playback_buffer_progressBar)
   ProgressBar mBufferProgressBar;
+
+  @InjectView(R.id.fragment_playback_album_image)
+  ImageView mAlbumArtImageView;
 
   public PlaybackFragmentView(Context context) {
     super(context);

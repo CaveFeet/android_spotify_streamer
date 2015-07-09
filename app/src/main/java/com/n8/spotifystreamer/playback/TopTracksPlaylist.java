@@ -96,7 +96,7 @@ public class TopTracksPlaylist implements Parcelable{
     List<String> trackThumbnailUrls = new ArrayList<>(tracks.size());
     for (Track track : tracks) {
       List<Image> images = track.album.images;
-      trackThumbnailUrls.add(images.get(images.size() - 1).url);
+      trackThumbnailUrls.add(images.get(0).url);
     }
 
     return trackThumbnailUrls;

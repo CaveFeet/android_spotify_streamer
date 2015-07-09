@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
+    android:elevation="@dimen/toolbar_elevation"
     >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -11,11 +12,10 @@
         >
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="50dp"
-            android:src="@drawable/play_on_spotify_black"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
+            android:id="@+id/fragment_playback_album_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
             />
 
         <FrameLayout
@@ -66,6 +66,24 @@
             android:layout_toEndOf="@id/fragment_playback_play_pause_container"
             android:src="@android:drawable/ic_media_next"
             />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/playback_fragment_header"
+            android:elevation="8dp"
+            >
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:src="@drawable/play_on_spotify_black"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                />
+        </RelativeLayout>
 
     </RelativeLayout>
 

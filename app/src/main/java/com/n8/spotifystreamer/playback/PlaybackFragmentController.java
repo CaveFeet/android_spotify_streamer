@@ -10,6 +10,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -19,9 +20,12 @@ import android.widget.MediaController;
 
 import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.BusProvider;
+import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.UiUtils;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
 import com.squareup.otto.Subscribe;
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.util.List;
@@ -83,6 +87,7 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPauseButton.setVisibility(View.VISIBLE);
     mView.mPlayButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
+    Picasso.with(mView.getContext()).load(event.getThumbnailUrl()).into(mView.mAlbumArtImageView);
   }
 
   @Subscribe
@@ -97,9 +102,20 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
 
     private final int FLING_THRESHOLD = 250;
 
-    private final float MAX_Y_SCROLL_OFFSET = 150;  // TODO update based on mView's header
+    // TODO update
 
     private final long FLING_ANIMATION_DURATION = 200;
+
+    // header
+    // based on mView's
+
+    private float mYOffset;
+
+    public MyGestureListener() {
+      TypedValue tv = new TypedValue();
+      mView.getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true);
+      mYOffset = mView.getContext().getResources().getDimensionPixelSize(tv.resourceId);
+    }
 
     public boolean onDown(MotionEvent event) {
       return true;
@@ -156,7 +172,7 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     }
 
     private float getMaxYScroll(){
-      return mView.getHeight() - MAX_Y_SCROLL_OFFSET;
+      return mView.getHeight() - mYOffset;
     }
 
     private void animateUp(){
