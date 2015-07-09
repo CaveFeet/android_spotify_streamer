@@ -1,6 +1,7 @@
 package com.n8.spotifystreamer.playback;
 
 import android.animation.Animator;
+import android.animation.TimeInterpolator;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -13,6 +14,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.MediaController;
 
 import com.n8.spotifystreamer.BaseFragmentController;
@@ -90,59 +92,88 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
   }
 
   class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
-    private static final String DEBUG_TAG = "Gestures";
 
-    boolean mAnimating;
+    private final String TAG = MyGestureListener.class.getSimpleName();
 
-    @Override
+    private final int FLING_THRESHOLD = 250;
+
+    private final float MAX_Y_SCROLL_OFFSET = 150;  // TODO update based on mView's header
+
+    private final long FLING_ANIMATION_DURATION = 200;
+
     public boolean onDown(MotionEvent event) {
-      //Log.d(DEBUG_TAG, "onDown: " + event.toString());
       return true;
     }
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-
       float delta = e2.getY() - e1.getY();
+
       if (mView.getY() + delta < 0) {
         float overscroll = mView.getY() + delta;
         delta -= overscroll;
+      }else if (mView.getY() + delta > getMaxYScroll()) {
+        float overscroll = mView.getY() - delta;
+        delta += overscroll;
       }
 
-      Log.d(TAG, "delta = " + delta);
+      float newY = mView.getY() + delta;
+      mView.setY(newY);
 
-      if (!mAnimating) {
-        mView.setY(mView.getY() + delta);
-//        mView.animate().translationYBy(delta).setListener(new Animator.AnimatorListener() {
-//          @Override
-//          public void onAnimationStart(Animator animation) {
-//            mAnimating = true;
-//          }
-//
-//          @Override
-//          public void onAnimationEnd(Animator animation) {
-//            mAnimating = false;
-//          }
-//
-//          @Override
-//          public void onAnimationCancel(Animator animation) {
-//            mAnimating = false;
-//          }
-//
-//          @Override
-//          public void onAnimationRepeat(Animator animation) {
-//
-//          }
-//        });
-      }
-      return super.onScroll(e1, e2, distanceX, distanceY);
+      return true;
     }
 
     @Override
-    public boolean onFling(MotionEvent event1, MotionEvent event2,
-                           float velocityX, float velocityY) {
-      Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+    public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
+      Log.d(TAG, "onFling: velocityY = " + velocityY);
+
+      if (Math.abs(velocityY) < FLING_THRESHOLD) {
+
+        // Dragging up from bottom
+        //
+        if (velocityY < 0 && mView.getY() < (mView.getHeight() * .85)) {
+          animateDown();
+        }else if (velocityY < 0 && mView.getY() > (mView.getHeight() * .85)) {
+          animateUp();
+        }
+
+        // Dragging down from top
+        if (velocityY > 0 && mView.getY() > (mView.getHeight() * .15)) {
+          animateUp();
+        }else if (velocityY > 0 && mView.getY() < (mView.getHeight() * .15)) {
+          animateDown();
+        }
+        return false;
+      }
+
+      if (velocityY < 0) {
+        animateUp();
+      } else {
+        animateDown();
+      }
+
       return true;
+    }
+
+    private float getMaxYScroll(){
+      return mView.getHeight() - MAX_Y_SCROLL_OFFSET;
+    }
+
+    private void animateUp(){
+      mView.animate()
+          .y(0)
+          .setDuration(FLING_ANIMATION_DURATION)
+          .setInterpolator(new AccelerateDecelerateInterpolator())
+          .start();
+
+    }
+
+    private void animateDown(){
+      mView.animate()
+          .y(getMaxYScroll())
+          .setDuration(FLING_ANIMATION_DURATION)
+          .setInterpolator(new AccelerateDecelerateInterpolator())
+          .start();
     }
   }
 }
