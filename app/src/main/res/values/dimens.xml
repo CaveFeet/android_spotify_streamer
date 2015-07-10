@@ -21,4 +21,9 @@
     <dimen name="recycler_view_artist_badge_icon_size">25dp</dimen>
 
     <dimen name="toolbar_height">?android:attr/actionBarSize</dimen>
+
+    <dimen name="fragment_playback_header_elevation">8dp</dimen>
+    <dimen name="fragment_playback_header_thumbnail_size">50dp</dimen>
+    <dimen name="fragment_playback_spotify_badge_width">100dp</dimen>
+    <dimen name="fragment_playback_media_control_button_size">60dp</dimen>
 </resources>

@@ -3,13 +3,10 @@ package com.n8.spotifystreamer.playback;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.n8.spotifystreamer.BaseFragmentView;
 import com.n8.spotifystreamer.R;
@@ -31,6 +28,24 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
 
   @InjectView(R.id.fragment_playback_album_image)
   ImageView mAlbumArtImageView;
+
+  @InjectView(R.id.fragment_playback_header_track_title_textView)
+  TextView mHeaderTrackTitleTextView;
+
+  @InjectView(R.id.fragment_playback_header_artist_name_textView)
+  TextView mHeaderArtistNameTextView;
+
+  @InjectView(R.id.fragment_playback_header_thumbnail)
+  ImageView mHeaderThumbnail;
+
+  @InjectView(R.id.fragment_playback_header_play_imageView)
+  ImageView mHeaderPlayImageView;
+
+  @InjectView(R.id.fragment_playback_header_pause_imageView)
+  ImageView mHeaderPauseImageView;
+
+  @InjectView(R.id.fragment_playback_header_buffer_progressBar)
+  ProgressBar mHeaderProgressBar;
 
   public PlaybackFragmentView(Context context) {
     super(context);
@@ -54,13 +69,13 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
     ButterKnife.inject(this);
   }
 
-  @OnClick(R.id.fragment_playback_play_imageButton)
-  void onPlayClicked(ImageButton button){
+  @OnClick({R.id.fragment_playback_play_imageButton, R.id.fragment_playback_header_play_imageView})
+  void onPlayClicked(){
     mController.onPlayClicked();
   }
 
-  @OnClick(R.id.fragment_playback_pause_imageButton)
-  void onPauseClicked(ImageButton button) {
+  @OnClick({R.id.fragment_playback_pause_imageButton, R.id.fragment_playback_header_pause_imageView})
+  void onPauseClicked() {
     mController.onPauseClicked();
   }
 }

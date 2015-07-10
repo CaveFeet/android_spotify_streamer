@@ -1,33 +1,23 @@
 package com.n8.spotifystreamer.playback;
 
-import android.animation.Animator;
-import android.animation.TimeInterpolator;
+import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
-import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.widget.MediaController;
 
 import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.BusProvider;
-import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.UiUtils;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
@@ -53,13 +43,24 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPauseButton.setVisibility(View.GONE);
     mView.mPlayButton.setVisibility(View.GONE);
 
-    final GestureDetectorCompat mDetector = new GestureDetectorCompat(mView.getContext(), new MyGestureListener());
+    mView.mHeaderPauseImageView.setVisibility(View.GONE);
+    mView.mHeaderPlayImageView.setVisibility(View.GONE);
+
+    final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
     view.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
-        return mDetector.onTouchEvent(event);
+        return gestureDetector.onTouchEvent(event);
       }
     });
+
+    String thumbnailUrl = mCurrentTrack.album.images.get(0).url;
+
+    Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mHeaderThumbnail);
+    Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mAlbumArtImageView);
+
+    mView.mHeaderTrackTitleTextView.setText(mCurrentTrack.name);
+    mView.mHeaderArtistNameTextView.setText(mCurrentTrack.artists.get(0).name);
   }
 
   @Override
@@ -87,29 +88,52 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPauseButton.setVisibility(View.VISIBLE);
     mView.mPlayButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
-    Picasso.with(mView.getContext()).load(event.getThumbnailUrl()).into(mView.mAlbumArtImageView);
+
+    mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
+    mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    mView.mHeaderProgressBar.setVisibility(View.GONE);
   }
 
   @Subscribe
   public void onTrackPaused(TrackPausedEvent event) {
     mView.mPlayButton.setVisibility(View.VISIBLE);
     mView.mPauseButton.setVisibility(View.GONE);
+
+    mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
+    mView.mHeaderPauseImageView.setVisibility(View.GONE);
+  }
+
+  class MyGestureDetector extends GestureDetectorCompat {
+
+    private MyGestureListener mMyGestureListener;
+
+    public MyGestureDetector(Context context, MyGestureListener listener) {
+      super(context, listener);
+      mMyGestureListener = listener;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+      boolean gestureHandled = super.onTouchEvent(event);
+      boolean upHandled = false;
+
+      if (event.getAction() == MotionEvent.ACTION_UP) {
+        upHandled = mMyGestureListener.onUp(event);
+      }
+
+      return gestureHandled || upHandled;
+    }
   }
 
   class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     private final String TAG = MyGestureListener.class.getSimpleName();
 
-    private final int FLING_THRESHOLD = 250;
-
-    // TODO update
-
     private final long FLING_ANIMATION_DURATION = 200;
 
-    // header
-    // based on mView's
-
     private float mYOffset;
+
+    private float mDeltaY;
 
     public MyGestureListener() {
       TypedValue tv = new TypedValue();
@@ -121,19 +145,38 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
       return true;
     }
 
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-      float delta = e2.getY() - e1.getY();
+    public boolean onUp(MotionEvent event) {
 
-      if (mView.getY() + delta < 0) {
-        float overscroll = mView.getY() + delta;
-        delta -= overscroll;
-      }else if (mView.getY() + delta > getMaxYScroll()) {
-        float overscroll = mView.getY() - delta;
-        delta += overscroll;
+      if (mDeltaY < 0 && mView.getY() < (mView.getHeight() * .85)) { // Dragging up from bottom
+        animateUp();
+      } else if (mDeltaY < 0 && mView.getY() > (mView.getHeight() * .85)) {
+        animateDown();
+      } else if (mDeltaY > 0 && mView.getY() > (mView.getHeight() * .15)) { // Dragging down from top
+        animateDown();
+      } else if (mDeltaY > 0 && mView.getY() < (mView.getHeight() * .15)) {
+        animateUp();
+      } else {
+        animateUp();
       }
 
-      float newY = mView.getY() + delta;
+      mDeltaY = 0;
+
+      return true;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+      mDeltaY = e2.getY() - e1.getY();
+
+      if (mView.getY() + mDeltaY < 0) {
+        float overscroll = mView.getY() + mDeltaY;
+        mDeltaY -= overscroll;
+      }else if (mView.getY() + mDeltaY > getMaxYScroll()) {
+        float overscroll = mView.getY() - mDeltaY;
+        mDeltaY += overscroll;
+      }
+
+      float newY = mView.getY() + mDeltaY;
       mView.setY(newY);
 
       return true;
@@ -141,27 +184,6 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
 
     @Override
     public boolean onFling(MotionEvent event1, MotionEvent event2, float velocityX, float velocityY) {
-      Log.d(TAG, "onFling: velocityY = " + velocityY);
-
-      if (Math.abs(velocityY) < FLING_THRESHOLD) {
-
-        // Dragging up from bottom
-        //
-        if (velocityY < 0 && mView.getY() < (mView.getHeight() * .85)) {
-          animateDown();
-        }else if (velocityY < 0 && mView.getY() > (mView.getHeight() * .85)) {
-          animateUp();
-        }
-
-        // Dragging down from top
-        if (velocityY > 0 && mView.getY() > (mView.getHeight() * .15)) {
-          animateUp();
-        }else if (velocityY > 0 && mView.getY() < (mView.getHeight() * .15)) {
-          animateDown();
-        }
-        return false;
-      }
-
       if (velocityY < 0) {
         animateUp();
       } else {

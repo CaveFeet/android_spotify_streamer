@@ -8,5 +8,5 @@
     <color name="accent_light">#A1887F</color>
     <color name="accent_dark">#5D4037</color>
 
-    <color name="playback_fragment_header">#CCFFFFFF</color>
+    <color name="playback_fragment_header">#DDFFFFFF</color>
 </resources>

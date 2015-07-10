@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/white"
-    android:elevation="@dimen/toolbar_elevation"
     >
     <RelativeLayout
         android:layout_width="match_parent"
@@ -20,8 +20,8 @@
 
         <FrameLayout
             android:id="@+id/fragment_playback_play_pause_container"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/fragment_playback_media_control_button_size"
+            android:layout_height="@dimen/fragment_playback_media_control_button_size"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             >
@@ -49,8 +49,8 @@
 
         <ImageButton
             android:id="@+id/fragment_playback_prev_imageButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/fragment_playback_media_control_button_size"
+            android:layout_height="@dimen/fragment_playback_media_control_button_size"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_toStartOf="@id/fragment_playback_play_pause_container"
@@ -59,31 +59,108 @@
 
         <ImageButton
             android:id="@+id/fragment_playback_next_imageButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="@dimen/fragment_playback_media_control_button_size"
+            android:layout_height="@dimen/fragment_playback_media_control_button_size"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_toEndOf="@id/fragment_playback_play_pause_container"
             android:src="@android:drawable/ic_media_next"
             />
 
+
         <RelativeLayout
+            android:id="@+id/fragment_playback_header"
             android:layout_width="match_parent"
             android:layout_height="?android:attr/actionBarSize"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="@color/playback_fragment_header"
-            android:elevation="8dp"
+            android:elevation="@dimen/fragment_playback_header_elevation"
+            android:padding="@dimen/keyline_0"
             >
 
             <ImageView
-                android:layout_width="100dp"
-                android:layout_height="50dp"
-                android:src="@drawable/play_on_spotify_black"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentEnd="true"
+                android:id="@+id/fragment_playback_header_thumbnail"
+                android:layout_width="@dimen/fragment_playback_header_thumbnail_size"
+                android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 />
+
+            <FrameLayout
+                android:id="@+id/fragment_playback_header_play_pause_container"
+                android:layout_width="@dimen/fragment_playback_media_control_button_size"
+                android:layout_height="@dimen/fragment_playback_media_control_button_size"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                >
+
+                <ImageView
+                    android:id="@+id/fragment_playback_header_play_imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_media_play"
+                    />
+
+                <ImageView
+                    android:id="@+id/fragment_playback_header_pause_imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_media_pause"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/fragment_playback_header_buffer_progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    />
+
+            </FrameLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:gravity="center_vertical"
+                android:layout_toEndOf="@id/fragment_playback_header_thumbnail"
+                android:layout_toStartOf="@id/fragment_playback_header_play_pause_container"
+                android:layout_marginStart="@dimen/keyline_0"
+                >
+
+                <TextView
+                    android:id="@+id/fragment_playback_header_track_title_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="marquee"
+                    android:text="Track title"
+                    tools:ignoreHardcodedText="true"
+                    />
+
+                <TextView
+                    android:id="@+id/fragment_playback_header_artist_name_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="marquee"
+                    android:text="Album Title"
+                    tools:ignoreHardcodedText="true"
+                    />
+
+
+            </LinearLayout>
         </RelativeLayout>
+
+        <ImageView
+            android:layout_below="@+id/fragment_playback_header"
+            android:layout_width="@dimen/fragment_playback_spotify_badge_width"
+            android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
+            android:src="@drawable/play_on_spotify_black"
+            android:layout_alignParentEnd="true"
+            />
 
     </RelativeLayout>
 
