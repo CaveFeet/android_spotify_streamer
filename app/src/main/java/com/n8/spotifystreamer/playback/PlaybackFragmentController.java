@@ -4,12 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 
 import com.n8.spotifystreamer.BaseFragmentController;
 import com.n8.spotifystreamer.BusProvider;
@@ -26,9 +28,15 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
 
   private static final String TAG = PlaybackFragmentController.class.getSimpleName();
 
+  private enum PlaybackState{
+    PLAYING, PAUSED
+  }
+
   private List<Track> mTracks;
 
   private Track mCurrentTrack;
+
+  boolean mFullScreen;
 
   public PlaybackFragmentController(List<Track> tracks, Track track) {
     mTracks = tracks;
@@ -43,8 +51,7 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPauseButton.setVisibility(View.GONE);
     mView.mPlayButton.setVisibility(View.GONE);
 
-    mView.mHeaderPauseImageView.setVisibility(View.GONE);
-    mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    hideHeaderMediaControls();
 
     final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
     view.setOnTouchListener(new View.OnTouchListener() {
@@ -89,9 +96,23 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPlayButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
 
-    mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
-    mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    updateHeaderMediaControls(PlaybackState.PLAYING);
+  }
+
+  private void updateHeaderMediaControls(PlaybackState state) {
     mView.mHeaderProgressBar.setVisibility(View.GONE);
+
+    if (mView.getY() == 0) {
+      return;
+    }
+
+    if (state == PlaybackState.PLAYING) {
+      mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
+      mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    } else if (state == PlaybackState.PAUSED) {
+      mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
+      mView.mHeaderPauseImageView.setVisibility(View.GONE);
+    }
   }
 
   @Subscribe
@@ -99,8 +120,19 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     mView.mPlayButton.setVisibility(View.VISIBLE);
     mView.mPauseButton.setVisibility(View.GONE);
 
-    mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
+    updateHeaderMediaControls(PlaybackState.PAUSED);
+  }
+
+  private void hideHeaderMediaControls(){
     mView.mHeaderPauseImageView.setVisibility(View.GONE);
+    mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    mView.mHeaderProgressBar.setVisibility(View.GONE);
+  }
+
+  private void showHeaderMediaControls(){
+    mView.mHeaderPauseImageView.setVisibility(mView.mPauseButton.getVisibility());
+    mView.mHeaderPlayImageView.setVisibility(mView.mPlayButton.getVisibility());
+    mView.mHeaderProgressBar.setVisibility(mView.mBufferProgressBar.getVisibility());
   }
 
   class MyGestureDetector extends GestureDetectorCompat {
@@ -159,9 +191,19 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
         animateUp();
       }
 
+      checkIfFullScreen();
+
       mDeltaY = 0;
 
       return true;
+    }
+
+    private void checkIfFullScreen() {
+      if (mView.getY() == 0) {
+        mFullScreen = true;
+      }else if (mView.getY() == (mView.getHeight() - mYOffset)) {
+        mFullScreen = false;
+      }
     }
 
     @Override
@@ -178,6 +220,8 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
 
       float newY = mView.getY() + mDeltaY;
       mView.setY(newY);
+
+      checkIfFullScreen();
 
       return true;
     }
@@ -198,6 +242,8 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     }
 
     private void animateUp(){
+      mFullScreen = true;
+      hideHeaderMediaControls();
       mView.animate()
           .y(0)
           .setDuration(FLING_ANIMATION_DURATION)
@@ -207,6 +253,8 @@ public class PlaybackFragmentController extends BaseFragmentController<PlaybackF
     }
 
     private void animateDown(){
+      mFullScreen = false;
+      showHeaderMediaControls();
       mView.animate()
           .y(getMaxYScroll())
           .setDuration(FLING_ANIMATION_DURATION)
