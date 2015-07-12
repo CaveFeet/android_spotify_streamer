@@ -12,22 +12,17 @@ email: contracts@esri.com
 package com.n8.spotifystreamer.tracks;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.UiUtils;

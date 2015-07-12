@@ -27,6 +27,7 @@ import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
+import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -34,7 +35,7 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer
-    .OnBufferingUpdateListener, MediaPlayer.OnErrorListener, AudioManager.OnAudioFocusChangeListener {
+    .OnBufferingUpdateListener, MediaPlayer.OnErrorListener, AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnCompletionListener {
 
   private static final String TAG = PlaybackService.class.getSimpleName();
 
@@ -78,6 +79,13 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   @Override
+  public void onTaskRemoved(Intent rootIntent) {
+    super.onTaskRemoved(rootIntent);
+    Log.d(TAG, "ONTaskRemoved");
+    stop();
+  }
+
+  @Override
   public void onDestroy() {
     cleanupMediaPlayer();
     cleanupWifiLock();
@@ -87,14 +95,18 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   public int onStartCommand(Intent intent, int flags, int startId) {
     Log.d(TAG, "onStartCommand");
 
-    String action = intent.getAction();
+    if (intent != null ) {
+      String action = intent.getAction();
 
-    if (action.equals(ACTION_PLAY)) {
-      handlePlayIntent(intent);
-    } else if (action.equals(ACTION_PAUSE)) {
-      pause();
-    } else if (action.equals(ACTION_STOP)) {
-      stop();
+      if (action != null) {
+        if (action.equals(ACTION_PLAY)) {
+          handlePlayIntent(intent);
+        } else if (action.equals(ACTION_PAUSE)) {
+          pause();
+        } else if (action.equals(ACTION_STOP)) {
+          stop();
+        }
+      }
     }
 
     return START_STICKY;
@@ -108,6 +120,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   @Override
   public void onBufferingUpdate(MediaPlayer mp, int percent) {
 
+  }
+
+  @Override
+  public void onCompletion(MediaPlayer mp) {
+    pause();
   }
 
   @Override
@@ -158,6 +175,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mMediaPlayer.setOnPreparedListener(this);
       mMediaPlayer.setOnBufferingUpdateListener(this);
       mMediaPlayer.setOnErrorListener(this);
+      mMediaPlayer.setOnCompletionListener(this);
 
       // Set wake lock to ensue cpu doesn't sleep while playing.
       // Is managed by media player so when music is paused or stopped, the lock is removed
@@ -251,6 +269,18 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     showPauseNotification();
   }
 
+  private void complete(){
+    Log.d(TAG, "Playback complete");
+    if (mWifiLock.isHeld()) {
+      mWifiLock.release();
+    }
+
+    BusProvider.getInstance().post(new TrackPlaybackCompleteEvent());
+
+    stopForeground(false);
+    showPauseNotification();
+  }
+
   private void stop() {
     Log.d(TAG, "Action_Stop");
 
@@ -297,7 +327,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .setLargeIcon(bitmap)
             // Add media control buttons that invoke intents in your media service
         .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
-        .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPendingIntent(ACTION_PAUSE))
+        .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPendingIntent(ACTION_PLAY))
         .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
             // Apply the media style template
         .setStyle(new NotificationCompat.MediaStyle()
@@ -311,7 +341,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         .build();
 
     NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
-    notificationManager.notify( NOTIFICATION_ID, notification );
+    notificationManager.notify(NOTIFICATION_ID, notification);
   }
 
   private void showPlayNotification() {

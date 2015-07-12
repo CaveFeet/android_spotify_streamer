@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.BaseFragmentView;
 import com.n8.spotifystreamer.R;
 
 import butterknife.ButterKnife;

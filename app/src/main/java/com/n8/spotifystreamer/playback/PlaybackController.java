@@ -1,9 +1,9 @@
 package com.n8.spotifystreamer.playback;
 
-import com.n8.spotifystreamer.BaseFragmentView;
 
+import com.n8.n8droid.ViewController;
 
-public interface PlaybackController extends BaseFragmentView.Controller {
+public interface PlaybackController extends ViewController {
   void onPlayClicked();
 
   void onPauseClicked();

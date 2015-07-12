@@ -82,16 +82,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Signal service to stop itself
-        Intent playbackIntent = new Intent(this, PlaybackService.class);
-        playbackIntent.setAction(PlaybackService.ACTION_STOP);
-        startService(playbackIntent);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button

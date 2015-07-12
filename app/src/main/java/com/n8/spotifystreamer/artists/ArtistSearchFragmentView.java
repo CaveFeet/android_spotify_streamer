@@ -12,11 +12,9 @@ email: contracts@esri.com
 package com.n8.spotifystreamer.artists;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -25,13 +23,11 @@ import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -131,7 +127,7 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
   private void setupSearchView() {
     mSearchView.setIconifiedByDefault(false);
 
-    SearchManager searchManager = (SearchManager) mActivity.getSystemService(
+    SearchManager searchManager = (SearchManager) getContext().getSystemService(
         Context.SEARCH_SERVICE);
     mSearchView.setSearchableInfo(searchManager.getSearchableInfo(mActivity.getComponentName()));
 
