@@ -6,11 +6,9 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +60,8 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   private String mCountryCode;
 
+  private Track mCurrentTrack;
+
   public static TopTracksFragment getInstance(Artist artist) {
     TopTracksFragment fragment = new TopTracksFragment();
     fragment.mArtist = artist;
@@ -112,6 +112,11 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   @Override
+  public void onShareClicked() {
+    startActivity(createShareIntent());
+  }
+
+  @Override
   public void onNavIconClicked() {
     getActivity().onBackPressed();
   }
@@ -150,6 +155,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   @Override
   public void onTrackViewClicked(Track track) {
+    mCurrentTrack = track;
     BusProvider.getInstance().post(new TrackClickedEvent(mArtist, mTracks, track));
   }
 
@@ -354,5 +360,13 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
           public void onError() {
           }
         });
+  }
+
+  private Intent createShareIntent() {
+    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+    shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+    shareIntent.setType("text/plain");
+    shareIntent.putExtra(Intent.EXTRA_TEXT, mArtist.name + "  -  " + mArtist.external_urls.get("spotify"));
+    return shareIntent;
   }
 }

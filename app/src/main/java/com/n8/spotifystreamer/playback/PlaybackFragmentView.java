@@ -47,6 +47,9 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   @InjectView(R.id.fragment_playback_header_buffer_progressBar)
   ProgressBar mHeaderProgressBar;
 
+  @InjectView(R.id.fragment_playback_spotify_badge_imageView)
+  ImageView mSpotifyBadgeImageView;
+
   public PlaybackFragmentView(Context context) {
     super(context);
   }

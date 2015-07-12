@@ -16,7 +16,9 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.MenuItem;
@@ -53,6 +55,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
   @InjectView(R.id.fragment_top_tracks_artist_image_header_background)
   ImageView mArtistHeaderBackgroundImageView;
+  private ShareActionProvider mShareActionProvider;
 
   public TopTracksFragmentView(Context context) {
     super(context);
@@ -87,6 +90,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
         }
       });
       mToolbar.inflateMenu(R.menu.settings_menu);
+      mToolbar.inflateMenu(R.menu.share_menu);
       mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem item) {
@@ -94,11 +98,15 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
             case R.id.main_menu_settings:
               mController.onSettingsMenuOptionClicked();
               return true;
+            case R.id.action_share:
+              mController.onShareClicked();
+              return true;
             default:
           }
           return false;
         }
       });
+
     }
 
     mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));

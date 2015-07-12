@@ -3,6 +3,7 @@ package com.n8.spotifystreamer.playback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -111,6 +112,14 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
     mView.mHeaderTrackTitleTextView.setText(mTrack.name);
     mView.mHeaderArtistNameTextView.setText(mTrack.artists.get(0).name);
+
+    mView.mSpotifyBadgeImageView.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(mTrack.external_urls.get("spotify")));
+        startActivity(intent);
+      }
+    });
 
     BusProvider.getInstance().post(new PlaybackServiceStateRequestEvent());
 

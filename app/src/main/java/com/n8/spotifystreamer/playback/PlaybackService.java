@@ -1,11 +1,14 @@
 package com.n8.spotifystreamer.playback;
 
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -79,8 +82,42 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     super.onCreate();
     BusProvider.getInstance().register(this);
 
-    mLockScreenControlsEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString
-        (R.string.pref_enable_notification_media_controls_key), false);
+    BroadcastReceiver lockScreenReceiver = new BroadcastReceiver() {
+      @Override
+      public void onReceive(Context context, Intent intent) {
+        KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+        boolean locked = km.inKeyguardRestrictedInputMode();
+
+        mLockScreenControlsEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString
+            (R.string.pref_enable_notification_media_controls_key), false);
+
+        if (locked) {
+          if (mMediaPlayer == null) {
+            return;
+          }
+
+          if (mMediaPlayer.isPlaying()) {
+            showPauseNotification(mLockScreenControlsEnabled);
+          } else {
+            showPlayNotification(mLockScreenControlsEnabled);
+          }
+        } else {
+          if (mMediaPlayer == null) {
+            return;
+          }
+
+          if (mMediaPlayer.isPlaying()) {
+            showPauseNotification(true);
+          } else {
+            showPlayNotification(true);
+          }
+        }
+      }
+    };
+
+    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
   }
 
   @Override
@@ -135,7 +172,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   @Override
   public void onCompletion(MediaPlayer mp) {
-    pause();
+    complete();
   }
 
   @Override
@@ -184,20 +221,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer));
   }
 
-  @Subscribe
-  public void onLockScreenControlsSettingChangedEventReceived(LockScreenControlsSettingChangedEvent event) {
-    mLockScreenControlsEnabled = event.isLockScreenControlsEnabled();
-
-    if (mMediaPlayer == null) {
-      return;
-    }
-
-    if (mMediaPlayer.isPlaying()) {
-      showPauseNotification(mLockScreenControlsEnabled);
-    } else {
-      showPlayNotification(mLockScreenControlsEnabled);
-    }
-  }
+//  @Subscribe
+//  public void onLockScreenControlsSettingChangedEventReceived(LockScreenControlsSettingChangedEvent event) {
+//    mLockScreenControlsEnabled = event.isLockScreenControlsEnabled();
+//  }
 
   private void initMediaPlayer() {
     if (mMediaPlayer == null) {
@@ -272,7 +299,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       Log.d(TAG, "Failed to get audio focus");
     } else {
       mWifiLock.acquire();
-      showPlayNotification(mLockScreenControlsEnabled);
+      showPlayNotification(true);
       mMediaPlayer.start();
       BusProvider.getInstance().post(
           new TrackStartedEvent(
@@ -297,7 +324,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
 
     stopForeground(false);
-    showPauseNotification(mLockScreenControlsEnabled);
+    showPauseNotification(true);
   }
 
   private void complete(){
@@ -309,7 +336,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().post(new TrackPlaybackCompleteEvent());
 
     stopForeground(false);
-    showPauseNotification(mLockScreenControlsEnabled);
+    showPauseNotification(true);
   }
 
   private void stop() {

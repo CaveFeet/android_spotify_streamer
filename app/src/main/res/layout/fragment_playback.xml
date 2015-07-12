@@ -155,6 +155,7 @@
         </RelativeLayout>
 
         <ImageView
+            android:id="@+id/fragment_playback_spotify_badge_imageView"
             android:layout_below="@+id/fragment_playback_header"
             android:layout_width="@dimen/fragment_playback_spotify_badge_width"
             android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
