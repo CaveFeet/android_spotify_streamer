@@ -3,7 +3,9 @@ package com.n8.spotifystreamer.tracks;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -18,8 +20,10 @@ import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.SettingsActivity;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
+import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
@@ -56,6 +60,8 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   private TracksRecyclerAdapter mAdapter;
 
+  private String mCountryCode;
+
   public static TopTracksFragment getInstance(Artist artist) {
     TopTracksFragment fragment = new TopTracksFragment();
     fragment.mArtist = artist;
@@ -88,6 +94,9 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
     super.onCreateView(inflater, container, savedInstanceState);
 
+    mCountryCode = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string
+        .pref_country_code_key), Locale.getDefault().getCountry());
+
     bindArtist();
 
     return mView;
@@ -108,6 +117,12 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   @Override
+  public void onSettingsMenuOptionClicked() {
+    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+    startActivity(intent);
+  }
+
+  @Override
   public LinearLayoutManager getLinearLayoutManager() {
     return new LinearLayoutManager(getActivity());
   }
@@ -125,6 +140,12 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     mArtist = event.mArtist;
     mTracks = null;
     bindArtist();
+  }
+
+  @Subscribe
+  public void onCountryCodeSettingChangeEventReceived(CountryCodeSettingChangedEvent event) {
+    mCountryCode = event.getCountryCode();
+    requestTopTracks();
   }
 
   @Override
@@ -202,7 +223,9 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   private void requestTopTracks() {
     final Map<String, Object> map = new HashMap<>();
-    map.put("country", Locale.getDefault().getCountry());
+
+    map.put("country", mCountryCode);
+
     final Handler handler = new Handler();
     SpotifyStreamerApplication
         .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {

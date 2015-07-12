@@ -18,6 +18,8 @@ import com.n8.n8droid.ViewController;
 public interface TopTracksController extends ViewController {
   void onNavIconClicked();
 
+  void onSettingsMenuOptionClicked();
+
   LinearLayoutManager getLinearLayoutManager();
 
   String getArtistName();

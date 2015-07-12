@@ -2,9 +2,11 @@ package com.n8.spotifystreamer.artists;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.SearchRecentSuggestions;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,13 +23,16 @@ import com.n8.n8droid.BaseViewControllerFragment;
 import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.SettingsActivity;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
+import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import kaaes.spotify.webapi.android.models.Artist;
@@ -60,6 +65,8 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
 
   private boolean mPagingNewResults;
 
+  private String mCountryCode;
+
   public ArtistSearchFragment() {
   }
 
@@ -84,6 +91,10 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     super.onCreateView(inflater, container, savedInstanceState);
 
     BusProvider.getInstance().register(this);
+
+    mCountryCode = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(getString(R.string
+        .pref_country_code_key), Locale.getDefault().getCountry());
+
     // If view is being recreated after a rotation, there may be existing artist data to view
     if (mArtists != null && mArtists.size() > 0) {
       bindArtists(false);
@@ -101,6 +112,12 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   @Override
   public LinearLayoutManager getLinearLayoutManager() {
     return new LinearLayoutManager(getActivity());
+  }
+
+  @Override
+  public void onSettingsMenuOptionClicked() {
+    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+    startActivity(intent);
   }
 
   @Override
@@ -131,6 +148,14 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   @Subscribe
   public void onSearchIntentReceived(SearchIntentReceivedEvent event) {
     submitQuery(event.getQuery());
+  }
+
+  @Subscribe
+  public void onCountryCodeSettingChangeEventReceived(CountryCodeSettingChangedEvent event) {
+    mCountryCode = event.getCountryCode();
+    if (mCurrentQuery != null && mCurrentQuery.length() > 0) {
+      submitQuery(mCurrentQuery);
+    }
   }
 
   private void submitQuery(String query) {
@@ -164,6 +189,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     Map<String, Object> queryMap = new HashMap<>();
     queryMap.put("offset", mCurrentQueryOffset);
     queryMap.put("limit", REQUEST_LIMIT);
+    queryMap.put("country", mCountryCode);
 
     SpotifyStreamerApplication.getSpotifyService().searchArtists(mCurrentQuery, queryMap,
         new Callback<ArtistsPager>() {

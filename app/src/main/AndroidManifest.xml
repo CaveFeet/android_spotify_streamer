@@ -44,9 +44,20 @@
             android:enabled="true"
             android:exported="true" >
             <intent-filter>
-                <action android:name="ANDROID.INTENT.ACTION.MEDIA_BUTTON"/>
+                <action android:name="ANDROID.INTENT.ACTION.MEDIA_BUTTON" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/SettingsTheme"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.n8.spotifystreamer.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

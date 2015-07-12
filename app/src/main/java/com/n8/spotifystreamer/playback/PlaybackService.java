@@ -4,20 +4,15 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.ResultReceiver;
-import android.support.v4.media.session.MediaSessionCompat;
+import android.preference.PreferenceManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -26,6 +21,7 @@ import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.LockScreenControlsSettingChangedEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
@@ -76,10 +72,15 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private Bitmap mNotificationImage;
 
+  private boolean mLockScreenControlsEnabled;
+
   @Override
   public void onCreate() {
     super.onCreate();
     BusProvider.getInstance().register(this);
+
+    mLockScreenControlsEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString
+        (R.string.pref_enable_notification_media_controls_key), false);
   }
 
   @Override
@@ -183,6 +184,21 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer));
   }
 
+  @Subscribe
+  public void onLockScreenControlsSettingChangedEventReceived(LockScreenControlsSettingChangedEvent event) {
+    mLockScreenControlsEnabled = event.isLockScreenControlsEnabled();
+
+    if (mMediaPlayer == null) {
+      return;
+    }
+
+    if (mMediaPlayer.isPlaying()) {
+      showPauseNotification(mLockScreenControlsEnabled);
+    } else {
+      showPlayNotification(mLockScreenControlsEnabled);
+    }
+  }
+
   private void initMediaPlayer() {
     if (mMediaPlayer == null) {
       mMediaPlayer = new MediaPlayer();
@@ -256,7 +272,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       Log.d(TAG, "Failed to get audio focus");
     } else {
       mWifiLock.acquire();
-      showPlayNotification();
+      showPlayNotification(mLockScreenControlsEnabled);
       mMediaPlayer.start();
       BusProvider.getInstance().post(
           new TrackStartedEvent(
@@ -281,7 +297,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
 
     stopForeground(false);
-    showPauseNotification();
+    showPauseNotification(mLockScreenControlsEnabled);
   }
 
   private void complete(){
@@ -293,7 +309,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().post(new TrackPlaybackCompleteEvent());
 
     stopForeground(false);
-    showPauseNotification();
+    showPauseNotification(mLockScreenControlsEnabled);
   }
 
   private void stop() {
@@ -310,9 +326,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     stopSelf();
   }
 
-  private void showPauseNotification() {
+  private void showPauseNotification(final boolean showLockScreenControls) {
     if (mNotificationImage != null) {
-      showPauseNotification(mNotificationImage);
+      showPauseNotification(mNotificationImage, showLockScreenControls);
       return;
     }
 
@@ -321,7 +337,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       @Override
       public void onSuccess() {
         mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
-        showPauseNotification(mNotificationImage);
+        showPauseNotification(mNotificationImage, showLockScreenControls);
       }
 
       @Override
@@ -330,38 +346,49 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       }
     });
 
-    showPauseNotification(null);
+    showPauseNotification(null, showLockScreenControls);
   }
 
-  private void showPauseNotification(Bitmap bitmap){
+  private void showPauseNotification(Bitmap bitmap, boolean showLockScreenControls){
 
-    Notification notification = new NotificationCompat.Builder(this)
-        // show controls on lockscreen even when user hides sensitive content.
-        .setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.drawable.notification_icon)
-        .setLargeIcon(bitmap)
-            // Add media control buttons that invoke intents in your media service
-        .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
-        .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPendingIntent(ACTION_PLAY))
-        .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
-            // Apply the media style template
-        .setStyle(new NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(1)
-        )
-        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
-        .setContentText(mTopTracksPlaylist.getArtistName())
-        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
-        .setContentIntent(createNotificationContentPendingIntent())
-        .setOngoing(false)
-        .build();
+    NotificationCompat.Builder builder = createBaseNotificationBuilder(bitmap);
+
+    if (showLockScreenControls) {
+      // Add media control buttons that invoke intents in your media service
+      builder.addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
+          .addAction(android.R.drawable.ic_media_play, "Play", createNotificationPendingIntent(ACTION_PLAY))
+          .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
+              // Apply the media style template
+          .setStyle(new NotificationCompat.MediaStyle()
+                  .setShowActionsInCompactView(1)
+          );
+    }
+
+    Notification notification = builder.build();
 
     NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
     notificationManager.notify(NOTIFICATION_ID, notification);
   }
 
-  private void showPlayNotification() {
+  private NotificationCompat.Builder createBaseNotificationBuilder(Bitmap bitmap){
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+        // show controls on lockscreen even when user hides sensitive content.
+        builder.setVisibility(Notification.VISIBILITY_PUBLIC)
+        .setSmallIcon(R.drawable.notification_icon)
+        .setLargeIcon(bitmap)
+        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
+        .setContentText(mTopTracksPlaylist.getArtistName())
+        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
+        .setContentIntent(createNotificationContentPendingIntent())
+        .setOngoing(false);
+
+    return builder;
+  }
+
+  private void showPlayNotification(final boolean showLockScreenControls) {
     if (mNotificationImage != null) {
-      showPlayNotification(mNotificationImage);
+      showPlayNotification(mNotificationImage, showLockScreenControls);
       return;
     }
 
@@ -370,7 +397,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       @Override
       public void onSuccess() {
         mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
-        showPlayNotification(mNotificationImage);
+        showPlayNotification(mNotificationImage, showLockScreenControls);
       }
 
       @Override
@@ -379,31 +406,28 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       }
     });
 
-    showPlayNotification(null);
+    showPlayNotification(null, showLockScreenControls);
   }
 
-  private void showPlayNotification(Bitmap bitmap) {
-    Notification notification = new NotificationCompat.Builder(this)
-        // show controls on lockscreen even when user hides sensitive content.
-        .setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.drawable.notification_icon)
-        .setLargeIcon(bitmap)
-            // Add media control buttons that invoke intents in your media service
-        .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
-        .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPendingIntent(ACTION_PAUSE))
-        .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
-            // Apply the media style template
-        .setStyle(new NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(1)
-        )
-        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
-        .setContentText(mTopTracksPlaylist.getArtistName())
-        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
-        .setContentIntent(createNotificationContentPendingIntent())
-        .setOngoing(true)
-        .build();
+  private void showPlayNotification(Bitmap bitmap, boolean showLockScreenControls) {
+    NotificationCompat.Builder builder = createBaseNotificationBuilder(bitmap);
+
+    if (showLockScreenControls) {
+      builder
+          .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
+          .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPendingIntent(ACTION_PAUSE))
+          .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
+              // Apply the media style template
+          .setStyle(new NotificationCompat.MediaStyle()
+                  .setShowActionsInCompactView(1)
+          );
+    }
+
+    Notification notification = builder.build();
 
     startForeground(NOTIFICATION_ID, notification);
+    NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+    notificationManager.notify(NOTIFICATION_ID, notification);
   }
 
   private PendingIntent createNotificationContentPendingIntent() {

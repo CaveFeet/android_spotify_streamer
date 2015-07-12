@@ -19,6 +19,8 @@ import com.n8.n8droid.ViewController;
 public interface ArtistSearchController extends ViewController {
   LinearLayoutManager getLinearLayoutManager();
 
+  void onSettingsMenuOptionClicked();
+
   void onClearSuggestions();
 
   void onSubmitQuery(String query);

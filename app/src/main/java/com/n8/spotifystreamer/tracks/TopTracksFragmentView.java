@@ -19,13 +19,14 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.n8.n8droid.BaseFragmentView;
+import com.n8.n8droid.UiUtils;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -77,12 +78,25 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
     if (!UiUtils.isTablet(mActivity)) {
       mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
       mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
-              PorterDuff.Mode.SRC_ATOP);
+          PorterDuff.Mode.SRC_ATOP);
       mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
           //getActivity().onBackPressed();
           mController.onNavIconClicked();
+        }
+      });
+      mToolbar.inflateMenu(R.menu.settings_menu);
+      mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+          switch (item.getItemId()) {
+            case R.id.main_menu_settings:
+              mController.onSettingsMenuOptionClicked();
+              return true;
+            default:
+          }
+          return false;
         }
       });
     }

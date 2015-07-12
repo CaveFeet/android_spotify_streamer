@@ -4,4 +4,9 @@
     <!-- enable window content transitions -->
     <item name="android:windowContentTransitions">true</item>
   </style>
+
+  <style name="SettingsTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
+    <item name="android:colorPrimary">@color/primary</item>
+    <item name="android:colorPrimaryDark">@color/primary_dark</item>
+  </style>
 </resources>

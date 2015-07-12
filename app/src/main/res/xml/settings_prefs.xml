@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <EditTextPreference
+        android:title="@string/pref_country_code_label"
+        android:key="@string/pref_country_code_key"
+        android:defaultValue="@string/pref_country_code_default"
+        android:inputType="text"
+        android:singleLine="true"
+        />
+
+    <CheckBoxPreference
+        android:title="@string/pref_enable_notification_media_controls_label"
+        android:key="@string/pref_enable_notification_media_controls_key"
+        android:summaryOff="@string/pref_enable_notification_media_controls_false"
+        android:summaryOn="@string/pref_enable_notification_media_controls_true"
+        android:defaultValue="@string/pref_enable_notification_media_controls_default"
+        />
+
+</PreferenceScreen>
