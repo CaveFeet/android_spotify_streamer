@@ -21,6 +21,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.n8.n8droid.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
+import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
@@ -110,6 +112,8 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mHeaderTrackTitleTextView.setText(mTrack.name);
     mView.mHeaderArtistNameTextView.setText(mTrack.artists.get(0).name);
 
+    BusProvider.getInstance().post(new PlaybackServiceStateRequestEvent());
+
     return mView;
   }
 
@@ -134,28 +138,23 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   }
 
   @Subscribe
+  public void onPlaybackServiceStateBroadcastEventReceived(PlaybackServiceStateBroadcastEvent event) {
+    if (event.isPlaying()) {
+      mView.mPauseButton.setVisibility(View.VISIBLE);
+      mView.mPlayButton.setVisibility(View.GONE);
+      mView.mBufferProgressBar.setVisibility(View.GONE);
+
+      updateHeaderMediaControls(PlaybackState.PLAYING);
+    }
+  }
+
+  @Subscribe
   public void onTrackStarted(TrackStartedEvent event) {
     mView.mPauseButton.setVisibility(View.VISIBLE);
     mView.mPlayButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
 
     updateHeaderMediaControls(PlaybackState.PLAYING);
-  }
-
-  private void updateHeaderMediaControls(PlaybackState state) {
-    mView.mHeaderProgressBar.setVisibility(View.GONE);
-
-    if (mView.getY() == 0) {
-      return;
-    }
-
-    if (state == PlaybackState.PLAYING) {
-      mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
-      mView.mHeaderPlayImageView.setVisibility(View.GONE);
-    } else if (state == PlaybackState.PAUSED) {
-      mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
-      mView.mHeaderPauseImageView.setVisibility(View.GONE);
-    }
   }
 
   @Subscribe
@@ -174,6 +173,22 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mBufferProgressBar.setVisibility(View.GONE);
 
     updateHeaderMediaControls(PlaybackState.PAUSED);
+  }
+
+  private void updateHeaderMediaControls(PlaybackState state) {
+    mView.mHeaderProgressBar.setVisibility(View.GONE);
+
+    if (mView.getY() == 0) {
+      return;
+    }
+
+    if (state == PlaybackState.PLAYING) {
+      mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
+      mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    } else if (state == PlaybackState.PAUSED) {
+      mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
+      mView.mHeaderPauseImageView.setVisibility(View.GONE);
+    }
   }
 
   private void hideHeaderMediaControls(){

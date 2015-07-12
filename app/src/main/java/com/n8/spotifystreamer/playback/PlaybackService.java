@@ -26,9 +26,12 @@ import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
+import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
+import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -74,6 +77,19 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private Bitmap mNotificationImage;
 
   @Override
+  public void onCreate() {
+    super.onCreate();
+    BusProvider.getInstance().register(this);
+  }
+
+  @Override
+  public void onDestroy() {
+    BusProvider.getInstance().unregister(this);
+    cleanupMediaPlayer();
+    cleanupWifiLock();
+  }
+
+  @Override
   public IBinder onBind(Intent intent) {
     return null;
   }
@@ -83,12 +99,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     super.onTaskRemoved(rootIntent);
     Log.d(TAG, "ONTaskRemoved");
     stop();
-  }
-
-  @Override
-  public void onDestroy() {
-    cleanupMediaPlayer();
-    cleanupWifiLock();
   }
 
   @Override
@@ -166,6 +176,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         }
         break;
     }
+  }
+
+  @Subscribe
+  public void onPlaybackServiceStateRequestEventReceived(PlaybackServiceStateRequestEvent event) {
+    BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer));
   }
 
   private void initMediaPlayer() {
