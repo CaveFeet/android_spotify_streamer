@@ -1,29 +1,26 @@
 package com.n8.spotifystreamer.playback;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.SeekBar;
 
 import com.n8.n8droid.BaseViewControllerFragment;
+import com.n8.n8droid.TimeUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
+import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
@@ -34,7 +31,7 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 
-public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmentView> implements PlaybackController {
+public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmentView> implements PlaybackController, SeekBar.OnSeekBarChangeListener {
 
   private static final String TAG = PlaybackFragment.class.getSimpleName();
 
@@ -84,9 +81,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
     BusProvider.getInstance().register(this);
 
-    TypedValue tv = new TypedValue();
-    mView.getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true);
-    mYOffset = mView.getContext().getResources().getDimensionPixelSize(tv.resourceId);
+    mYOffset = mView.getContext().getResources().getDimensionPixelSize(R.dimen.playback_fragment_header_height);
 
 //    mView.setVisibility(View.INVISIBLE);
 //    mView.setY(mView.getMeasuredHeight() - mYOffset);
@@ -111,6 +106,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mAlbumArtImageView);
 
     mView.mHeaderTrackTitleTextView.setText(mTrack.name);
+    mView.mHeaderAlbumNameTextView.setText(mTrack.album.name);
     mView.mHeaderArtistNameTextView.setText(mTrack.artists.get(0).name);
 
     mView.mSpotifyBadgeImageView.setOnClickListener(new View.OnClickListener() {
@@ -133,6 +129,21 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   }
 
   @Override
+  public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+  }
+
+  @Override
+  public void onStartTrackingTouch(SeekBar seekBar) {
+
+  }
+
+  @Override
+  public void onStopTrackingTouch(SeekBar seekBar) {
+    BusProvider.getInstance().post(new SeekbarChangedEvent(seekBar.getProgress()));
+  }
+
+  @Override
   public void onPlayClicked() {
     Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
     playbackIntent.setAction(PlaybackService.ACTION_PLAY);
@@ -144,6 +155,15 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
     playbackIntent.setAction(PlaybackService.ACTION_PAUSE);
     mView.getContext().startService(playbackIntent);
+  }
+
+  @Subscribe
+  public void onPlaybackProgressEventReceived(final PlaybackProgressEvent event) {
+    mView.mProgressSeekBar.setProgress((int)event.getProgress());
+
+    // Format and set current duration text
+    //
+    mView.mCurrentProgressTextView.setText(TimeUtils.getFormattedTime(event.getProgress()));
   }
 
   @Subscribe
@@ -163,6 +183,15 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mPlayButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
 
+    mView.mProgressSeekBar.setMax((int) event.getDuration());
+    mView.mProgressSeekBar.setOnSeekBarChangeListener(this);
+
+    // Format and set duration text
+    mView.mDurationTextView.setText(TimeUtils.getFormattedTime(event.getDuration()));
+
+    // Format and set current duration text to be 0
+    mView.mCurrentProgressTextView.setText(TimeUtils.getFormattedTime(0));
+
     updateHeaderMediaControls(PlaybackState.PLAYING);
   }
 
@@ -180,6 +209,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mPlayButton.setVisibility(View.VISIBLE);
     mView.mPauseButton.setVisibility(View.GONE);
     mView.mBufferProgressBar.setVisibility(View.GONE);
+    mView.mProgressSeekBar.setProgress(0);
 
     updateHeaderMediaControls(PlaybackState.PAUSED);
   }

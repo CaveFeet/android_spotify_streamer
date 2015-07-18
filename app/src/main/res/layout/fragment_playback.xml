@@ -18,60 +18,103 @@
             android:scaleType="fitXY"
             />
 
-        <FrameLayout
-            android:id="@+id/fragment_playback_play_pause_container"
-            android:layout_width="@dimen/fragment_playback_media_control_button_size"
-            android:layout_height="@dimen/fragment_playback_media_control_button_size"
+        <RelativeLayout
+            android:id="@+id/fragment_playback_media_controls_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/playback_fragment_media_controls_container_height"
+            android:background="@color/playback_fragment_media_controls_container"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             >
-            <ImageButton
-                android:id="@+id/fragment_playback_play_imageButton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@android:drawable/ic_media_play"
-                />
+            <FrameLayout
+                android:id="@+id/fragment_playback_play_pause_container"
+                android:layout_width="@dimen/fragment_playback_media_control_button_size"
+                android:layout_height="@dimen/fragment_playback_media_control_button_size"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                >
+                <ImageButton
+                    android:id="@+id/fragment_playback_play_imageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_media_play"
+                    />
+
+                <ImageButton
+                    android:id="@+id/fragment_playback_pause_imageButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@android:drawable/ic_media_pause"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/fragment_playback_buffer_progressBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    />
+            </FrameLayout>
 
             <ImageButton
-                android:id="@+id/fragment_playback_pause_imageButton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:src="@android:drawable/ic_media_pause"
+                android:id="@+id/fragment_playback_prev_imageButton"
+                android:layout_width="@dimen/fragment_playback_media_control_button_size"
+                android:layout_height="@dimen/fragment_playback_media_control_button_size"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_toStartOf="@id/fragment_playback_play_pause_container"
+                android:src="@android:drawable/ic_media_previous"
                 />
 
-            <ProgressBar
-                android:id="@+id/fragment_playback_buffer_progressBar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:indeterminate="true"
+            <ImageButton
+                android:id="@+id/fragment_playback_next_imageButton"
+                android:layout_width="@dimen/fragment_playback_media_control_button_size"
+                android:layout_height="@dimen/fragment_playback_media_control_button_size"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_toEndOf="@id/fragment_playback_play_pause_container"
+                android:src="@android:drawable/ic_media_next"
                 />
-        </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/fragment_playback_prev_imageButton"
-            android:layout_width="@dimen/fragment_playback_media_control_button_size"
-            android:layout_height="@dimen/fragment_playback_media_control_button_size"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_toStartOf="@id/fragment_playback_play_pause_container"
-            android:src="@android:drawable/ic_media_previous"
+            <TextView
+                android:id="@+id/fragment_playback_current_progress_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_above="@+id/fragment_playback_prev_imageButton"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="@dimen/keyline_0"
+                android:text="04"
+                tools:ignoreHardcodeText="true"
+                />
+
+            <TextView
+                android:id="@+id/fragment_playback_duration_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:layout_above="@+id/fragment_playback_prev_imageButton"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="@dimen/keyline_0"
+                android:text="30"
+                tools:ignoreHardcodeText="true"
+                />
+
+        </RelativeLayout>
+
+        <SeekBar
+            android:id="@+id/fragment_playback_progress_seekbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/playback_seekbar_height"
+            android:layout_above="@id/fragment_playback_media_controls_container"
+            android:layout_marginBottom="@dimen/playback_seekbar_vertical_margin"
+            android:paddingStart="@dimen/playback_seekbar_horizontal_padding"
+            android:paddingEnd="@dimen/playback_seekbar_horizontal_padding"
+            android:indeterminate="false"
             />
-
-        <ImageButton
-            android:id="@+id/fragment_playback_next_imageButton"
-            android:layout_width="@dimen/fragment_playback_media_control_button_size"
-            android:layout_height="@dimen/fragment_playback_media_control_button_size"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_toEndOf="@id/fragment_playback_play_pause_container"
-            android:src="@android:drawable/ic_media_next"
-            />
-
 
         <RelativeLayout
             android:id="@+id/fragment_playback_header"
             android:layout_width="match_parent"
-            android:layout_height="?android:attr/actionBarSize"
+            android:layout_height="@dimen/playback_fragment_header_height"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="@color/playback_fragment_header"
@@ -83,7 +126,6 @@
                 android:id="@+id/fragment_playback_header_thumbnail"
                 android:layout_width="@dimen/fragment_playback_header_thumbnail_size"
                 android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
-                android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 />
@@ -134,6 +176,7 @@
                     android:id="@+id/fragment_playback_header_track_title_textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:maxLines="1"
                     android:ellipsize="marquee"
                     android:text="Track title"
@@ -146,9 +189,20 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:ellipsize="marquee"
-                    android:text="Album Title"
+                    android:text="Artist Name"
                     tools:ignoreHardcodedText="true"
                     />
+
+                <TextView
+                    android:id="@+id/fragment_playback_header_album_name_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="marquee"
+                    android:text="Album Name"
+                    tools:ignoreHardcodedText="true"
+                    />
+
 
 
             </LinearLayout>

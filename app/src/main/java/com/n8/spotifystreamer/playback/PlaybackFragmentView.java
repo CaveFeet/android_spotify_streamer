@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.n8.n8droid.BaseFragmentView;
@@ -26,11 +27,23 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   @InjectView(R.id.fragment_playback_buffer_progressBar)
   ProgressBar mBufferProgressBar;
 
+  @InjectView(R.id.fragment_playback_progress_seekbar)
+  SeekBar mProgressSeekBar;
+
+  @InjectView(R.id.fragment_playback_current_progress_textView)
+  TextView mCurrentProgressTextView;
+
+  @InjectView(R.id.fragment_playback_duration_textView)
+  TextView mDurationTextView;
+
   @InjectView(R.id.fragment_playback_album_image)
   ImageView mAlbumArtImageView;
 
   @InjectView(R.id.fragment_playback_header_track_title_textView)
   TextView mHeaderTrackTitleTextView;
+
+  @InjectView(R.id.fragment_playback_header_album_name_textView)
+  TextView mHeaderAlbumNameTextView;
 
   @InjectView(R.id.fragment_playback_header_artist_name_textView)
   TextView mHeaderArtistNameTextView;

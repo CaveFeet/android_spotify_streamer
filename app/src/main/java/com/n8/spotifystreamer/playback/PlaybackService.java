@@ -25,8 +25,10 @@ import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.events.LockScreenControlsSettingChangedEvent;
+import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
+import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
@@ -35,6 +37,8 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer
     .OnBufferingUpdateListener, MediaPlayer.OnErrorListener, AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnCompletionListener {
@@ -64,6 +68,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   public static final String TAG_WIFI_LOCK = "mylock";
 
   private static final int NOTIFICATION_ID = 001;
+  public static final int PROGRESS_REPORTING_DELAY = 1000;
 
   private MediaPlayer mMediaPlayer;
 
@@ -76,13 +81,15 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private Bitmap mNotificationImage;
 
   private boolean mLockScreenControlsEnabled;
+  private BroadcastReceiver mLockScreenReceiver;
+  private Thread mProgressMonitorThread;
 
   @Override
   public void onCreate() {
     super.onCreate();
     BusProvider.getInstance().register(this);
 
-    BroadcastReceiver lockScreenReceiver = new BroadcastReceiver() {
+    mLockScreenReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
@@ -115,9 +122,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       }
     };
 
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
   }
 
   @Override
@@ -125,6 +132,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().unregister(this);
     cleanupMediaPlayer();
     cleanupWifiLock();
+    unregisterReceiver(mLockScreenReceiver);
   }
 
   @Override
@@ -221,10 +229,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer));
   }
 
-//  @Subscribe
-//  public void onLockScreenControlsSettingChangedEventReceived(LockScreenControlsSettingChangedEvent event) {
-//    mLockScreenControlsEnabled = event.isLockScreenControlsEnabled();
-//  }
+  @Subscribe
+  public void onSeekbarChangedEventReceived(SeekbarChangedEvent event) {
+    if (mMediaPlayer != null) {
+      mMediaPlayer.seekTo(event.getProgress());
+    }
+  }
 
   private void initMediaPlayer() {
     if (mMediaPlayer == null) {
@@ -306,9 +316,31 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
               mTopTracksPlaylist.getTrackName(mTrackIndex),
               mTopTracksPlaylist.getTrackAlbumName(mTrackIndex),
               mTopTracksPlaylist.getArtistName(),
-              mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)
+              mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex),
+              mMediaPlayer.getDuration()
           )
       );
+
+      mProgressMonitorThread = new Thread(){
+        @Override
+        public void run() {
+          while (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration()) {
+            if (isInterrupted()) {
+              Log.d(TAG, "Interrupted while monitoring progress");
+              return;
+            }
+
+            BusProvider.getInstance().post(new PlaybackProgressEvent(mMediaPlayer.getCurrentPosition()));
+            try {
+              sleep(PROGRESS_REPORTING_DELAY);
+            } catch (InterruptedException e) {
+              Log.d(TAG, "Failed to sleep while monitoring progress. " + e.getMessage());
+            }
+          }
+        }
+      };
+      mProgressMonitorThread.start();
+
     }
   }
 
@@ -320,6 +352,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     if (mMediaPlayer.isPlaying()) {
       mMediaPlayer.pause();
+      mProgressMonitorThread.interrupt();
       BusProvider.getInstance().post(new TrackPausedEvent());
     }
 

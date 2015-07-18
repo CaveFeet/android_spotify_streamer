@@ -12,4 +12,5 @@
     <color name="accent_light">#90A4AE</color>
 
     <color name="playback_fragment_header">#DDFFFFFF</color>
+    <color name="playback_fragment_media_controls_container">#AAFFFFFF</color>
 </resources>

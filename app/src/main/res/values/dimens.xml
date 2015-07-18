@@ -26,4 +26,14 @@
     <dimen name="fragment_playback_header_thumbnail_size">50dp</dimen>
     <dimen name="fragment_playback_spotify_badge_width">100dp</dimen>
     <dimen name="fragment_playback_media_control_button_size">60dp</dimen>
+    <dimen name="playback_fragment_header_height">80dp</dimen>
+
+    <!-- Seekbar dimens-->
+
+    <dimen name="playback_seekbar_height">30dp</dimen>
+    <!-- This should alwasy be 1/2 of playback_seekbar_height-->
+    <dimen name="playback_seekbar_vertical_margin">-15dp</dimen>
+    <dimen name="playback_seekbar_horizontal_padding">-8dp</dimen>
+
+    <dimen name="playback_fragment_media_controls_container_height">80dp</dimen>
 </resources>
