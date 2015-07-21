@@ -3,9 +3,11 @@
     <color name="primary_dark">#FFA000</color>
     <color name="primary">#FFC107</color>
 
-    <color name="primary_foreground">#FAFAFA</color>
+    <color name="primary_foreground">#FCFCFC</color>
 
-    <color name="window_background">#FFF9C4</color>
+    <color name="text_primary">#333333</color>
+
+    <color name="window_background">#CACACA</color>
 
     <color name="accent_dark">#455A64</color>
     <color name="accent">#607D8B</color>
