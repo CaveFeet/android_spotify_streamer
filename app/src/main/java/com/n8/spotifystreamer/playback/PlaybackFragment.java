@@ -115,11 +115,9 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   }
 
   private void bindTrackInfo() {
-    mView.mPauseButton.setVisibility(View.GONE);
-    mView.mPlayButton.setVisibility(View.GONE);
-    mView.mBufferProgressBar.setVisibility(View.VISIBLE);
-
-    hideHeaderMediaControls();
+    setPlayVisibility(View.GONE);
+    setPauseVisibility(View.GONE);
+    setBufferVisibility(View.VISIBLE);
 
     String thumbnailUrl = mTrack.album.images.get(0).url;
 
@@ -160,45 +158,23 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   @Subscribe
   public void onTrackStarted(TrackStartedEvent event) {
-    mView.mPauseButton.setVisibility(View.VISIBLE);
-    mView.mPlayButton.setVisibility(View.GONE);
-    mView.mBufferProgressBar.setVisibility(View.GONE);
-
-    updateHeaderMediaControls(PlaybackState.PLAYING);
+    setPauseVisibility(View.VISIBLE);
+    setPlayVisibility(View.GONE);
+    setBufferVisibility(View.GONE);
   }
 
   @Subscribe
   public void onTrackPaused(TrackPausedEvent event) {
-    mView.mPlayButton.setVisibility(View.VISIBLE);
-    mView.mPauseButton.setVisibility(View.GONE);
-    mView.mBufferProgressBar.setVisibility(View.GONE);
-
-    updateHeaderMediaControls(PlaybackState.PAUSED);
+    setPlayVisibility(View.VISIBLE);
+    setPauseVisibility(View.GONE);
+    setBufferVisibility(View.GONE);
   }
 
   @Subscribe
   public void onTrackPlaybackComplete(TrackPlaybackCompleteEvent event) {
-    mView.mPlayButton.setVisibility(View.VISIBLE);
-    mView.mPauseButton.setVisibility(View.GONE);
-    mView.mBufferProgressBar.setVisibility(View.GONE);
-
-    updateHeaderMediaControls(PlaybackState.PAUSED);
-  }
-
-  private void updateHeaderMediaControls(PlaybackState state) {
-    mView.mHeaderProgressBar.setVisibility(View.GONE);
-
-    if (mView.getY() == 0) {
-      return;
-    }
-
-    if (state == PlaybackState.PLAYING) {
-      mView.mHeaderPauseImageView.setVisibility(View.VISIBLE);
-      mView.mHeaderPlayImageView.setVisibility(View.GONE);
-    } else if (state == PlaybackState.PAUSED) {
-      mView.mHeaderPlayImageView.setVisibility(View.VISIBLE);
-      mView.mHeaderPauseImageView.setVisibility(View.GONE);
-    }
+    setPlayVisibility(View.VISIBLE);
+    setPauseVisibility(View.GONE);
+    setBufferVisibility(View.GONE);
   }
 
   private void hideHeaderMediaControls(){
@@ -211,6 +187,51 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mHeaderPauseImageView.setVisibility(mView.mPauseButton.getVisibility());
     mView.mHeaderPlayImageView.setVisibility(mView.mPlayButton.getVisibility());
     mView.mHeaderProgressBar.setVisibility(mView.mBufferProgressBar.getVisibility());
+  }
+
+  private boolean isFullScreen() {
+    if (mView.getY() == 0) {
+      mFullScreen = true;
+    }else if (mView.getY() == (mView.getHeight() - mYOffset)) {
+      mFullScreen = false;
+    }
+    return mFullScreen;
+  }
+
+  private void setPlayVisibility(int visibility) {
+    mView.mPlayButton.setVisibility(visibility);
+
+    // If view is expanded to fill screen, don't duplicate the media controls in the header view
+    //
+    if (!isFullScreen()) {
+      mView.mHeaderPlayImageView.setVisibility(visibility);
+    } else {
+      mView.mHeaderPlayImageView.setVisibility(View.GONE);
+    }
+  }
+
+  private void setPauseVisibility(int visibility) {
+    mView.mPauseButton.setVisibility(visibility);
+
+    // If view is expanded to fill screen, don't duplicate the media controls in the header view
+    //
+    if (!isFullScreen()) {
+      mView.mHeaderPauseImageView.setVisibility(visibility);
+    } else {
+      mView.mHeaderPauseImageView.setVisibility(View.GONE);
+    }
+  }
+
+  private void setBufferVisibility(int visibility) {
+    mView.mBufferProgressBar.setVisibility(visibility);
+
+    // If view is expanded to fill screen, don't duplicate the media controls in the header view
+    //
+    if (!isFullScreen()) {
+      mView.mHeaderProgressBar.setVisibility(visibility);
+    } else {
+      mView.mHeaderProgressBar.setVisibility(View.GONE);
+    }
   }
 
   private void animateUp(){
@@ -284,19 +305,11 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
         animateUp();
       }
 
-      checkIfFullScreen();
+      isFullScreen();
 
       mDeltaY = 0;
 
       return true;
-    }
-
-    private void checkIfFullScreen() {
-      if (mView.getY() == 0) {
-        mFullScreen = true;
-      }else if (mView.getY() == (mView.getHeight() - mYOffset)) {
-        mFullScreen = false;
-      }
     }
 
     @Override
@@ -314,7 +327,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
       float newY = mView.getY() + mDeltaY;
       mView.setY(newY);
 
-      checkIfFullScreen();
+      isFullScreen();
 
       return true;
     }
