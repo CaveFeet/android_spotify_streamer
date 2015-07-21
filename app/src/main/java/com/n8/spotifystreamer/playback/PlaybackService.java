@@ -76,13 +76,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private Bitmap mNotificationImage;
 
   private boolean mLockScreenControlsEnabled;
+  private BroadcastReceiver mLockScreenReceiver;
 
   @Override
   public void onCreate() {
     super.onCreate();
     BusProvider.getInstance().register(this);
 
-    BroadcastReceiver lockScreenReceiver = new BroadcastReceiver() {
+    mLockScreenReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
         KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
@@ -115,14 +116,15 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       }
     };
 
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
-    registerReceiver(lockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
+    registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
   }
 
   @Override
   public void onDestroy() {
     BusProvider.getInstance().unregister(this);
+    unregisterReceiver(mLockScreenReceiver);
     cleanupMediaPlayer();
     cleanupWifiLock();
   }
@@ -145,6 +147,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     if (intent != null ) {
       String action = intent.getAction();
+      Log.d(TAG, action);
 
       if (action != null) {
         if (action.equals(ACTION_PLAY)) {
@@ -242,21 +245,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       // Get a wifi lock that we can set when music is playing
       cleanupWifiLock();
       mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
+    }else{
+      mMediaPlayer.reset();
+    }
 
-      try {
-        String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
-        if (url == null) {
-          return;
-        }
-
-        mMediaPlayer.setDataSource(url);
-        mMediaPlayer.prepareAsync();
-      } catch (IOException e) {
-        Log.d(TAG, "Failed to prepare media playter " + e.getMessage());
+    try {
+      String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
+      if (url == null) {
+        return;
       }
-    } else {
-      stop();
-      initMediaPlayer();
+
+      mMediaPlayer.setDataSource(url);
+      mMediaPlayer.prepareAsync();
+    } catch (IOException e) {
+      Log.d(TAG, "Failed to prepare media playter " + e.getMessage());
     }
   }
 
@@ -275,7 +277,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void handlePlayIntent(Intent intent) {
-    Log.d(TAG, "Action_Play");
+    Log.d(TAG, "handlePlayIntent()");
 
     // Check for new playlist info.  If it exists in the bundle, update the service's members
     //
@@ -285,10 +287,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
       mNotificationImage = null;
       initMediaPlayer();
-      return;
     }
-
-    play();
   }
 
   private void play(){
@@ -313,7 +312,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void pause(){
-    Log.d(TAG, "Action_Pause");
+    Log.d(TAG, "pause()");
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
@@ -340,7 +339,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void stop() {
-    Log.d(TAG, "Action_Stop");
+    Log.d(TAG, "stop()");
 
     if (mMediaPlayer != null &&  mMediaPlayer.isPlaying()) {
       mMediaPlayer.stop();
