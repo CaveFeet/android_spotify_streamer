@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
@@ -54,13 +55,21 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   public static PlaybackFragment getInstance(List<Track> tracks, Track track) {
     PlaybackFragment fragment = new PlaybackFragment();
-    fragment.mTracks = tracks;
-    fragment.mTrack = track;
+    fragment.setPlaybackInfo(tracks, track);
 
     return fragment;
   }
 
   public PlaybackFragment() { }
+
+  public void setPlaybackInfo(@NonNull List<Track> tracks, @NonNull Track track) {
+    mTracks = tracks;
+    mTrack = track;
+
+    if (mView != null) {
+      bindTrackInfo();
+    }
+  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -92,11 +101,6 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 //    mView.setY(mView.getMeasuredHeight() - mYOffset);
 //    mView.setVisibility(View.VISIBLE);
 
-    mView.mPauseButton.setVisibility(View.GONE);
-    mView.mPlayButton.setVisibility(View.GONE);
-
-    hideHeaderMediaControls();
-
     final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
     mView.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -104,6 +108,18 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
         return gestureDetector.onTouchEvent(event);
       }
     });
+
+    bindTrackInfo();
+
+    return mView;
+  }
+
+  private void bindTrackInfo() {
+    mView.mPauseButton.setVisibility(View.GONE);
+    mView.mPlayButton.setVisibility(View.GONE);
+    mView.mBufferProgressBar.setVisibility(View.VISIBLE);
+
+    hideHeaderMediaControls();
 
     String thumbnailUrl = mTrack.album.images.get(0).url;
 
@@ -120,10 +136,6 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
         startActivity(intent);
       }
     });
-
-    BusProvider.getInstance().post(new PlaybackServiceStateRequestEvent());
-
-    return mView;
   }
 
   @Override
@@ -144,17 +156,6 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
     playbackIntent.setAction(PlaybackService.ACTION_PAUSE);
     mView.getContext().startService(playbackIntent);
-  }
-
-  @Subscribe
-  public void onPlaybackServiceStateBroadcastEventReceived(PlaybackServiceStateBroadcastEvent event) {
-    if (event.isPlaying()) {
-      mView.mPauseButton.setVisibility(View.VISIBLE);
-      mView.mPlayButton.setVisibility(View.GONE);
-      mView.mBufferProgressBar.setVisibility(View.GONE);
-
-      updateHeaderMediaControls(PlaybackState.PLAYING);
-    }
   }
 
   @Subscribe
