@@ -38,10 +38,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
 
-    private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
-
     private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
+
     public static final String PLAYBACK_FRAGMENT_TAG = "playback_fragment_tag";
+
+    private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,11 +160,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onTrackClicked(TrackClickedEvent event) {
-        // Show the playback fragment to interact with the media controls
-        PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
-        getSupportFragmentManager().beginTransaction()
-            .replace(R.id.main_activity_playback_frame, playbackFragment)
-            .addToBackStack(null).commit();
 
         TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
 
@@ -173,5 +169,19 @@ public class MainActivity extends AppCompatActivity {
         playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().indexOf(event.getClickedTrack()));
 
         startService(playbackIntent);
+
+        PlaybackFragment playbackFragment = null;
+
+        playbackFragment = (PlaybackFragment) getSupportFragmentManager().findFragmentByTag(PLAYBACK_FRAGMENT_TAG);
+        if (playbackFragment == null) {
+            // Show the playback fragment to interact with the media controls
+            playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
+                .addToBackStack(null).commit();
+        } else {
+            // Update playback fragment info
+            playbackFragment.setPlaybackInfo(event.getTracks(), event.getClickedTrack());
+        }
     }
 }

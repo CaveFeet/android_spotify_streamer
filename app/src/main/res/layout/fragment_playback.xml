@@ -143,6 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@android:drawable/ic_media_play"
+                    android:visibility="gone"
                     />
 
                 <ImageView
@@ -150,6 +151,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@android:drawable/ic_media_pause"
+                    android:visibility="gone"
                     />
 
                 <ProgressBar
@@ -157,6 +159,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:indeterminate="true"
+                    android:visibility="gone"
                     />
 
             </FrameLayout>
