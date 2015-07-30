@@ -36,6 +36,10 @@ public class TopTracksPlaylist implements Parcelable{
     mAlbumNames = getTrackAlbumNamesFromTracksList(tracks);
   }
 
+  public int size(){
+    return mTrackUrls == null ? 0 : mTrackUrls.size();
+  }
+
   public String getArtistName() {
     return mArtistName;
   }

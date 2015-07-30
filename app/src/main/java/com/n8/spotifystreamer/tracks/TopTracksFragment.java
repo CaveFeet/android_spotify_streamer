@@ -13,8 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.n8.n8droid.AndroidUtils;
 import com.n8.n8droid.BaseViewControllerFragment;
-import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;

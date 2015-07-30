@@ -19,8 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.n8.n8droid.AndroidUtils;
 import com.n8.n8droid.BaseViewControllerFragment;
-import com.n8.spotifystreamer.AndroidUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SettingsActivity;

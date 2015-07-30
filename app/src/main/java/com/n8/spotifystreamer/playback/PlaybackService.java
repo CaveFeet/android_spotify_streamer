@@ -24,10 +24,11 @@ import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.events.LockScreenControlsSettingChangedEvent;
+import com.n8.spotifystreamer.events.NextTrackEvent;
 import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
+import com.n8.spotifystreamer.events.PrevTrackEvent;
 import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
@@ -37,8 +38,6 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class PlaybackService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer
     .OnBufferingUpdateListener, MediaPlayer.OnErrorListener, AudioManager.OnAudioFocusChangeListener, MediaPlayer.OnCompletionListener {
@@ -55,19 +54,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   public static final String ACTION_STOP = "com.n8.spotifystreamer.STOP";
 
-  public static final String ACTION_REWIND = "com.n8.spotifystreamer.REWIND";
-
-  public static final String ACTION_FAST_FORWARD = "com.n8.spotifystreamer.FAST_FORWARD";
-
   public static final String ACTION_NEXT = "com.n8.spotifystreamer.NEXT";
 
   public static final String ACTION_PREVIOUS = "com.n8.spotifystreamer.PREVIOUS";
 
-  public static final String ACTION_MEDIA_BUTTONS = "com.n8.spotifystreamer.MEDIA_BUTTONS";
-
   public static final String TAG_WIFI_LOCK = "mylock";
 
   private static final int NOTIFICATION_ID = 001;
+
   public static final int PROGRESS_REPORTING_DELAY = 1000;
 
   private MediaPlayer mMediaPlayer;
@@ -135,7 +129,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     unregisterReceiver(mLockScreenReceiver);
     cleanupMediaPlayer();
     cleanupWifiLock();
-    unregisterReceiver(mLockScreenReceiver);
   }
 
   @Override
@@ -146,7 +139,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   @Override
   public void onTaskRemoved(Intent rootIntent) {
     super.onTaskRemoved(rootIntent);
-    Log.d(TAG, "ONTaskRemoved");
     stop();
   }
 
@@ -165,6 +157,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
           pause();
         } else if (action.equals(ACTION_STOP)) {
           stop();
+        } else if (action.equals(ACTION_NEXT)) {
+          next();
+        } else if (action.equals(ACTION_PREVIOUS)) {
+          prev();
         }
       }
     }
@@ -358,6 +354,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     stopForeground(false);
     showPauseNotification(true);
+  }
+
+  private void next() {
+    if (mTrackIndex < mTopTracksPlaylist.size() - 1) {
+      mTrackIndex++;
+      initMediaPlayer();
+
+      BusProvider.getInstance().post(new NextTrackEvent(mTrackIndex));
+    }
+  }
+
+  private void prev(){
+    if (mTrackIndex > 0) {
+      mTrackIndex--;
+      initMediaPlayer();
+
+      BusProvider.getInstance().post(new PrevTrackEvent(mTrackIndex));
+    }
   }
 
   private void complete(){

@@ -18,9 +18,11 @@ import com.n8.n8droid.BaseViewControllerFragment;
 import com.n8.n8droid.TimeUtils;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.NextTrackEvent;
 import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateRequestEvent;
+import com.n8.spotifystreamer.events.PrevTrackEvent;
 import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
@@ -114,6 +116,12 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     setPauseVisibility(View.GONE);
     setBufferVisibility(View.VISIBLE);
 
+    if (mTracks.indexOf(mTrack) == 0) {
+      mView.mPrevButton.setEnabled(true);
+    }else if (mTracks.indexOf(mTrack) == mTracks.size() - 1) {
+      mView.mNextButton.setEnabled(false);
+    }
+
     String thumbnailUrl = mTrack.album.images.get(0).url;
 
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mHeaderThumbnail);
@@ -155,16 +163,22 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   @Override
   public void onPlayClicked() {
-    Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
-    playbackIntent.setAction(PlaybackService.ACTION_PLAY);
-    mView.getContext().startService(playbackIntent);
+    sendServiceAction(PlaybackService.ACTION_PLAY);
   }
 
   @Override
   public void onPauseClicked() {
-    Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
-    playbackIntent.setAction(PlaybackService.ACTION_PAUSE);
-    mView.getContext().startService(playbackIntent);
+    sendServiceAction(PlaybackService.ACTION_PAUSE);
+  }
+
+  @Override
+  public void onNextClicked() {
+    sendServiceAction(PlaybackService.ACTION_NEXT);
+  }
+
+  @Override
+  public void onPrevClicked() {
+    sendServiceAction(PlaybackService.ACTION_PREVIOUS);
   }
 
   @Subscribe
@@ -209,6 +223,22 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   }
 
   @Subscribe
+  public void onNextTrack(NextTrackEvent event) {
+    mView.mPrevButton.setEnabled(true);
+
+    mTrack = mTracks.get(event.getTrackIndex());
+    bindTrackInfo();
+  }
+
+  @Subscribe
+  public void onPrevTrack(PrevTrackEvent event) {
+    mView.mNextButton.setEnabled(true);
+
+    mTrack = mTracks.get(event.getTrackIndex());
+    bindTrackInfo();
+  }
+
+  @Subscribe
   public void onTrackPlaybackComplete(TrackPlaybackCompleteEvent event) {
     setPlayVisibility(View.VISIBLE);
     setPauseVisibility(View.GONE);
@@ -226,6 +256,12 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.mHeaderPauseImageView.setVisibility(mView.mPauseButton.getVisibility());
     mView.mHeaderPlayImageView.setVisibility(mView.mPlayButton.getVisibility());
     mView.mHeaderProgressBar.setVisibility(mView.mBufferProgressBar.getVisibility());
+  }
+
+  private void sendServiceAction(String actionPlay) {
+    Intent playbackIntent = new Intent(mView.getContext(), PlaybackService.class);
+    playbackIntent.setAction(actionPlay);
+    mView.getContext().startService(playbackIntent);
   }
 
   private boolean isFullScreen() {

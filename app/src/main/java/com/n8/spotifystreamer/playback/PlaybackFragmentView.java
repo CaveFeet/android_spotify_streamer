@@ -24,6 +24,12 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   @InjectView(R.id.fragment_playback_pause_imageButton)
   ImageButton mPauseButton;
 
+  @InjectView(R.id.fragment_playback_next_imageButton)
+  ImageButton mNextButton;
+
+  @InjectView(R.id.fragment_playback_prev_imageButton)
+  ImageButton mPrevButton;
+
   @InjectView(R.id.fragment_playback_buffer_progressBar)
   ProgressBar mBufferProgressBar;
 
@@ -93,5 +99,15 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   @OnClick({R.id.fragment_playback_pause_imageButton, R.id.fragment_playback_header_pause_imageView})
   void onPauseClicked() {
     mController.onPauseClicked();
+  }
+
+  @OnClick(R.id.fragment_playback_next_imageButton)
+  void onNextClicked(){
+    mController.onNextClicked();
+  }
+
+  @OnClick(R.id.fragment_playback_prev_imageButton)
+  void onPrevClicked(){
+    mController.onPrevClicked();
   }
 }
