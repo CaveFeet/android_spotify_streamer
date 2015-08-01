@@ -253,6 +253,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       cleanupWifiLock();
       mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
     }else{
+      mNotificationImage = null;
       mMediaPlayer.reset();
     }
 
@@ -285,6 +286,11 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private void handlePlayIntent(Intent intent) {
     Log.d(TAG, "handlePlayIntent()");
+
+    if (mMediaPlayer != null) {
+      play();
+      return;
+    }
 
     // Check for new playlist info.  If it exists in the bundle, update the service's members
     //
