@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.SeekBar;
 
@@ -90,13 +91,18 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
 
+    mView.getViewTreeObserver().addOnGlobalLayoutListener(new     ViewTreeObserver.OnGlobalLayoutListener() {
+      public void onGlobalLayout() {
+        mView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        mView.setY(getMaxYScroll());
+        mView.setVisibility(View.VISIBLE);
+      }
+    });
     BusProvider.getInstance().register(this);
 
-    mYOffset = mView.getContext().getResources().getDimensionPixelSize(R.dimen.playback_fragment_header_height);
+    mView.setVisibility(View.INVISIBLE);
 
-//    mView.setVisibility(View.INVISIBLE);
-//    mView.setY(mView.getMeasuredHeight() - mYOffset);
-//    mView.setVisibility(View.VISIBLE);
+    mYOffset = mView.getContext().getResources().getDimensionPixelSize(R.dimen.playback_fragment_header_height);
 
     final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
     mView.setOnTouchListener(new View.OnTouchListener() {
@@ -331,6 +337,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   }
 
   private float getMaxYScroll(){
+    int h = mView.getHeight();
     return mView.getHeight() - mYOffset;
   }
 
