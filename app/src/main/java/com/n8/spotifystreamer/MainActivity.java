@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -163,29 +164,37 @@ public class MainActivity extends AppCompatActivity {
 
         TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
 
+        // Create playback intent to send to service with current playback information
+        //
         Intent playbackIntent = new Intent(this, PlaybackService.class);
         playbackIntent.setAction(PlaybackService.ACTION_PLAY);
         playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
         playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().indexOf(event.getClickedTrack()));
 
+        // Send playback intent to the playback service.  The service will be started if not already started.
         startService(playbackIntent);
 
-        PlaybackFragment playbackFragment = null;
-
-        playbackFragment = (PlaybackFragment) getSupportFragmentManager().findFragmentByTag(PLAYBACK_FRAGMENT_TAG);
+        // Show a new PlaybackFragment if one doesn't exist, or update an existing one.
+        //
+        PlaybackFragment playbackFragment = (PlaybackFragment) getSupportFragmentManager().findFragmentByTag(PLAYBACK_FRAGMENT_TAG);
         if (playbackFragment == null) {
             // Show the playback fragment to interact with the media controls
-            playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
-            if (!event.isPlayInDialog()) {
-                getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
-                    .addToBackStack(PLAYBACK_FRAGMENT_TAG).commit();
-            } else {
-                playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
-            }
+            showPlaybackFragment(event);
         } else {
             // Update playback fragment info
             playbackFragment.setPlaybackInfo(event.getTracks(), event.getClickedTrack());
+        }
+    }
+
+
+    private void showPlaybackFragment(@NonNull TrackClickedEvent event) {
+        PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
+        if (!event.isPlayInDialog()) {
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
+                .addToBackStack(PLAYBACK_FRAGMENT_TAG).commit();
+        } else {
+            playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
         }
     }
 }

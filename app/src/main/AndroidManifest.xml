@@ -39,15 +39,6 @@
             android:exported="true" >
         </service>
 
-        <receiver
-            android:name=".playback.MediaControlReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <intent-filter>
-                <action android:name="ANDROID.INTENT.ACTION.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"

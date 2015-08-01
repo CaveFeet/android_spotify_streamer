@@ -5,6 +5,9 @@ import java.util.List;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Track;
 
+/**
+ * Indicates that a track has been clicked.
+ */
 public class TrackClickedEvent {
 
   private Artist mArtist;

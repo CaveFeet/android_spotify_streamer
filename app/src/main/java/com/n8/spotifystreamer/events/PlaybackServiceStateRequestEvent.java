@@ -1,7 +1,7 @@
 package com.n8.spotifystreamer.events;
 
 /**
- * Created by n8 on 7/12/15.
+ * Indicates that some client code would like to receive a {@link PlaybackServiceStateBroadcastEvent}.
  */
 public class PlaybackServiceStateRequestEvent {
 }

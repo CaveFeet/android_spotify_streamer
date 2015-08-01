@@ -1,7 +1,7 @@
 package com.n8.spotifystreamer.events;
 
 /**
- * Created by n8 on 7/12/15.
+ * Indicates that the current track has been completed.
  */
 public class TrackPlaybackCompleteEvent {
 }

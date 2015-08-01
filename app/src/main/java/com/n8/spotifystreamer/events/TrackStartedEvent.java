@@ -2,6 +2,9 @@ package com.n8.spotifystreamer.events;
 
 import android.support.annotation.NonNull;
 
+/**
+ * Indicates that a new track has been started.
+ */
 public class TrackStartedEvent {
 
   private String mTrackName;

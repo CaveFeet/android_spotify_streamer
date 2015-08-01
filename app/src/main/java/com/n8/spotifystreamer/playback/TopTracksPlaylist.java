@@ -12,6 +12,9 @@ import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.Image;
 import kaaes.spotify.webapi.android.models.Track;
 
+/**
+ * Represents a collection of an Artist's top songs that can be played as a group.
+ */
 public class TopTracksPlaylist implements Parcelable{
 
   private String mArtistName;

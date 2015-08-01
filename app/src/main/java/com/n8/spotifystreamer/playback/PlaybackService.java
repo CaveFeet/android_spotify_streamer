@@ -323,27 +323,31 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
           )
       );
 
-      mProgressMonitorThread = new Thread(){
-        @Override
-        public void run() {
-          while (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration()) {
-            if (isInterrupted()) {
-              Log.d(TAG, "Interrupted while monitoring progress");
-              return;
-            }
-
-            BusProvider.getInstance().post(new PlaybackProgressEvent(mMediaPlayer.getCurrentPosition()));
-            try {
-              sleep(PROGRESS_REPORTING_DELAY);
-            } catch (InterruptedException e) {
-              Log.d(TAG, "Failed to sleep while monitoring progress. " + e.getMessage());
-            }
-          }
-        }
-      };
+      mProgressMonitorThread = createProgressMonitorThread();
       mProgressMonitorThread.start();
 
     }
+  }
+
+  private Thread createProgressMonitorThread() {
+    return new Thread(){
+      @Override
+      public void run() {
+        while (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration()) {
+          if (isInterrupted()) {
+            Log.d(TAG, "Interrupted while monitoring progress");
+            return;
+          }
+
+          BusProvider.getInstance().post(new PlaybackProgressEvent(mMediaPlayer.getCurrentPosition()));
+          try {
+            sleep(PROGRESS_REPORTING_DELAY);
+          } catch (InterruptedException e) {
+            Log.d(TAG, "Failed to sleep while monitoring progress. " + e.getMessage());
+          }
+        }
+      }
+    };
   }
 
   private void pause(){
@@ -364,6 +368,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private void next() {
     if (mTrackIndex < mTopTracksPlaylist.size() - 1) {
+      pause();
       mTrackIndex++;
       initMediaPlayer();
 
@@ -373,6 +378,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private void prev(){
     if (mTrackIndex > 0) {
+      pause();
       mTrackIndex--;
       initMediaPlayer();
 
@@ -397,6 +403,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     if (mMediaPlayer != null &&  mMediaPlayer.isPlaying()) {
       mMediaPlayer.stop();
+
+      if (mProgressMonitorThread != null) {
+        mProgressMonitorThread.interrupt();
+      }
     }
 
     stopForeground(true);
@@ -453,15 +463,15 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private NotificationCompat.Builder createBaseNotificationBuilder(Bitmap bitmap){
     NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
-        // show controls on lockscreen even when user hides sensitive content.
-        builder.setVisibility(Notification.VISIBILITY_PUBLIC)
-        .setSmallIcon(R.drawable.notification_icon)
-        .setLargeIcon(bitmap)
-        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
-        .setContentText(mTopTracksPlaylist.getArtistName())
-        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
-        .setContentIntent(createNotificationContentPendingIntent())
-        .setOngoing(false);
+    // show controls on lockscreen even when user hides sensitive content.
+    builder.setVisibility(Notification.VISIBILITY_PUBLIC)
+    .setSmallIcon(R.drawable.notification_icon)
+    .setLargeIcon(bitmap)
+    .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
+    .setContentText(mTopTracksPlaylist.getArtistName())
+    .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
+    .setContentIntent(createNotificationContentPendingIntent())
+    .setOngoing(false);
 
     return builder;
   }

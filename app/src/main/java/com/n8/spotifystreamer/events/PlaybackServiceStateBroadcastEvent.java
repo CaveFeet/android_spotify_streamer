@@ -2,6 +2,9 @@ package com.n8.spotifystreamer.events;
 
 import android.media.MediaPlayer;
 
+/**
+ * Indicates the current state of the playback service.
+ */
 public class PlaybackServiceStateBroadcastEvent {
 
   private MediaPlayer mMediaPlayer;

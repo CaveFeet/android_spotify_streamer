@@ -103,6 +103,8 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
 
+    // When view is layed out, start it at the bottom if not being shown in dialog.
+    //
     mView.getViewTreeObserver().addOnGlobalLayoutListener(new     ViewTreeObserver.OnGlobalLayoutListener() {
       public void onGlobalLayout() {
         mView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
@@ -110,6 +112,7 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
           mView.setY(getMaxYScroll());
         }
         mView.setVisibility(View.VISIBLE);
+        bindTrackInfo();
       }
     });
     BusProvider.getInstance().register(this);
@@ -118,6 +121,8 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
 
     mYOffset = mView.getContext().getResources().getDimensionPixelSize(R.dimen.playback_fragment_header_height);
 
+    // If isn't being shown in dialog, allow to be swiped up or down
+    //
     if (!getShowsDialog()) {
       final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
       mView.setOnTouchListener(new View.OnTouchListener() {
@@ -127,8 +132,6 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
         }
       });
     }
-
-    bindTrackInfo();
 
     return mView;
   }
@@ -353,10 +356,13 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
   }
 
   private float getMaxYScroll(){
-    int h = mView.getHeight();
     return mView.getHeight() - mYOffset;
   }
 
+  /**
+   * Detects swipe up and swipe down gestures on the view.  This allows the the fragment to be expanded or
+   * collapsed on a swipe gesture.
+   */
   class MyGestureDetector extends GestureDetectorCompat {
 
     private MyGestureListener mMyGestureListener;
@@ -379,6 +385,9 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     }
   }
 
+  /**
+   * Listens for detected gestures, and responds apporpriatley be animating up or animating down the view.
+   */
   class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
     private final String TAG = MyGestureListener.class.getSimpleName();

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.SearchRecentSuggestions;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -159,40 +160,44 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   }
 
   private void submitQuery(String query) {
+    // Clear existing query state
+    //
     mCurrentQuery = query;
     mTotalCurrentSearchResults = 0;
     mCurrentQueryOffset = 0;
     mArtists = null;
     mAdapter = null;
 
-    FragmentActivity activity = getActivity();
-
     // Leverage provider to populate suggestions adapter
     //
-    SearchRecentSuggestions suggestions = new SearchRecentSuggestions(activity,
+    SearchRecentSuggestions suggestions = new SearchRecentSuggestions(getActivity(),
         ArtistSuggestionProvider.AUTHORITY, ArtistSuggestionProvider.MODE);
     suggestions.saveRecentQuery(query, null);
 
-    final ProgressDialog progressDialog = new ProgressDialog(activity);
-    progressDialog.setTitle(activity.getString(R.string.searching_for) + query);
-    progressDialog.setCancelable(false);
-    progressDialog.setCanceledOnTouchOutside(false);
-    progressDialog.show();
+    final ProgressDialog progressDialog = createSearchProgressDialog(query);
 
     final Handler handler = new Handler();
     searchForArtists(progressDialog, handler);
   }
 
-  private void searchForArtists(final ProgressDialog progressDialog,
-                                final Handler handler) {
+  @NonNull
+  private ProgressDialog createSearchProgressDialog(String query) {
+    final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+    progressDialog.setTitle(getActivity().getString(R.string.searching_for) + query);
+    progressDialog.setCancelable(false);
+    progressDialog.setCanceledOnTouchOutside(false);
+    progressDialog.show();
+    return progressDialog;
+  }
+
+  private void searchForArtists(final ProgressDialog progressDialog, final Handler handler) {
 
     Map<String, Object> queryMap = new HashMap<>();
     queryMap.put("offset", mCurrentQueryOffset);
     queryMap.put("limit", REQUEST_LIMIT);
     queryMap.put("country", mCountryCode);
 
-    SpotifyStreamerApplication.getSpotifyService().searchArtists(mCurrentQuery, queryMap,
-        new Callback<ArtistsPager>() {
+    SpotifyStreamerApplication.getSpotifyService().searchArtists(mCurrentQuery, queryMap, new Callback<ArtistsPager>() {
           @Override
           public void success(final ArtistsPager artistsPager, Response response) {
             if (progressDialog != null) {
