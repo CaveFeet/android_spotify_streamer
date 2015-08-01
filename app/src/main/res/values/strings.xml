@@ -38,4 +38,6 @@
   <string name="pref_enable_notification_media_controls_true">Enabled</string>
   <string name="pref_enable_notification_media_controls_false">Not Enabled</string>
   <string name="pref_enable_notification_media_controls_default" translatable="false">true</string>
+  <string name="track_overflow_play_in_dialog">Play In Dialog</string>
+  <string name="play">Play</string>
 </resources>

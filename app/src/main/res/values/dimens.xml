@@ -36,4 +36,5 @@
     <dimen name="playback_seekbar_horizontal_padding">-8dp</dimen>
 
     <dimen name="playback_fragment_media_controls_container_height">80dp</dimen>
+    <dimen name="overflow_size">40dp</dimen>
 </resources>

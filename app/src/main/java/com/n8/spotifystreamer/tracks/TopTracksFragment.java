@@ -10,8 +10,10 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 
 import com.n8.n8droid.AndroidUtils;
 import com.n8.n8droid.BaseViewControllerFragment;
@@ -155,8 +157,36 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   @Override
   public void onTrackViewClicked(Track track) {
+    playTrack(track, false);
+  }
+
+  @Override
+  public void onOverflowClicked(View view, final Track track) {
+    PopupMenu overflowMenu = new PopupMenu(getActivity(), view);
+    overflowMenu.inflate(R.menu.track_overflow_menu);
+
+    overflowMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+          case R.id.track_overflow_play:
+            playTrack(track, false);
+            return true;
+          case R.id.track_overflow_play_in_dialog:
+            playTrack(track, true);
+            return true;
+        }
+        return false;
+      }
+    });
+
+    overflowMenu.show();
+  }
+
+  private void playTrack(Track track, boolean playInDialog) {
     mCurrentTrack = track;
-    BusProvider.getInstance().post(new TrackClickedEvent(mArtist, mTracks, track));
+    BusProvider.getInstance().post(new TrackClickedEvent(mArtist, mTracks, track, playInDialog));
   }
 
   private void bindArtist() {

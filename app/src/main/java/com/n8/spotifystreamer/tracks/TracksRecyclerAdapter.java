@@ -15,6 +15,8 @@ public class TracksRecyclerAdapter extends RecyclerView.Adapter<TrackViewHolder>
 
     public interface TrackClickListener{
         void onTrackViewClicked(Track track);
+
+        void onOverflowClicked(View view, Track track);
     }
 
     private TrackClickListener mTrackClickListener;

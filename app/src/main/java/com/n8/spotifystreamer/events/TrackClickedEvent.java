@@ -12,11 +12,13 @@ public class TrackClickedEvent {
   private List<Track> mTracks;
 
   private Track mClickedTrack;
+  private boolean mPlayInDialog;
 
-  public TrackClickedEvent(Artist artist, List<Track> tracks, Track clickedTrack) {
+  public TrackClickedEvent(Artist artist, List<Track> tracks, Track clickedTrack, boolean playInDialog) {
     mArtist = artist;
     mTracks = tracks;
     mClickedTrack = clickedTrack;
+    mPlayInDialog = playInDialog;
   }
 
   public Artist getArtist() {
@@ -29,5 +31,9 @@ public class TrackClickedEvent {
 
   public Track getClickedTrack() {
     return mClickedTrack;
+  }
+
+  public boolean isPlayInDialog() {
+    return mPlayInDialog;
   }
 }

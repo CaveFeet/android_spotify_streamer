@@ -1,22 +1,31 @@
-package com.n8.n8droid;
+/*
+COPYRIGHT 1995-2015 ESRI
 
+TRADE SECRETS: ESRI PROPRIETARY AND CONFIDENTIAL 
+Unpublished material - all rights reserved under the Copyright Laws of the United States.
+
+For additional information, contact: Environmental Systems Research Institute, Inc. 
+Attn: Contracts Dept 380 New York Street Redlands, California, USA 92373
+
+email: contracts@esri.com
+*/
+package com.n8.n8droid;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public abstract class BaseViewControllerFragment<T extends BaseFragmentView> extends Fragment {
+public abstract class BaseViewControllerDialogFragment<T extends BaseFragmentView> extends DialogFragment {
 
   public static final String TAG = BaseViewControllerFragment.class.getSimpleName();
 
   protected T mView;
 
-  public BaseViewControllerFragment() { }
+  public BaseViewControllerDialogFragment() { }
 
 
   @Override

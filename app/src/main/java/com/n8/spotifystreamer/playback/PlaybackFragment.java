@@ -1,5 +1,6 @@
 package com.n8.spotifystreamer.playback;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,9 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.SeekBar;
 
+import com.n8.n8droid.BaseViewControllerDialogFragment;
 import com.n8.n8droid.BaseViewControllerFragment;
 import com.n8.n8droid.TimeUtils;
 import com.n8.spotifystreamer.BusProvider;
@@ -35,7 +38,8 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 
-public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmentView> implements PlaybackController, SeekBar.OnSeekBarChangeListener {
+public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackFragmentView> implements PlaybackController,
+    SeekBar.OnSeekBarChangeListener {
 
   private static final String TAG = PlaybackFragment.class.getSimpleName();
 
@@ -87,6 +91,14 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.setController(getActivity(), this);
   }
 
+  @NonNull
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    Dialog dialog = super.onCreateDialog(savedInstanceState);
+    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    return dialog;
+  }
+
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
@@ -94,7 +106,9 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.getViewTreeObserver().addOnGlobalLayoutListener(new     ViewTreeObserver.OnGlobalLayoutListener() {
       public void onGlobalLayout() {
         mView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        mView.setY(getMaxYScroll());
+        if (!getShowsDialog()) {
+          mView.setY(getMaxYScroll());
+        }
         mView.setVisibility(View.VISIBLE);
       }
     });
@@ -104,13 +118,15 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
     mYOffset = mView.getContext().getResources().getDimensionPixelSize(R.dimen.playback_fragment_header_height);
 
-    final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
-    mView.setOnTouchListener(new View.OnTouchListener() {
-      @Override
-      public boolean onTouch(View v, MotionEvent event) {
-        return gestureDetector.onTouchEvent(event);
-      }
-    });
+    if (!getShowsDialog()) {
+      final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
+      mView.setOnTouchListener(new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+          return gestureDetector.onTouchEvent(event);
+        }
+      });
+    }
 
     bindTrackInfo();
 

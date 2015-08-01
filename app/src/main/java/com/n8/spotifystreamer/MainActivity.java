@@ -176,9 +176,13 @@ public class MainActivity extends AppCompatActivity {
         if (playbackFragment == null) {
             // Show the playback fragment to interact with the media controls
             playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
-            getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
-                .addToBackStack(null).commit();
+            if (!event.isPlayInDialog()) {
+                getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
+                    .addToBackStack(PLAYBACK_FRAGMENT_TAG).commit();
+            } else {
+                playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
+            }
         } else {
             // Update playback fragment info
             playbackFragment.setPlaybackInfo(event.getTracks(), event.getClickedTrack());
