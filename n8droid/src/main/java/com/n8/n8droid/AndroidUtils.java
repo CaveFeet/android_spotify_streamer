@@ -9,10 +9,9 @@ Attn: Contracts Dept 380 New York Street Redlands, California, USA 92373
 
 email: contracts@esri.com
 */
-package com.n8.spotifystreamer;
+package com.n8.n8droid;
 
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 

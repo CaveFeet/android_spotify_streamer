@@ -12,11 +12,17 @@ email: contracts@esri.com
 package com.n8.spotifystreamer.tracks;
 
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.ShareActionProvider;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.ViewController;
 
-public interface TopTracksController extends BaseFragmentView.Controller {
+public interface TopTracksController extends ViewController {
+
+  void onShareClicked();
+
   void onNavIconClicked();
+
+  void onSettingsMenuOptionClicked();
 
   LinearLayoutManager getLinearLayoutManager();
 

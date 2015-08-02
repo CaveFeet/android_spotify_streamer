@@ -14,10 +14,12 @@ package com.n8.spotifystreamer.artists;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.ViewController;
 
-public interface ArtistSearchController extends BaseFragmentView.Controller {
+public interface ArtistSearchController extends ViewController {
   LinearLayoutManager getLinearLayoutManager();
+
+  void onSettingsMenuOptionClicked();
 
   void onClearSuggestions();
 

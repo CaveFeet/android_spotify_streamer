@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.n8.n8droid.BaseViewControllerFragment;
+import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
+import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 
-public class CoachmarkFragment extends Fragment {
-
-    private CoachmarkFragmentController mController;
+public class CoachmarkFragment extends BaseViewControllerFragment<CoachmarkFragmentView> implements CoachmarkController {
 
     public CoachmarkFragment() { }
 
@@ -24,18 +26,32 @@ public class CoachmarkFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        CoachmarkFragmentView view = (CoachmarkFragmentView) inflater.inflate(R.layout.fragment_coachmark, container, false);
+    protected int getLayoutId() {
+        return R.layout.fragment_coachmark;
+    }
 
-        if (mController == null) {
-            mController = new CoachmarkFragmentController();
-        }
-        mController.setActivity((AppCompatActivity)getActivity());
+    @Override
+    protected void setViewController() {
+        mView.setController(getActivity(), this);
+    }
 
-        view.setController((AppCompatActivity)getActivity(), mController);
-        mController.onCreateView(view);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
 
-        return view;
+        String title = String.format(getString(R.string.coachmark_title), getString(R.string.app_name));
+        mView.mToolbar.setTitle(title);
+
+        return mView;
+    }
+
+    @Override
+    public void onDoneClicked() {
+        BusProvider.getInstance().post(new CoachmarksDoneEvent());
+    }
+
+    @Override
+    public void onShowCoachmarkCheckChanged(boolean isChecked) {
+        BusProvider.getInstance().post(new CoachmarkShowAgainEvent(isChecked));
     }
 }

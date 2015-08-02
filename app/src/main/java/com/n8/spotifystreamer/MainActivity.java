@@ -6,12 +6,14 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.TransitionInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -22,6 +24,10 @@ import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.events.TrackClickedEvent;
+import com.n8.spotifystreamer.playback.PlaybackFragment;
+import com.n8.spotifystreamer.playback.PlaybackService;
+import com.n8.spotifystreamer.playback.TopTracksPlaylist;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
@@ -33,9 +39,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
 
-    private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
-
     private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
+
+    public static final String PLAYBACK_FRAGMENT_TAG = "playback_fragment_tag";
+
+    private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
         if(fragmentManager.findFragmentByTag(tag) == null) {
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.add(layoutId,
-                    fragment,
-                    tag)
-                    .commit();
+                fragment,
+                tag)
+                .commit();
         }
     }
 
@@ -148,6 +156,45 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.main_activity_fragment_frame, fragment, TRACK_FRAGMENT_TAG)
                 .addToBackStack(null);
             ft.commit();
+        }
+    }
+
+    @Subscribe
+    public void onTrackClicked(TrackClickedEvent event) {
+
+        TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
+
+        // Create playback intent to send to service with current playback information
+        //
+        Intent playbackIntent = new Intent(this, PlaybackService.class);
+        playbackIntent.setAction(PlaybackService.ACTION_PLAY);
+        playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
+        playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().indexOf(event.getClickedTrack()));
+
+        // Send playback intent to the playback service.  The service will be started if not already started.
+        startService(playbackIntent);
+
+        // Show a new PlaybackFragment if one doesn't exist, or update an existing one.
+        //
+        PlaybackFragment playbackFragment = (PlaybackFragment) getSupportFragmentManager().findFragmentByTag(PLAYBACK_FRAGMENT_TAG);
+        if (playbackFragment == null) {
+            // Show the playback fragment to interact with the media controls
+            showPlaybackFragment(event);
+        } else {
+            // Update playback fragment info
+            playbackFragment.setPlaybackInfo(event.getTracks(), event.getClickedTrack());
+        }
+    }
+
+
+    private void showPlaybackFragment(@NonNull TrackClickedEvent event) {
+        PlaybackFragment playbackFragment = PlaybackFragment.getInstance(event.getTracks(), event.getClickedTrack());
+        if (!event.isPlayInDialog()) {
+            getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_activity_playback_frame, playbackFragment, PLAYBACK_FRAGMENT_TAG)
+                .addToBackStack(PLAYBACK_FRAGMENT_TAG).commit();
+        } else {
+            playbackFragment.show(getSupportFragmentManager(), PLAYBACK_FRAGMENT_TAG);
         }
     }
 }

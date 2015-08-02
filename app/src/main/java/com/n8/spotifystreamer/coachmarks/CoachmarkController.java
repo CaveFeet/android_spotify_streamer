@@ -1,11 +1,11 @@
 package com.n8.spotifystreamer.coachmarks;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.ViewController;
 
 /**
  * Defines behavior that can/should be handled when interacting with {@link CoachmarkFragmentView}
  */
-public interface CoachmarkController extends BaseFragmentView.Controller {
+public interface CoachmarkController extends ViewController {
     void onDoneClicked();
 
     void onShowCoachmarkCheckChanged(boolean isChecked);

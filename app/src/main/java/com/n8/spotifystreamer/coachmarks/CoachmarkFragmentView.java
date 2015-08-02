@@ -14,9 +14,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.BaseFragmentView;
+import com.n8.n8droid.UiUtils;
 import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.UiUtils;
 import com.viewpagerindicator.LinePageIndicator;
 
 import butterknife.ButterKnife;

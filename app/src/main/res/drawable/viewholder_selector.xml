@@ -5,5 +5,5 @@
       android:drawable="@color/accent"
       />
 
-  <item android:drawable="@color/primary_light" />
+  <item android:drawable="@color/primary_foreground" />
 </selector>

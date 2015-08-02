@@ -38,12 +38,26 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
     @InjectView(R.id.track_recycler_view_popularity_textView)
     TextView mPopularityTextView;
 
+    @InjectView(R.id.track_recycler_view_overflow_imageView)
+    ImageView mOverflowImageView;
+
     private Track mTrack;
 
-    public TrackViewHolder(View itemView) {
+    private TracksRecyclerAdapter.TrackClickListener mListener;
+
+    public TrackViewHolder(View itemView, TracksRecyclerAdapter.TrackClickListener listener) {
         super(itemView);
+        mListener = listener;
         ButterKnife.inject(this, itemView);
         itemView.setOnClickListener(this);
+        mOverflowImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onOverflowClicked(mOverflowImageView, mTrack);
+                }
+            }
+        });
     }
 
     public void bindViewHolder(final Track track){
@@ -67,6 +81,8 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     @Override
     public void onClick(View v) {
-
+        if (mListener != null) {
+            mListener.onTrackViewClicked(mTrack);
+        }
     }
 }

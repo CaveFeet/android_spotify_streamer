@@ -12,25 +12,23 @@ email: contracts@esri.com
 package com.n8.spotifystreamer.tracks;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.n8.spotifystreamer.BaseFragmentView;
+import com.n8.n8droid.BaseFragmentView;
+import com.n8.n8droid.UiUtils;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
-import com.n8.spotifystreamer.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -57,6 +55,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
   @InjectView(R.id.fragment_top_tracks_artist_image_header_background)
   ImageView mArtistHeaderBackgroundImageView;
+  private ShareActionProvider mShareActionProvider;
 
   public TopTracksFragmentView(Context context) {
     super(context);
@@ -82,7 +81,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
     if (!UiUtils.isTablet(mActivity)) {
       mToolbar.setNavigationIcon(R.drawable.ic_menu_back);
       mToolbar.getNavigationIcon().setColorFilter(getResources().getColor(android.R.color.white),
-              PorterDuff.Mode.SRC_ATOP);
+          PorterDuff.Mode.SRC_ATOP);
       mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -90,6 +89,24 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
           mController.onNavIconClicked();
         }
       });
+      mToolbar.inflateMenu(R.menu.settings_menu);
+      mToolbar.inflateMenu(R.menu.share_menu);
+      mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+          switch (item.getItemId()) {
+            case R.id.main_menu_settings:
+              mController.onSettingsMenuOptionClicked();
+              return true;
+            case R.id.action_share:
+              mController.onShareClicked();
+              return true;
+            default:
+          }
+          return false;
+        }
+      });
+
     }
 
     mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));
