@@ -1,5 +1,6 @@
 package com.n8.spotifystreamer.playback;
 
+import android.animation.Animator;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -152,6 +153,8 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mHeaderThumbnail);
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mAlbumArtImageView);
 
+    mView.mAlbumArtImageView.setVisibility(View.GONE);
+
     mView.mHeaderTrackTitleTextView.setText(mTrack.name);
     mView.mHeaderAlbumNameTextView.setText(mTrack.album.name);
     mView.mHeaderArtistNameTextView.setText(mTrack.artists.get(0).name);
@@ -275,12 +278,14 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     mView.mHeaderPauseImageView.setVisibility(View.GONE);
     mView.mHeaderPlayImageView.setVisibility(View.GONE);
     mView.mHeaderProgressBar.setVisibility(View.GONE);
+    mView.mHeaderShadowImageView.setVisibility(View.GONE);
   }
 
   private void showHeaderMediaControls(){
     mView.mHeaderPauseImageView.setVisibility(mView.mPauseButton.getVisibility());
     mView.mHeaderPlayImageView.setVisibility(mView.mPlayButton.getVisibility());
     mView.mHeaderProgressBar.setVisibility(mView.mBufferProgressBar.getVisibility());
+    mView.mHeaderShadowImageView.setVisibility(View.VISIBLE);
   }
 
   private void sendServiceAction(String actionPlay) {
@@ -341,6 +346,27 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
         .y(0)
         .setDuration(FLING_ANIMATION_DURATION)
         .setInterpolator(new AccelerateDecelerateInterpolator())
+        .setListener(new Animator.AnimatorListener() {
+          @Override
+          public void onAnimationStart(Animator animation) {
+            mView.mAlbumArtImageView.setVisibility(View.VISIBLE);
+          }
+
+          @Override
+          public void onAnimationEnd(Animator animation) {
+
+          }
+
+          @Override
+          public void onAnimationCancel(Animator animation) {
+
+          }
+
+          @Override
+          public void onAnimationRepeat(Animator animation) {
+
+          }
+        })
         .start();
 
   }
@@ -352,6 +378,27 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
         .y(getMaxYScroll())
         .setDuration(FLING_ANIMATION_DURATION)
         .setInterpolator(new AccelerateDecelerateInterpolator())
+        .setListener(new Animator.AnimatorListener() {
+          @Override
+          public void onAnimationStart(Animator animation) {
+
+          }
+
+          @Override
+          public void onAnimationEnd(Animator animation) {
+            mView.mAlbumArtImageView.setVisibility(View.GONE);
+          }
+
+          @Override
+          public void onAnimationCancel(Animator animation) {
+
+          }
+
+          @Override
+          public void onAnimationRepeat(Animator animation) {
+
+          }
+        })
         .start();
   }
 

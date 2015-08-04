@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@android:color/white"
     >
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@android:color/white"
         >
 
         <ImageView
@@ -115,100 +115,114 @@
             android:id="@+id/fragment_playback_header"
             android:layout_width="match_parent"
             android:layout_height="@dimen/playback_fragment_header_height"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:background="@color/playback_fragment_header"
+            android:background="@android:color/transparent"
             android:elevation="@dimen/fragment_playback_header_elevation"
-            android:padding="@dimen/keyline_0"
             >
 
             <ImageView
-                android:id="@+id/fragment_playback_header_thumbnail"
-                android:layout_width="@dimen/fragment_playback_header_thumbnail_size"
-                android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
+                android:id="@+id/fragment_playback_header_shadow"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/keyline_0"
+                android:src="@drawable/shadow"
                 />
 
-            <FrameLayout
-                android:id="@+id/fragment_playback_header_play_pause_container"
-                android:layout_width="@dimen/fragment_playback_media_control_button_size"
-                android:layout_height="@dimen/fragment_playback_media_control_button_size"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                >
-
-                <ImageView
-                    android:id="@+id/fragment_playback_header_play_imageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@android:drawable/ic_media_play"
-                    android:visibility="gone"
-                    />
-
-                <ImageView
-                    android:id="@+id/fragment_playback_header_pause_imageView"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@android:drawable/ic_media_pause"
-                    android:visibility="gone"
-                    />
-
-                <ProgressBar
-                    android:id="@+id/fragment_playback_header_buffer_progressBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:indeterminate="true"
-                    android:visibility="gone"
-                    />
-
-            </FrameLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_centerVertical="true"
-                android:gravity="center_vertical"
-                android:layout_toEndOf="@id/fragment_playback_header_thumbnail"
-                android:layout_toStartOf="@id/fragment_playback_header_play_pause_container"
-                android:layout_marginStart="@dimen/keyline_0"
+                android:background="@color/playback_fragment_header"
+                android:padding="@dimen/keyline_0"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
                 >
 
-                <TextView
-                    android:id="@+id/fragment_playback_header_track_title_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:maxLines="1"
-                    android:ellipsize="marquee"
-                    android:text="Track title"
-                    tools:ignoreHardcodedText="true"
+                <ImageView
+                    android:id="@+id/fragment_playback_header_thumbnail"
+                    android:layout_width="@dimen/fragment_playback_header_thumbnail_size"
+                    android:layout_height="@dimen/fragment_playback_header_thumbnail_size"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
                     />
 
-                <TextView
-                    android:id="@+id/fragment_playback_header_artist_name_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:ellipsize="marquee"
-                    android:text="Artist Name"
-                    tools:ignoreHardcodedText="true"
-                    />
+                <FrameLayout
+                    android:id="@+id/fragment_playback_header_play_pause_container"
+                    android:layout_width="@dimen/fragment_playback_media_control_button_size"
+                    android:layout_height="@dimen/fragment_playback_media_control_button_size"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    >
 
-                <TextView
-                    android:id="@+id/fragment_playback_header_album_name_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="1"
-                    android:ellipsize="marquee"
-                    android:text="Album Name"
-                    tools:ignoreHardcodedText="true"
-                    />
+                    <ImageView
+                        android:id="@+id/fragment_playback_header_play_imageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@android:drawable/ic_media_play"
+                        android:visibility="gone"
+                        />
+
+                    <ImageView
+                        android:id="@+id/fragment_playback_header_pause_imageView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@android:drawable/ic_media_pause"
+                        android:visibility="gone"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/fragment_playback_header_buffer_progressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:indeterminate="true"
+                        android:visibility="gone"
+                        />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:layout_toEndOf="@id/fragment_playback_header_thumbnail"
+                    android:layout_toStartOf="@id/fragment_playback_header_play_pause_container"
+                    android:layout_marginStart="@dimen/keyline_0"
+                    >
+
+                    <TextView
+                        android:id="@+id/fragment_playback_header_track_title_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                        android:maxLines="1"
+                        android:ellipsize="marquee"
+                        android:text="Track title"
+                        tools:ignoreHardcodedText="true"
+                        />
+
+                    <TextView
+                        android:id="@+id/fragment_playback_header_artist_name_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="marquee"
+                        android:text="Artist Name"
+                        tools:ignoreHardcodedText="true"
+                        />
+
+                    <TextView
+                        android:id="@+id/fragment_playback_header_album_name_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:ellipsize="marquee"
+                        android:text="Album Name"
+                        tools:ignoreHardcodedText="true"
+                        />
 
 
 
-            </LinearLayout>
+                </LinearLayout>
+            </RelativeLayout>
         </RelativeLayout>
 
         <ImageView

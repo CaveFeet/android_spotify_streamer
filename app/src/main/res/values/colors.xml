@@ -13,6 +13,6 @@
     <color name="accent">#607D8B</color>
     <color name="accent_light">#90A4AE</color>
 
-    <color name="playback_fragment_header">#DDFFFFFF</color>
+    <color name="playback_fragment_header">#AAFFFFFF</color>
     <color name="playback_fragment_media_controls_container">#AAFFFFFF</color>
 </resources>

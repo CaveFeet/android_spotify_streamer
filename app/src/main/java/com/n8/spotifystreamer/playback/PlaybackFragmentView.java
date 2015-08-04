@@ -45,6 +45,9 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
   @InjectView(R.id.fragment_playback_album_image)
   ImageView mAlbumArtImageView;
 
+  @InjectView(R.id.fragment_playback_header_shadow)
+  ImageView mHeaderShadowImageView;
+
   @InjectView(R.id.fragment_playback_header_track_title_textView)
   TextView mHeaderTrackTitleTextView;
 
