@@ -133,6 +133,10 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
 
   @Override
   public void onRecyclerViewScrolled(RecyclerView recyclerView, int dx, int dy) {
+    if (mAdapter == null) {
+      return;
+    }
+
     if (mAdapter.getItemCount() != mTotalCurrentSearchResults) {
       LinearLayoutManager manager = (LinearLayoutManager) mView.getArtistRecyclerView().getLayoutManager();
       if (manager.findLastVisibleItemPosition() == mAdapter.getItemCount() - 1 && !mPagingNewResults) {

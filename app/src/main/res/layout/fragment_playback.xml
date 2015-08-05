@@ -195,8 +195,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:maxLines="1"
                         android:ellipsize="marquee"
-                        android:text="Track title"
-                        tools:ignoreHardcodedText="true"
+                        android:text="@string/search_artists"
                         />
 
                     <TextView
@@ -205,8 +204,7 @@
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:ellipsize="marquee"
-                        android:text="Artist Name"
-                        tools:ignoreHardcodedText="true"
+                        android:text="@string/select_a_track"
                         />
 
                     <TextView
@@ -215,8 +213,7 @@
                         android:layout_height="wrap_content"
                         android:maxLines="1"
                         android:ellipsize="marquee"
-                        android:text="Album Name"
-                        tools:ignoreHardcodedText="true"
+                        android:text="@string/preview"
                         />
 
 

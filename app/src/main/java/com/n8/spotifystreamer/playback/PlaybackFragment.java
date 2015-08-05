@@ -39,7 +39,7 @@ import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Track;
 
-public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackFragmentView> implements PlaybackController,
+public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmentView> implements PlaybackController,
     SeekBar.OnSeekBarChangeListener {
 
   private static final String TAG = PlaybackFragment.class.getSimpleName();
@@ -56,7 +56,11 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
 
   private float mYOffset;
 
-  boolean mFullScreen;
+  private boolean mFullScreen;
+
+  private boolean mIsExpandable = true;
+
+  private boolean mIsRetained = true;
 
   public static PlaybackFragment getInstance(List<Track> tracks, Track track) {
     PlaybackFragment fragment = new PlaybackFragment();
@@ -76,10 +80,18 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     }
   }
 
+  public void setIsRetained(boolean isRetained) {
+    mIsRetained = isRetained;
+  }
+
+  public void setExpandable(boolean expandable) {
+    mIsExpandable = expandable;
+  }
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setRetainInstance(true);
+    setRetainInstance(mIsRetained);
   }
 
   @Override
@@ -92,14 +104,6 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     mView.setController(getActivity(), this);
   }
 
-  @NonNull
-  @Override
-  public Dialog onCreateDialog(Bundle savedInstanceState) {
-    Dialog dialog = super.onCreateDialog(savedInstanceState);
-    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    return dialog;
-  }
-
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
@@ -109,7 +113,7 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
     mView.getViewTreeObserver().addOnGlobalLayoutListener(new     ViewTreeObserver.OnGlobalLayoutListener() {
       public void onGlobalLayout() {
         mView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        if (!getShowsDialog()) {
+        if (mIsExpandable) {
           mView.setY(getMaxYScroll());
         }
         mView.setVisibility(View.VISIBLE);
@@ -124,11 +128,17 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
 
     // If isn't being shown in dialog, allow to be swiped up or down
     //
-    if (!getShowsDialog()) {
+    if (mIsExpandable) {
       final MyGestureDetector gestureDetector = new MyGestureDetector(mView.getContext(), new MyGestureListener());
       mView.setOnTouchListener(new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+          // Don't respond to defined fling & scroll gestures unless we have track info
+          //
+          if (mTracks == null || mTrack == null) {
+            return false;
+          }
+
           return gestureDetector.onTouchEvent(event);
         }
       });
@@ -138,6 +148,10 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
   }
 
   private void bindTrackInfo() {
+    if (mTracks == null || mTrack == null) {
+      return;
+    }
+
     setPlayVisibility(View.GONE);
     setPauseVisibility(View.GONE);
     setBufferVisibility(View.VISIBLE);
@@ -166,6 +180,13 @@ public class PlaybackFragment extends BaseViewControllerDialogFragment<PlaybackF
         startActivity(intent);
       }
     });
+
+    // Ensure shadow is gone, and album art visible when not expandable/collapsable
+    //
+    if (!mIsExpandable) {
+      hideHeaderMediaControls();
+      mView.mAlbumArtImageView.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override

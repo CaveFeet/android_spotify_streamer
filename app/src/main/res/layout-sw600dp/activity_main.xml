@@ -29,19 +29,26 @@
               android:layout_height="match_parent"
               >
 
-            <fragment android:name="com.n8.spotifystreamer.tracks.TopTracksFragment"
-                      android:id="@+id/top_tracks_fragment"
-                      android:layout_weight="1"
-                      android:layout_width="0dp"
-                      android:layout_height="match_parent"
-                />
-
             <FrameLayout
-                android:id="@+id/main_activity_playback_frame"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:elevation="8dp"
+                android:paddingBottom="@dimen/playback_fragment_header_height"
+                >
+              <fragment android:name="com.n8.spotifystreamer.tracks.TopTracksFragment"
+                        android:id="@+id/top_tracks_fragment"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                  />
+            </FrameLayout>
+
+            <fragment
+                android:name="com.n8.spotifystreamer.playback.PlaybackFragment"
+                android:id="@+id/playback_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 />
+
           </FrameLayout>
 
     </LinearLayout>
