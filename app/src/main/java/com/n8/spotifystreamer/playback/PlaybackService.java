@@ -49,6 +49,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   public static final String KEY_TRACK_INDEX = "key_track_index";
 
+  public static final String ACTION_START = "com.n8.spotifystreamer.START";
+
   public static final String ACTION_PLAY = "com.n8.spotifystreamer.PLAY";
 
   public static final String ACTION_PAUSE = "com.n8.spotifystreamer.PAUSE";
@@ -152,8 +154,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       Log.d(TAG, action);
 
       if (action != null) {
-        if (action.equals(ACTION_PLAY)) {
-          handlePlayIntent(intent);
+        if (action.equals(ACTION_START)) {
+          handleStartIntent(intent);
+        } else if (action.equals(ACTION_PLAY)) {
+          play();
         } else if (action.equals(ACTION_PAUSE)) {
           pause();
         } else if (action.equals(ACTION_STOP)) {
@@ -289,19 +293,14 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     mWifiLock = null;
   }
 
-  private void handlePlayIntent(Intent intent) {
-    Log.d(TAG, "handlePlayIntent()");
-
-    if (mMediaPlayer != null) {
-      play();
-      return;
-    }
+  private void handleStartIntent(Intent intent) {
+    Log.d(TAG, "handleStartIntent()");
 
     // Check for new playlist info.  If it exists in the bundle, update the service's members
     //
-    TopTracksPlaylist playlist = intent.getParcelableExtra(KEY_PLAYLIST);
-    if (playlist != null) {
-      mTopTracksPlaylist = playlist;
+    mTopTracksPlaylist = intent.getParcelableExtra(KEY_PLAYLIST);
+
+    if (mTopTracksPlaylist != null) {
       mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
       mNotificationImage = null;
 

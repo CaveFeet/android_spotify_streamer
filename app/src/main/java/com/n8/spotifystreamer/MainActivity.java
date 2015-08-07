@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         // Create playback intent to send to service with current playback information
         //
         Intent playbackIntent = new Intent(this, PlaybackService.class);
-        playbackIntent.setAction(PlaybackService.ACTION_PLAY);
+        playbackIntent.setAction(PlaybackService.ACTION_START);
         playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
         playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().tracks.indexOf(event.getClickedTrack()));
 
