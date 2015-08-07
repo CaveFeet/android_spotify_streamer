@@ -169,8 +169,6 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mHeaderThumbnail);
     Picasso.with(mView.getContext()).load(thumbnailUrl).into(mView.mAlbumArtImageView);
 
-    mView.mAlbumArtImageView.setVisibility(View.GONE);
-
     mView.mHeaderTrackTitleTextView.setText(mTrack.name);
     mView.mHeaderAlbumNameTextView.setText(mTrack.album.name);
     mView.mHeaderArtistNameTextView.setText(mTrack.artists.get(0).name);
