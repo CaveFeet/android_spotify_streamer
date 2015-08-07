@@ -11,4 +11,8 @@ public interface PlaybackController extends ViewController {
   void onNextClicked();
 
   void onPrevClicked();
+
+  boolean isExpansionEnabled();
+
+  boolean isExpandable();
 }
