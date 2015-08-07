@@ -32,6 +32,8 @@ import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
+import com.n8.spotifystreamer.models.ParcelableTrack;
+import com.n8.spotifystreamer.models.ParcelableTracks;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
@@ -44,9 +46,9 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   private static final String TAG = PlaybackFragment.class.getSimpleName();
 
-  private List<Track> mTracks;
+  private ParcelableTracks mTracks;
 
-  private Track mTrack;
+  private ParcelableTrack mTrack;
 
   private enum PlaybackState{
     PLAYING, PAUSED
@@ -62,7 +64,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   private boolean mIsRetained = true;
 
-  public static PlaybackFragment getInstance(List<Track> tracks, Track track) {
+  public static PlaybackFragment getInstance(ParcelableTracks tracks, ParcelableTrack track) {
     PlaybackFragment fragment = new PlaybackFragment();
     fragment.setPlaybackInfo(tracks, track);
 
@@ -71,7 +73,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   public PlaybackFragment() { }
 
-  public void setPlaybackInfo(@NonNull List<Track> tracks, @NonNull Track track) {
+  void setPlaybackInfo(@NonNull ParcelableTracks tracks, @NonNull ParcelableTrack track) {
     mTracks = tracks;
     mTrack = track;
 
@@ -156,9 +158,9 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     setPauseVisibility(View.GONE);
     setBufferVisibility(View.VISIBLE);
 
-    if (mTracks.indexOf(mTrack) == 0) {
+    if (mTracks.tracks.indexOf(mTrack) == 0) {
       mView.mPrevButton.setEnabled(true);
-    }else if (mTracks.indexOf(mTrack) == mTracks.size() - 1) {
+    }else if (mTracks.tracks.indexOf(mTrack) == mTracks.tracks.size() - 1) {
       mView.mNextButton.setEnabled(false);
     }
 
@@ -241,6 +243,8 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   @Subscribe
   public void onPlaybackServiceStateBroadcastEventReceived(PlaybackServiceStateBroadcastEvent event) {
+    setPlaybackInfo(event.getTracks(), event.getCurrentTrack());
+
     if (event.isPlaying()) {
       mView.mPauseButton.setVisibility(View.VISIBLE);
       mView.mPlayButton.setVisibility(View.GONE);
@@ -275,7 +279,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   public void onNextTrack(NextTrackEvent event) {
     mView.mPrevButton.setEnabled(true);
 
-    mTrack = mTracks.get(event.getTrackIndex());
+    mTrack = mTracks.tracks.get(event.getTrackIndex());
     bindTrackInfo();
   }
 
@@ -283,7 +287,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   public void onPrevTrack(PrevTrackEvent event) {
     mView.mNextButton.setEnabled(true);
 
-    mTrack = mTracks.get(event.getTrackIndex());
+    mTrack = mTracks.tracks.get(event.getTrackIndex());
     bindTrackInfo();
   }
 

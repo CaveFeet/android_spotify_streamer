@@ -1,5 +1,9 @@
 package com.n8.spotifystreamer.events;
 
+import com.n8.spotifystreamer.models.ParcelableArtist;
+import com.n8.spotifystreamer.models.ParcelableTrack;
+import com.n8.spotifystreamer.models.ParcelableTracks;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
@@ -10,29 +14,30 @@ import kaaes.spotify.webapi.android.models.Track;
  */
 public class TrackClickedEvent {
 
-  private Artist mArtist;
+  private ParcelableArtist mArtist;
 
-  private List<Track> mTracks;
+  private ParcelableTracks mTracks;
 
-  private Track mClickedTrack;
+  private ParcelableTrack mClickedTrack;
+
   private boolean mPlayInDialog;
 
-  public TrackClickedEvent(Artist artist, List<Track> tracks, Track clickedTrack, boolean playInDialog) {
+  public TrackClickedEvent(ParcelableArtist artist, ParcelableTracks tracks, ParcelableTrack clickedTrack, boolean playInDialog) {
     mArtist = artist;
     mTracks = tracks;
     mClickedTrack = clickedTrack;
     mPlayInDialog = playInDialog;
   }
 
-  public Artist getArtist() {
+  public ParcelableArtist getArtist() {
     return mArtist;
   }
 
-  public List<Track> getTracks() {
+  public ParcelableTracks getTracks() {
     return mTracks;
   }
 
-  public Track getClickedTrack() {
+  public ParcelableTrack getClickedTrack() {
     return mClickedTrack;
   }
 

@@ -33,6 +33,7 @@ import com.n8.spotifystreamer.events.SeekbarChangedEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
+import com.n8.spotifystreamer.models.TopTracksPlaylist;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
@@ -226,7 +227,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   @Subscribe
   public void onPlaybackServiceStateRequestEventReceived(PlaybackServiceStateRequestEvent event) {
-    BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer));
+    broadcastState();
   }
 
   @Subscribe
@@ -234,6 +235,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     if (mMediaPlayer != null) {
       mMediaPlayer.seekTo(event.getProgress());
     }
+  }
+
+  private void broadcastState() {
+    BusProvider.getInstance().post(new PlaybackServiceStateBroadcastEvent(mMediaPlayer, mTopTracksPlaylist, mTrackIndex));
   }
 
   private void initMediaPlayer() {
@@ -258,7 +263,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
 
     try {
-      String url = mTopTracksPlaylist.getTrackUrls().get(mTrackIndex);
+      String url = mTopTracksPlaylist.getTrackPreviewUrl(mTrackIndex);
       if (url == null) {
         return;
       }
@@ -299,7 +304,9 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mTopTracksPlaylist = playlist;
       mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
       mNotificationImage = null;
+
       initMediaPlayer();
+      broadcastState();
     }
   }
 
@@ -315,10 +322,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       mMediaPlayer.start();
       BusProvider.getInstance().post(
           new TrackStartedEvent(
-              mTopTracksPlaylist.getTrackName(mTrackIndex),
-              mTopTracksPlaylist.getTrackAlbumName(mTrackIndex),
-              mTopTracksPlaylist.getArtistName(),
-              mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex),
+              mTopTracksPlaylist.getTracks().tracks.get(mTrackIndex),
               mMediaPlayer.getDuration()
           )
       );
@@ -423,7 +427,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
 
     final ImageView imageView = new ImageView(this);
-    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)).into(imageView, new Callback() {
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
       @Override
       public void onSuccess() {
         mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
@@ -483,7 +487,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     }
 
     final ImageView imageView = new ImageView(this);
-    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(mTrackIndex)).into(imageView, new Callback() {
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
       @Override
       public void onSuccess() {
         mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());

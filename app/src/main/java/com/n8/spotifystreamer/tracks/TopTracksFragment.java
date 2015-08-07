@@ -25,6 +25,10 @@ import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
+import com.n8.spotifystreamer.models.ParcelableArtist;
+import com.n8.spotifystreamer.models.ParcelableImage;
+import com.n8.spotifystreamer.models.ParcelableTrack;
+import com.n8.spotifystreamer.models.ParcelableTracks;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
 
@@ -52,9 +56,9 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   public static final int THUMBNAIL_IMAGE_SIZE = 200;
 
-  private Artist mArtist;
+  private ParcelableArtist mArtist;
 
-  private List<Track> mTracks;
+  private ParcelableTracks mTracks;
 
   private AnimatorSet mAnimatorSet;
 
@@ -62,9 +66,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
   private String mCountryCode;
 
-  private Track mCurrentTrack;
-
-  public static TopTracksFragment getInstance(Artist artist) {
+  public static TopTracksFragment getInstance(ParcelableArtist artist) {
     TopTracksFragment fragment = new TopTracksFragment();
     fragment.mArtist = artist;
 
@@ -156,12 +158,12 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   @Override
-  public void onTrackViewClicked(Track track) {
+  public void onTrackViewClicked(ParcelableTrack track) {
     playTrack(track, false);
   }
 
   @Override
-  public void onOverflowClicked(View view, final Track track) {
+  public void onOverflowClicked(View view, final ParcelableTrack track) {
     PopupMenu overflowMenu = new PopupMenu(getActivity(), view);
     overflowMenu.inflate(R.menu.track_overflow_menu);
 
@@ -184,8 +186,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     overflowMenu.show();
   }
 
-  private void playTrack(Track track, boolean playInDialog) {
-    mCurrentTrack = track;
+  private void playTrack(ParcelableTrack track, boolean playInDialog) {
     BusProvider.getInstance().post(new TrackClickedEvent(mArtist, mTracks, track, playInDialog));
   }
 
@@ -201,7 +202,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
 
     // Load artist thumbnail into thumbnail view in the collapsing toolbar header
     //
-    List<Image> images = mArtist.images;
+    List<ParcelableImage> images = mArtist.images;
     if (images != null && images.size() > 0) {
       int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_IMAGE_SIZE);
       Picasso.with(getActivity()).load(images.get(index).url).into(mView.getArtistThumbnailImageView());
@@ -232,9 +233,9 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   private void setupToolbarHeader() {
     // Sets up the collapsing toolbar header to display the artist's top track images
     //
-    List<Image> trackImages = new ArrayList<>();
-    for (Track track : mTracks) {
-      List<Image> imgs = track.album.images;
+    List<ParcelableImage> trackImages = new ArrayList<>();
+    for (ParcelableTrack track : mTracks.tracks) {
+      List<ParcelableImage> imgs = track.album.images;
       if (imgs != null && imgs.size() > 0) {
         trackImages.add(imgs.get(0));
       }
@@ -248,7 +249,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   private void updateContentViews() {
-    if (mTracks != null && mTracks.size() > 0) {
+    if (mTracks != null && mTracks.tracks.size() > 0) {
       mView.getTopTracksRecyclerView().setVisibility(View.VISIBLE);
       mView.getNoContentView().setVisibility(View.GONE);
     } else {
@@ -263,31 +264,31 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     map.put("country", mCountryCode);
 
     final Handler handler = new Handler();
-    SpotifyStreamerApplication
-        .getSpotifyService().getArtistTopTrack(mArtist.id, map, new Callback<Tracks>() {
-      @Override
-      public void success(Tracks tracks, Response response) {
-        mTracks = tracks.tracks;
-        handler.post(new Runnable() {
+    SpotifyStreamerApplication.getSpotifyService().getArtistTopTrack(mArtist.id, map,
+        new Callback<Tracks>() {
           @Override
-          public void run() {
-            bindTracks(true);
-            updateContentViews();
-            setupToolbarHeader();
+          public void success(Tracks tracks, Response response) {
+            mTracks = new ParcelableTracks(tracks);
+            handler.post(new Runnable() {
+              @Override
+              public void run() {
+                bindTracks(true);
+                updateContentViews();
+                setupToolbarHeader();
+              }
+            });
           }
-        });
-      }
 
-      @Override
-      public void failure(final RetrofitError error) {
-        handler.post(new Runnable() {
           @Override
-          public void run() {
-            AndroidUtils.showToast(getActivity(), error.getLocalizedMessage());
+          public void failure(final RetrofitError error) {
+            handler.post(new Runnable() {
+              @Override
+              public void run() {
+                AndroidUtils.showToast(getActivity(), error.getLocalizedMessage());
+              }
+            });
           }
         });
-      }
-    });
   }
 
   /**
@@ -296,7 +297,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
    * @param images
    * @param index
    */
-  private void setupHeaderImages(final List<Image> images, final int index) {
+  private void setupHeaderImages(final List<ParcelableImage> images, final int index) {
     // Preload the next image to avoid any delay
     if (index != images.size() - 1) {
       Picasso.with(getActivity()).load(images.get(index + 1).url);

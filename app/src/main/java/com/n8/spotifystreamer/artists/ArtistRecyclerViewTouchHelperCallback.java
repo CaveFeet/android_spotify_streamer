@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.models.ParcelableArtist;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class ArtistRecyclerViewTouchHelperCallback extends ItemTouchHelper.Simpl
 
   private RecyclerView.Adapter<ArtistViewHolder> mAdapter;
 
-  private List<Artist> mArtists;
+  private List<ParcelableArtist> mArtists;
 
   private String mSnackbarText;
 
@@ -45,7 +46,8 @@ public class ArtistRecyclerViewTouchHelperCallback extends ItemTouchHelper.Simpl
 
   private View mSwipeBackgroundView;
 
-  public ArtistRecyclerViewTouchHelperCallback(ViewGroup parentView, RecyclerView.Adapter<ArtistViewHolder> adapter, List<Artist> artists) {
+  public ArtistRecyclerViewTouchHelperCallback(ViewGroup parentView, RecyclerView.Adapter<ArtistViewHolder> adapter,
+                                               List<ParcelableArtist> artists) {
     super(0, ItemTouchHelper.RIGHT);
     mParentView = parentView;
     mAdapter = adapter;
@@ -73,7 +75,7 @@ public class ArtistRecyclerViewTouchHelperCallback extends ItemTouchHelper.Simpl
   public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
 
     final int index = viewHolder.getAdapterPosition();
-    final Artist artist = mArtists.remove(index);
+    final ParcelableArtist artist = mArtists.remove(index);
     mAdapter.notifyItemRemoved(index);
 
     Snackbar snackbar = Snackbar.make(mParentView, mSnackbarText, Snackbar.LENGTH_LONG)

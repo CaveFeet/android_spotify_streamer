@@ -4,21 +4,15 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.provider.SearchRecentSuggestions;
 import android.support.annotation.IdRes;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.TransitionInflater;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.n8.spotifystreamer.artists.ArtistSearchFragment;
-import com.n8.spotifystreamer.artists.ArtistSuggestionProvider;
 import com.n8.spotifystreamer.coachmarks.CoachmarkFragment;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
@@ -26,9 +20,8 @@ import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackDialogFragment;
-import com.n8.spotifystreamer.playback.PlaybackFragment;
 import com.n8.spotifystreamer.playback.PlaybackService;
-import com.n8.spotifystreamer.playback.TopTracksPlaylist;
+import com.n8.spotifystreamer.models.TopTracksPlaylist;
 import com.n8.spotifystreamer.tracks.TopTracksFragment;
 import com.squareup.otto.Subscribe;
 
@@ -171,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
         Intent playbackIntent = new Intent(this, PlaybackService.class);
         playbackIntent.setAction(PlaybackService.ACTION_PLAY);
         playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
-        playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().indexOf(event.getClickedTrack()));
+        playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().tracks.indexOf(event.getClickedTrack()));
 
         // Send playback intent to the playback service.  The service will be started if not already started.
         startService(playbackIntent);
@@ -185,11 +178,6 @@ public class MainActivity extends AppCompatActivity {
             PlaybackDialogFragment playbackDialogFragment = PlaybackDialogFragment.getInstance(event.getTracks(), event.getClickedTrack());
             playbackDialogFragment.show(getSupportFragmentManager(), TAG_PLAYBACK_DIALOG_FRAGMENT);
         }
-
-        // Update the always-visible playback fragment
-        //
-        PlaybackFragment playbackFragment = (PlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.playback_fragment);
-        playbackFragment.setPlaybackInfo(event.getTracks(), event.getClickedTrack());
 
     }
 }

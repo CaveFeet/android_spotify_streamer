@@ -1,4 +1,4 @@
-package com.n8.spotifystreamer.playback;
+package com.n8.spotifystreamer.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,56 +19,54 @@ public class TopTracksPlaylist implements Parcelable{
 
   private String mArtistName;
 
-  private List<String> mTrackNames;
+  private ParcelableTracks mTracks;
 
-  private List<String> mTrackUrls;
-
-  private List<String> mTrackImageUrls;
-
-  private List<String> mAlbumNames;
-
-  public TopTracksPlaylist(@NonNull Artist artist, @NonNull List<Track> tracks) {
+  public TopTracksPlaylist(@NonNull ParcelableArtist artist, @NonNull ParcelableTracks tracks) {
     if (artist == null || tracks == null) {
       throw new IllegalArgumentException("Argument to " + TopTracksPlaylist.class.getSimpleName() + " constructor was null");
     }
 
+    mTracks = tracks;
     mArtistName = artist.name;
-    mTrackNames = getTrackNamesFromTracksList(tracks);
-    mTrackUrls = getTrackPreviewUrlsFromTracksList(tracks);
-    mTrackImageUrls = getTrackThumbnailUrlsFromTracksList(tracks);
-    mAlbumNames = getTrackAlbumNamesFromTracksList(tracks);
+  }
+
+  public ParcelableTracks getTracks() {
+    return mTracks;
   }
 
   public int size(){
-    return mTrackUrls == null ? 0 : mTrackUrls.size();
+    return mTracks == null ? 0 : mTracks.tracks.size();
   }
 
   public String getArtistName() {
     return mArtistName;
   }
 
-  public List<String> getTrackUrls() {
-    return mTrackUrls;
-  }
-
-  public List<String> getTrackImageUrls() {
-    return mTrackImageUrls;
-  }
-
   public String getTrackName(@IntRange(from = 0) int index) {
-    return mTrackNames.get(index);
+    return mTracks.tracks.get(index).name;
   }
 
   public String getTrackPreviewUrl(@IntRange(from=0)int index) {
-    return mTrackUrls.get(index);
+    return mTracks.tracks.get(index).preview_url;
   }
 
-  public String getTrackThumbnailUrl(@IntRange(from = 0) int index) {
-    return mTrackImageUrls.get(index);
+  public String getTrackThumbnailUrl(@IntRange(from = 0) int index, @IntRange(from = 0) int trackIndex) {
+    ParcelableAlbumSimple album = getAlbum(index);
+
+    int imageIndex = trackIndex;
+    if (imageIndex >= album.images.size()) {
+      imageIndex = album.images.size() - 1;
+    }
+
+    return album.images.get(imageIndex).url;
   }
 
   public String getTrackAlbumName(@IntRange(from = 0) int index) {
-    return mAlbumNames.get(index);
+    return getAlbum(index).name;
+  }
+
+  private ParcelableAlbumSimple getAlbum(@IntRange(from = 0) int index) {
+    return mTracks.tracks.get(index).album;
   }
 
   /*
@@ -130,10 +128,7 @@ public class TopTracksPlaylist implements Parcelable{
   @Override
   public void writeToParcel(Parcel dest, int flags) {
     dest.writeString(mArtistName);
-    dest.writeStringList(mTrackNames);
-    dest.writeStringList(mTrackUrls);
-    dest.writeStringList(mTrackImageUrls);
-    dest.writeStringList(mAlbumNames);
+    dest.writeParcelable(mTracks, flags);
   }
 
   public static final Parcelable.Creator<TopTracksPlaylist> CREATOR = new Parcelable.Creator<TopTracksPlaylist>() {
@@ -148,17 +143,6 @@ public class TopTracksPlaylist implements Parcelable{
 
   private TopTracksPlaylist(Parcel in) {
     mArtistName = in.readString();
-
-    mTrackNames = new ArrayList<>();
-    in.readStringList(mTrackNames);
-
-    mTrackUrls = new ArrayList<>();
-    in.readStringList(mTrackUrls);
-
-    mTrackImageUrls = new ArrayList<>();
-    in.readStringList(mTrackImageUrls);
-
-    mAlbumNames = new ArrayList<>();
-    in.readStringList(mAlbumNames);
+    mTracks = in.readParcelable(ParcelableTracks.class.getClassLoader());
   }
 }

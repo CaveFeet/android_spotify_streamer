@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.view.Window;
 
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.models.ParcelableTrack;
+import com.n8.spotifystreamer.models.ParcelableTracks;
 
 import java.util.List;
 
@@ -22,13 +24,14 @@ import kaaes.spotify.webapi.android.models.Track;
 public class PlaybackDialogFragment extends DialogFragment {
 
   public static final String TAG_PLAYBACK_FRAGMENT = "playback_fragment";
-  private static List<Track> mTracks;
 
-  private static Track mTrack;
+  private static ParcelableTracks mTracks;
+
+  private static ParcelableTrack mTrack;
 
   private PlaybackFragment mPlaybackFragment;
 
-  public static PlaybackDialogFragment getInstance(List<Track> tracks, Track track) {
+  public static PlaybackDialogFragment getInstance(ParcelableTracks tracks, ParcelableTrack track) {
     PlaybackDialogFragment fragment = new PlaybackDialogFragment();
     fragment.setPlaybackInfo(tracks, track);
 
@@ -62,7 +65,7 @@ public class PlaybackDialogFragment extends DialogFragment {
     return view;
   }
 
-  public void setPlaybackInfo(@NonNull List<Track> tracks, @NonNull Track track) {
+  public void setPlaybackInfo(@NonNull ParcelableTracks tracks, @NonNull ParcelableTrack track) {
     mTracks = tracks;
     mTrack = track;
 

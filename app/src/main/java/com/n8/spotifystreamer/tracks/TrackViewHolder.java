@@ -8,6 +8,8 @@ import android.widget.TextView;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.artists.ArtistViewHolder;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.models.ParcelableImage;
+import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -41,7 +43,7 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
     @InjectView(R.id.track_recycler_view_overflow_imageView)
     ImageView mOverflowImageView;
 
-    private Track mTrack;
+    private ParcelableTrack mTrack;
 
     private TracksRecyclerAdapter.TrackClickListener mListener;
 
@@ -60,7 +62,7 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
         });
     }
 
-    public void bindViewHolder(final Track track){
+    public void bindViewHolder(final ParcelableTrack track){
 
         mTrack = track;
         mTrackTitleTextView.setText(mTrack.name);
@@ -70,7 +72,7 @@ public class TrackViewHolder extends RecyclerView.ViewHolder implements View.OnC
         DecimalFormat formatter = new DecimalFormat("#,###,###,###");
         mPopularityTextView.setText(formatter.format(mTrack.popularity));
 
-        List<Image> images = mTrack.album.images;
+        List<ParcelableImage> images = mTrack.album.images;
         if (images != null && images.size() > 0) {
             int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_SIZE);
             Picasso.with(itemView.getContext()).load(images.get(index).url).error(R.drawable.ic_track_placeholder_light).into(mTrackImageView);

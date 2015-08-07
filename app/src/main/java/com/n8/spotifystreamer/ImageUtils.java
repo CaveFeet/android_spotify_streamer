@@ -17,6 +17,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 
+import com.n8.spotifystreamer.models.ParcelableImage;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Image;
@@ -27,7 +29,7 @@ public class ImageUtils {
 
   public static final int INVALID_IMAGE_INDEX = -1;
 
-  public static int getIndexOfClosestSizeImage(@NonNull List<Image> images, float imageSize) {
+  public static int getIndexOfClosestSizeImage(@NonNull List<ParcelableImage> images, float imageSize) {
     if (images == null || images.size() == 0) {
       return INVALID_IMAGE_INDEX;
     }

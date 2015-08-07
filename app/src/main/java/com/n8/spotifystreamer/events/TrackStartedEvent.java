@@ -2,41 +2,36 @@ package com.n8.spotifystreamer.events;
 
 import android.support.annotation.NonNull;
 
+import com.n8.spotifystreamer.models.ParcelableTrack;
+
 /**
  * Indicates that a new track has been started.
  */
 public class TrackStartedEvent {
 
-  private String mTrackName;
-  private String mAlbumName;
-  private String mArtistName;
-  private String mThumbnailUrl;
+  private ParcelableTrack mTrack;
+
   private int mDuration;
 
-  public TrackStartedEvent(@NonNull String trackName, @NonNull String albumName, @NonNull String artistName, @NonNull String
-      thumbnailUrl, int duration) {
-
-    mTrackName = trackName;
-    mAlbumName = albumName;
-    mArtistName = artistName;
-    mThumbnailUrl = thumbnailUrl;
+  public TrackStartedEvent(@NonNull ParcelableTrack track, int duration) {
+    mTrack = track;
     mDuration = duration;
   }
 
   public String getTrackName() {
-    return mTrackName;
+    return mTrack.name;
   }
 
   public String getAlbumName() {
-    return mAlbumName;
+    return mTrack.album.name;
   }
 
   public String getArtistName() {
-    return mArtistName;
+    return mTrack.artists.get(0).name;
   }
 
   public String getThumbnailUrl() {
-    return mThumbnailUrl;
+    return mTrack.album.images.get(0).url;
   }
 
   public int getDuration() {

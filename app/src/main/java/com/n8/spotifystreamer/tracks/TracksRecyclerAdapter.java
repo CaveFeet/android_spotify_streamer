@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.n8.spotifystreamer.models.ParcelableTrack;
+import com.n8.spotifystreamer.models.ParcelableTracks;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
@@ -14,16 +17,16 @@ import kaaes.spotify.webapi.android.models.Track;
 public class TracksRecyclerAdapter extends RecyclerView.Adapter<TrackViewHolder> {
 
     public interface TrackClickListener{
-        void onTrackViewClicked(Track track);
+        void onTrackViewClicked(ParcelableTrack track);
 
-        void onOverflowClicked(View view, Track track);
+        void onOverflowClicked(View view, ParcelableTrack track);
     }
 
     private TrackClickListener mTrackClickListener;
 
-    private List<Track> mTracks;
+    private ParcelableTracks mTracks;
 
-    public TracksRecyclerAdapter(List<Track> tracks, TrackClickListener listener) {
+    public TracksRecyclerAdapter(ParcelableTracks tracks, TrackClickListener listener) {
         mTrackClickListener = listener;
         mTracks = tracks;
     }
@@ -37,11 +40,11 @@ public class TracksRecyclerAdapter extends RecyclerView.Adapter<TrackViewHolder>
 
     @Override
     public void onBindViewHolder(TrackViewHolder holder, int position) {
-        holder.bindViewHolder(mTracks.get(position));
+        holder.bindViewHolder(mTracks.tracks.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return mTracks == null ? 0 : mTracks.size();
+        return mTracks == null ? 0 : mTracks.tracks.size();
     }
 }

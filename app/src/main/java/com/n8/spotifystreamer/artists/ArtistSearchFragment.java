@@ -29,6 +29,8 @@ import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.models.ParcelableArtist;
+import com.n8.spotifystreamer.models.ParcelableArtistPager;
 import com.squareup.otto.Subscribe;
 
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
 
   public static final String SUGGESTIONS_PREFERENCES_KEY = "suggestions_preferences_key";
 
-  private List<Artist> mArtists;
+  private List<ParcelableArtist> mArtists;
 
   private ArtistsRecyclerAdapter mAdapter;
 
@@ -218,7 +220,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
                 }
                 mView.getProgressBar().setVisibility(View.GONE);
 
-                handleQueryResponse(artistsPager);
+                handleQueryResponse(new ParcelableArtistPager(artistsPager));
               }
             });
           }
@@ -245,7 +247,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     return getActivity().getSharedPreferences(ArtistSearchFragment.class.getSimpleName(), Context.MODE_PRIVATE);
   }
 
-  public void onArtistViewClicked(Artist artist, ImageView sharedImageView) {
+  public void onArtistViewClicked(ParcelableArtist artist, ImageView sharedImageView) {
     BusProvider.getInstance().post(new ArtistClickedEvent(artist, sharedImageView));
   }
 
@@ -258,7 +260,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     sharedPreferences.edit().remove(SUGGESTIONS_PREFERENCES_KEY).apply();
   }
 
-  private void handleQueryResponse(ArtistsPager artistsPager) {
+  private void handleQueryResponse(ParcelableArtistPager artistsPager) {
     if (mArtists == null) {
       mArtists = artistsPager.artists.items;
     } else {
@@ -286,8 +288,8 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   }
 
   private void setupSwipeToDeleteHelper(ViewGroup view) {
-    ArtistRecyclerViewTouchHelperCallback callback = new ArtistRecyclerViewTouchHelperCallback(
-        view, mAdapter, mArtists);
+    ArtistRecyclerViewTouchHelperCallback callback =
+        new ArtistRecyclerViewTouchHelperCallback(view, mAdapter, mArtists);
     ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
     itemTouchHelper.attachToRecyclerView(mView.getArtistRecyclerView());
   }

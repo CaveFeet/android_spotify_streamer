@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.n8.spotifystreamer.models.ParcelableArtist;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Artist;
@@ -13,16 +15,16 @@ import kaaes.spotify.webapi.android.models.Artist;
 public class ArtistsRecyclerAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
 
     public interface ArtistClickListener{
-        void onArtistViewClicked(Artist artist, ImageView sharedImage);
+        void onArtistViewClicked(ParcelableArtist artist, ImageView sharedImage);
     }
 
-    private List<Artist> mArtists;
+    private List<ParcelableArtist> mArtists;
 
     private ArtistClickListener mArtistClickListener;
 
     int selectedPosition = -1;
 
-    public ArtistsRecyclerAdapter(List<Artist> artists, ArtistClickListener artistClickListener) {
+    public ArtistsRecyclerAdapter(List<ParcelableArtist> artists, ArtistClickListener artistClickListener) {
         mArtists = artists;
         mArtistClickListener = artistClickListener;
     }

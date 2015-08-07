@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.models.ParcelableArtist;
+import com.n8.spotifystreamer.models.ParcelableImage;
 import com.squareup.picasso.Picasso;
 
 import java.text.DecimalFormat;
@@ -38,14 +40,14 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
     @InjectView(R.id.artist_recycler_view_followers_textView)
     TextView mFollowersTextView;
 
-    private Artist mArtist;
+    private ParcelableArtist mArtist;
 
     public ArtistViewHolder(View itemView) {
         super(itemView);
         ButterKnife.inject(this, itemView);
     }
 
-    public void bindViewHolder(final Artist artist){
+    public void bindViewHolder(final ParcelableArtist artist){
 
         // Set a unique transition name if using api 21+ to support shared element transitions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -61,7 +63,7 @@ public class ArtistViewHolder extends RecyclerView.ViewHolder {
         mFollowersTextView.setText(formatter.format(mArtist.followers.total));
 
 
-        List<Image> images = artist.images;
+        List<ParcelableImage> images = artist.images;
 
         if (images != null && images.size() > 0) {
             int index = ImageUtils.getIndexOfClosestSizeImage(images, THUMBNAIL_SIZE);
