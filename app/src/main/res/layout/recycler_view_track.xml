@@ -29,7 +29,7 @@
             android:layout_centerVertical="true"
             android:layout_toEndOf="@+id/track_recycler_view_imageView"
             android:orientation="vertical"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_3"
             >
 
             <TextView

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +18,7 @@ import com.n8.spotifystreamer.coachmarks.CoachmarkFragment;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
+import com.n8.spotifystreamer.events.PlayAllEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackDialogFragment;
@@ -155,6 +157,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Subscribe
+    public void onPlayAllEventReceived(PlayAllEvent event) {
+        TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
+
+        // Create playback intent to send to service with current playback information
+        //
+        Intent playbackIntent = new Intent(this, PlaybackService.class);
+        playbackIntent.setAction(PlaybackService.ACTION_PLAY_ALL);
+        playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
+
+        play(playbackIntent, event.isPlayInDialog());
+    }
+
+    @Subscribe
     public void onTrackClicked(TrackClickedEvent event) {
 
         TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
@@ -166,18 +181,22 @@ public class MainActivity extends AppCompatActivity {
         playbackIntent.putExtra(PlaybackService.KEY_PLAYLIST, playlist);
         playbackIntent.putExtra(PlaybackService.KEY_TRACK_INDEX, event.getTracks().tracks.indexOf(event.getClickedTrack()));
 
+        play(playbackIntent, event.isPlayInDialog());
+
+    }
+
+    private void play(@NonNull Intent playbackIntent, boolean playInDialog) {
         // Send playback intent to the playback service.  The service will be started if not already started.
         startService(playbackIntent);
 
         // Show playback controls in a dialog
         // TODO remove this after submission.  Only here to strictly satisfy dialog fragment requirement
         //
-        if (event.isPlayInDialog()) {
+        if (playInDialog) {
             // Show a new PlaybackFragment if one doesn't exist, or update an existing one.
             //
-            PlaybackDialogFragment playbackDialogFragment = PlaybackDialogFragment.getInstance(event.getTracks(), event.getClickedTrack());
+            PlaybackDialogFragment playbackDialogFragment = PlaybackDialogFragment.getInstance();
             playbackDialogFragment.show(getSupportFragmentManager(), TAG_PLAYBACK_DIALOG_FRAGMENT);
         }
-
     }
 }

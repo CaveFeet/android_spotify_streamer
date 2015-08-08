@@ -16,6 +16,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
@@ -32,6 +33,7 @@ import com.n8.spotifystreamer.R;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 /**
  * Custom view that encapsulates view specific setup/logic for {@link TopTracksFragment}
@@ -52,6 +54,9 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
   @InjectView(R.id.fragment_top_tracks_artist_image_thumbnail)
   ImageView mArtistThumbnailImageView;
+
+  @InjectView(R.id.fragment_top_tracks_play_all_floatingActionButton)
+  FloatingActionButton mPlayAllButton;
 
   @InjectView(R.id.fragment_top_tracks_artist_image_header_background)
   ImageView mArtistHeaderBackgroundImageView;
@@ -115,6 +120,11 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
     mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.black));
     mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.white));
+  }
+
+  @OnClick(R.id.fragment_top_tracks_play_all_floatingActionButton)
+  void onPlayAllClicked(){
+    mController.onPlayAllClicked();
   }
 
   public Toolbar getToolbar() {

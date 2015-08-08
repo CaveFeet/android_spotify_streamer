@@ -24,6 +24,7 @@ import com.n8.spotifystreamer.SettingsActivity;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
+import com.n8.spotifystreamer.events.PlayAllEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.models.ParcelableArtist;
 import com.n8.spotifystreamer.models.ParcelableImage;
@@ -116,6 +117,11 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   @Override
+  public void onPlayAllClicked() {
+    playAllTracks();
+  }
+
+  @Override
   public void onShareClicked() {
     startActivity(createShareIntent());
   }
@@ -184,6 +190,10 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     });
 
     overflowMenu.show();
+  }
+
+  private void playAllTracks() {
+    BusProvider.getInstance().post(new PlayAllEvent(mArtist, mTracks, false));
   }
 
   private void playTrack(ParcelableTrack track, boolean playInDialog) {

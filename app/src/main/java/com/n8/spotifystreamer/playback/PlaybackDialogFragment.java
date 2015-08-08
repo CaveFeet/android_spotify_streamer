@@ -25,15 +25,10 @@ public class PlaybackDialogFragment extends DialogFragment {
 
   public static final String TAG_PLAYBACK_FRAGMENT = "playback_fragment";
 
-  private static ParcelableTracks mTracks;
-
-  private static ParcelableTrack mTrack;
-
   private PlaybackFragment mPlaybackFragment;
 
-  public static PlaybackDialogFragment getInstance(ParcelableTracks tracks, ParcelableTrack track) {
+  public static PlaybackDialogFragment getInstance() {
     PlaybackDialogFragment fragment = new PlaybackDialogFragment();
-    fragment.setPlaybackInfo(tracks, track);
 
     return fragment;
   }
@@ -55,7 +50,7 @@ public class PlaybackDialogFragment extends DialogFragment {
     View view = inflater.inflate(R.layout.fragment_playback_dialog, container, false);
 
     if (getChildFragmentManager().findFragmentByTag(TAG_PLAYBACK_FRAGMENT) == null) {
-      mPlaybackFragment = PlaybackFragment.getInstance(mTracks, mTrack);
+      mPlaybackFragment = PlaybackFragment.getInstance();
       mPlaybackFragment.setIsRetained(false);
       mPlaybackFragment.setExpandable(false);
       getChildFragmentManager().beginTransaction().add(R.id.fragment_playback_dialog_frameLayout, mPlaybackFragment,
@@ -63,15 +58,6 @@ public class PlaybackDialogFragment extends DialogFragment {
     }
 
     return view;
-  }
-
-  public void setPlaybackInfo(@NonNull ParcelableTracks tracks, @NonNull ParcelableTrack track) {
-    mTracks = tracks;
-    mTrack = track;
-
-    if (mPlaybackFragment != null) {
-      mPlaybackFragment.setPlaybackInfo(mTracks, mTrack);
-    }
   }
 
 

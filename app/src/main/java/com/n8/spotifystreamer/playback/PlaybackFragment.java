@@ -41,9 +41,8 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
 
   private boolean mIsExpandable = true;
 
-  public static PlaybackFragment getInstance(ParcelableTracks tracks, ParcelableTrack track) {
+  public static PlaybackFragment getInstance() {
     PlaybackFragment fragment = new PlaybackFragment();
-    fragment.setPlaybackInfo(tracks, track);
 
     return fragment;
   }
@@ -211,7 +210,7 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
     mView.setController(getActivity(), this);
   }
 
-  void setPlaybackInfo(@NonNull ParcelableTracks tracks, @NonNull ParcelableTrack track) {
+  private void setPlaybackInfo(@NonNull ParcelableTracks tracks, @NonNull ParcelableTrack track) {
     mTracks = tracks;
     mTrack = track;
 

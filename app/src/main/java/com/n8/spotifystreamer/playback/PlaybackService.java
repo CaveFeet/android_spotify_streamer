@@ -16,6 +16,7 @@ import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -53,6 +54,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   public static final String ACTION_PLAY = "com.n8.spotifystreamer.PLAY";
 
+  public static final String ACTION_PLAY_ALL = "com.n8.spotifystream.PLAY_ALL";
+
   public static final String ACTION_PAUSE = "com.n8.spotifystreamer.PAUSE";
 
   public static final String ACTION_STOP = "com.n8.spotifystreamer.STOP";
@@ -82,6 +85,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private BroadcastReceiver mLockScreenReceiver;
 
   private Thread mProgressMonitorThread;
+  private boolean mPlayAll;
 
   @Override
   public void onCreate() {
@@ -156,6 +160,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       if (action != null) {
         if (action.equals(ACTION_START)) {
           handleStartIntent(intent);
+        }else if (action.equals(ACTION_PLAY_ALL)) {
+          handlePlayAllIntent(intent);
         } else if (action.equals(ACTION_PLAY)) {
           play();
         } else if (action.equals(ACTION_PAUSE)) {
@@ -301,7 +307,25 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     mTopTracksPlaylist = intent.getParcelableExtra(KEY_PLAYLIST);
 
     if (mTopTracksPlaylist != null) {
+      mPlayAll = false;
       mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
+      mNotificationImage = null;
+
+      initMediaPlayer();
+      broadcastState();
+    }
+  }
+
+  private void handlePlayAllIntent(@NonNull Intent intent) {
+    Log.d(TAG, "handlePlayAllIntent()");
+
+    // Check for new playlist info.  If it exists in the bundle, update the service's members
+    //
+    mTopTracksPlaylist = intent.getParcelableExtra(KEY_PLAYLIST);
+
+    if (mTopTracksPlaylist != null) {
+      mTrackIndex = 0;
+      mPlayAll = true;
       mNotificationImage = null;
 
       initMediaPlayer();
@@ -390,7 +414,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void complete(){
-    Log.d(TAG, "Playback complete");
+    Log.d(TAG, "Playback complete for current track");
+
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
@@ -399,6 +424,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     stopForeground(false);
     showPauseNotification(true);
+
+    if (mPlayAll) {
+      next();
+    }
   }
 
   private void stop() {

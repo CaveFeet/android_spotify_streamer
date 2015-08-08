@@ -3,6 +3,10 @@ package com.n8.n8droid;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Build;
+import android.os.Looper;
+import android.text.TextUtils;
+import android.view.View;
 
 /**
  * Created by n8 on 7/12/15.
@@ -47,5 +51,26 @@ public class UiUtils {
 
     float scale = Resources.getSystem().getDisplayMetrics().density;
     return (int) (dips * scale + 0.5f);
+  }
+
+  /**
+   * Convenience method to determine if the current thread is the main thread (UI thread)
+   *
+   * @return if the thread this method is called from is the UI thread
+   */
+  public static boolean isRunningInUiThread() {
+    return (Looper.myLooper() == Looper.getMainLooper());
+  }
+
+  /**
+   * Right-to-left (RTL) support was implemented in API 17,
+   * so this returns true if the following are true:
+   *  - Device API >= 17
+   *  - Devices is configured with an RTL language
+   */
+  public static boolean isDeviceUsingRtlLanguage(Context context) {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1
+        && TextUtils.getLayoutDirectionFromLocale(
+        context.getResources().getConfiguration().locale) == View.LAYOUT_DIRECTION_RTL;
   }
 }
