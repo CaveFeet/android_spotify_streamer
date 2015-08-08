@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
@@ -38,6 +39,7 @@ import com.n8.spotifystreamer.models.TopTracksPlaylist;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.io.IOException;
 
@@ -78,7 +80,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private int mTrackIndex;
 
-  private Bitmap mNotificationImage;
+  //private Bitmap mNotificationImage;
 
   private boolean mLockScreenControlsEnabled;
 
@@ -129,6 +131,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
+
+
   }
 
   @Override
@@ -269,7 +273,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       cleanupWifiLock();
       mWifiLock = ((WifiManager) getSystemService(WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, TAG_WIFI_LOCK);
     }else{
-      mNotificationImage = null;
       mMediaPlayer.reset();
     }
 
@@ -310,7 +313,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     if (mTopTracksPlaylist != null) {
       mPlayAll = false;
       mTrackIndex = intent.getIntExtra(KEY_TRACK_INDEX, 0);
-      mNotificationImage = null;
 
       initMediaPlayer();
       broadcastState();
@@ -327,7 +329,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     if (mTopTracksPlaylist != null) {
       mTrackIndex = 0;
       mPlayAll = true;
-      mNotificationImage = null;
 
       initMediaPlayer();
       broadcastState();
@@ -406,6 +407,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       pause();
       mTrackIndex++;
       initMediaPlayer();
+      showPlayNotification(mLockScreenControlsEnabled);
 
       BusProvider.getInstance().post(new NextTrackEvent(mTrackIndex));
     }
@@ -416,6 +418,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
       pause();
       mTrackIndex--;
       initMediaPlayer();
+      showPlayNotification(mLockScreenControlsEnabled);
 
       BusProvider.getInstance().post(new PrevTrackEvent(mTrackIndex));
     }
@@ -463,26 +466,24 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   }
 
   private void showPauseNotification(final boolean showLockScreenControls) {
-    if (mNotificationImage != null) {
-      showPauseNotification(mNotificationImage, showLockScreenControls);
-      return;
-    }
+    showPauseNotification(null, showLockScreenControls);
 
-    final ImageView imageView = new ImageView(this);
-    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(new Target() {
       @Override
-      public void onSuccess() {
-        mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
-        showPauseNotification(mNotificationImage, showLockScreenControls);
+      public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        showPauseNotification(bitmap, showLockScreenControls);
       }
 
       @Override
-      public void onError() {
+      public void onBitmapFailed(Drawable errorDrawable) {
+
+      }
+
+      @Override
+      public void onPrepareLoad(Drawable placeHolderDrawable) {
 
       }
     });
-
-    showPauseNotification(null, showLockScreenControls);
   }
 
   private void showPauseNotification(Bitmap bitmap, boolean showLockScreenControls){
@@ -506,43 +507,39 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     notificationManager.notify(NOTIFICATION_ID, notification);
   }
 
-  private NotificationCompat.Builder createBaseNotificationBuilder(Bitmap bitmap){
-    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-
-    // show controls on lockscreen even when user hides sensitive content.
-    builder.setVisibility(Notification.VISIBILITY_PUBLIC)
-    .setSmallIcon(R.drawable.notification_icon)
-    .setLargeIcon(bitmap)
-    .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
-    .setContentText(mTopTracksPlaylist.getArtistName())
-    .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
-    .setContentIntent(createNotificationContentPendingIntent())
-    .setOngoing(false);
-
-    return builder;
-  }
-
   private void showPlayNotification(final boolean showLockScreenControls) {
-    if (mNotificationImage != null) {
-      showPlayNotification(mNotificationImage, showLockScreenControls);
-      return;
-    }
+    showPlayNotification(null, showLockScreenControls);
 
     final ImageView imageView = new ImageView(this);
-    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
+    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(new Target() {
       @Override
-      public void onSuccess() {
-        mNotificationImage = ImageUtils.drawableToBitmap(imageView.getDrawable());
-        showPlayNotification(mNotificationImage, showLockScreenControls);
+      public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+        showPlayNotification(bitmap, showLockScreenControls);
       }
 
       @Override
-      public void onError() {
+      public void onBitmapFailed(Drawable errorDrawable) {
+
+      }
+
+      @Override
+      public void onPrepareLoad(Drawable placeHolderDrawable) {
 
       }
     });
 
-    showPlayNotification(null, showLockScreenControls);
+//    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
+//      @Override
+//      public void onSuccess() {
+//        Bitmap image = ImageUtils.drawableToBitmap(imageView.getDrawable());
+//        showPlayNotification(image, showLockScreenControls);
+//      }
+//
+//      @Override
+//      public void onError() {
+//
+//      }
+//    });
   }
 
   private void showPlayNotification(Bitmap bitmap, boolean showLockScreenControls) {
@@ -564,6 +561,22 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     startForeground(NOTIFICATION_ID, notification);
     NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
     notificationManager.notify(NOTIFICATION_ID, notification);
+  }
+
+  private NotificationCompat.Builder createBaseNotificationBuilder(Bitmap bitmap){
+    NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+
+    // show controls on lockscreen even when user hides sensitive content.
+    builder.setVisibility(Notification.VISIBILITY_PUBLIC)
+        .setSmallIcon(R.drawable.notification_icon)
+        .setLargeIcon(bitmap)
+        .setContentTitle(mTopTracksPlaylist.getTrackName(mTrackIndex))
+        .setContentText(mTopTracksPlaylist.getArtistName())
+        .setSubText(mTopTracksPlaylist.getTrackAlbumName(mTrackIndex))
+        .setContentIntent(createNotificationContentPendingIntent())
+        .setOngoing(false);
+
+    return builder;
   }
 
   private PendingIntent createNotificationContentPendingIntent() {

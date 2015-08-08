@@ -51,9 +51,9 @@ public class TopTracksPlaylist implements Parcelable{
   }
 
   public String getTrackThumbnailUrl(@IntRange(from = 0) int index, @IntRange(from = 0) int trackIndex) {
-    ParcelableAlbumSimple album = getAlbum(index);
+    ParcelableAlbumSimple album = getAlbum(trackIndex);
 
-    int imageIndex = trackIndex;
+    int imageIndex = index;
     if (imageIndex >= album.images.size()) {
       imageIndex = album.images.size() - 1;
     }
