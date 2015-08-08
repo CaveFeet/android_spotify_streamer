@@ -85,6 +85,7 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private BroadcastReceiver mLockScreenReceiver;
 
   private Thread mProgressMonitorThread;
+
   private boolean mPlayAll;
 
   @Override
@@ -360,13 +361,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     return new Thread(){
       @Override
       public void run() {
-        while (mMediaPlayer.getCurrentPosition() < mMediaPlayer.getDuration()) {
+        while (mMediaPlayer != null) {
+          if (mMediaPlayer.isPlaying()) {
+            BusProvider.getInstance().post(new PlaybackProgressEvent(mMediaPlayer.getCurrentPosition()));
+          }
+
+          if (mMediaPlayer.isPlaying() && mMediaPlayer.getCurrentPosition() >= mMediaPlayer.getDuration()) {
+            break;
+          }
+
           if (isInterrupted()) {
             Log.d(TAG, "Interrupted while monitoring progress");
             return;
           }
 
-          BusProvider.getInstance().post(new PlaybackProgressEvent(mMediaPlayer.getCurrentPosition()));
           try {
             sleep(PROGRESS_REPORTING_DELAY);
           } catch (InterruptedException e) {
@@ -416,6 +424,10 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
   private void complete(){
     Log.d(TAG, "Playback complete for current track");
 
+    if (mProgressMonitorThread != null) {
+      mProgressMonitorThread.interrupt();
+    }
+
     if (mWifiLock.isHeld()) {
       mWifiLock.release();
     }
@@ -424,6 +436,8 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
     stopForeground(false);
     showPauseNotification(true);
+
+    mMediaPlayer.reset();
 
     if (mPlayAll) {
       next();
