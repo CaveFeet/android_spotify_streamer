@@ -29,6 +29,12 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
 
   private final long FLING_ANIMATION_DURATION = 200;
 
+  @InjectView(R.id.fragment_playback_media_controls_container)
+  View mFooterView;
+
+  @InjectView(R.id.fragment_playback_header_container)
+  View mHeaderView;
+
   @InjectView(R.id.fragment_playback_play_imageButton)
   ImageButton mPlayButton;
 

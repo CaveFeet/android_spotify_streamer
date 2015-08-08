@@ -4,9 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
@@ -32,6 +35,7 @@ import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.n8.spotifystreamer.models.ParcelableTracks;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -317,7 +321,30 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
         .into(mView.getArtistHeaderBackgroundImageView(), new com.squareup.picasso.Callback() {
           @Override
           public void onSuccess() {
-            mView.getArtistHeaderBackgroundImageView().setAlpha(.35f);
+            mView.getArtistHeaderBackgroundImageView();
+
+            Picasso.with(getActivity()).load(images.get(index).url).into(new Target() {
+              @Override
+              public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                  @Override
+                  public void onGenerated(Palette palette) {
+                    mView.mCollapsingToolbarLayout.setExpandedTitleColor(palette.getLightVibrantColor(mView
+                        .getDefaultExpandedTitleColor()));
+                  }
+                });
+              }
+
+              @Override
+              public void onBitmapFailed(Drawable errorDrawable) {
+
+              }
+
+              @Override
+              public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+              }
+            });
 
             long duration = 7000;
             float transStartX;

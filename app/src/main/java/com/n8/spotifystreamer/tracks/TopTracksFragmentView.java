@@ -118,8 +118,8 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
     mTopTracksRecyclerView.setLayoutManager(mController.getLinearLayoutManager());
     mTopTracksRecyclerView.setHasFixedSize(true);
 
-    mCollapsingToolbarLayout.setCollapsedTitleTextColor(getResources().getColor(android.R.color.black));
-    mCollapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.white));
+    mCollapsingToolbarLayout.setCollapsedTitleTextColor(getDefaultCollapsedTitleColor());
+    mCollapsingToolbarLayout.setExpandedTitleColor(getDefaultExpandedTitleColor());
   }
 
   @OnClick(R.id.fragment_top_tracks_play_all_floatingActionButton)
@@ -149,5 +149,13 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
   public View getNoContentView(){
     return mNoContentView;
+  }
+
+  public int getDefaultCollapsedTitleColor(){
+    return getResources().getColor(android.R.color.black);
+  }
+
+  public int getDefaultExpandedTitleColor(){
+    return getResources().getColor(android.R.color.white);
   }
 }
