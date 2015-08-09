@@ -11,6 +11,7 @@ import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -142,7 +143,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   @Override
-  public LinearLayoutManager getLinearLayoutManager() {
+  public RecyclerView.LayoutManager getLayoutManager() {
     return new LinearLayoutManager(getActivity());
   }
 

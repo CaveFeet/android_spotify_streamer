@@ -34,11 +34,12 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     app:layout_collapseMode="parallax"
+                    android:transitionName="@string/artist_thumbnail_transition_name"
                     />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/fragment_top_tracks_artist_image_thumbnail"
-                    android:transitionName="@string/artist_thumbnail_transition_name"
+                    android:transitionName="foo"
                     android:layout_width="@dimen/top_tracks_header_thumbnail_size"
                     android:layout_height="@dimen/top_tracks_header_thumbnail_size"
                     android:src="@drawable/ic_artist_placeholder_light"

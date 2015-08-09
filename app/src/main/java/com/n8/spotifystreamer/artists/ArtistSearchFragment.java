@@ -12,8 +12,10 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 import com.n8.n8droid.AndroidUtils;
 import com.n8.n8droid.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
+import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.SettingsActivity;
 import com.n8.spotifystreamer.SpotifyStreamerApplication;
@@ -55,10 +58,11 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   private static final int REQUEST_LIMIT = 20;
 
   public static final String SUGGESTIONS_PREFERENCES_KEY = "suggestions_preferences_key";
+  public static final int GRID_SPAN_COUNT = 2;
 
   private List<ParcelableArtist> mArtists;
 
-  private ArtistsRecyclerAdapter mAdapter;
+  private RecyclerView.Adapter mAdapter;
 
   private String mCurrentQuery;
 
@@ -113,11 +117,6 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   }
 
   @Override
-  public LinearLayoutManager getLinearLayoutManager() {
-    return new LinearLayoutManager(getActivity());
-  }
-
-  @Override
   public void onSettingsMenuOptionClicked() {
     Intent intent = new Intent(getActivity(), SettingsActivity.class);
     startActivity(intent);
@@ -140,16 +139,31 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     }
 
     if (mAdapter.getItemCount() != mTotalCurrentSearchResults) {
-      LinearLayoutManager manager = (LinearLayoutManager) mView.getArtistRecyclerView().getLayoutManager();
-      if (manager.findLastVisibleItemPosition() == mAdapter.getItemCount() - 1 && !mPagingNewResults) {
+      RecyclerView.LayoutManager manager = mView.getArtistRecyclerView().getLayoutManager();
+      if (manager instanceof LinearLayoutManager) {
+        if (((LinearLayoutManager)manager).findLastVisibleItemPosition() == mAdapter.getItemCount() - 1 &&
+            !mPagingNewResults) {
+          showPagingProgress();
+        }
+      }else if (manager instanceof StaggeredGridLayoutManager) {
+        int[] lastPositions = ((StaggeredGridLayoutManager) manager).findLastCompletelyVisibleItemPositions(null);
 
-        mView.getProgressBar().setVisibility(View.VISIBLE);
-        final Handler handler = new Handler();
-
-        mPagingNewResults = true;
-        searchForArtists(null, handler);
+        for (Integer position : lastPositions) {
+          if (position == mAdapter.getItemCount() - 1 && !mPagingNewResults) {
+            showPagingProgress();
+            break;
+          }
+        }
       }
     }
+  }
+
+  private void showPagingProgress() {
+    mView.getProgressBar().setVisibility(View.VISIBLE);
+    final Handler handler = new Handler();
+
+    mPagingNewResults = true;
+    searchForArtists(null, handler);
   }
 
   @Subscribe
@@ -280,11 +294,31 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     }
 
     if (bindFromScratch) {
-      mAdapter = new ArtistsRecyclerAdapter(mArtists, this);
+      mAdapter = createRecyclerAdapter();
     }
-    mView.getArtistRecyclerView().setAdapter(mAdapter);
+
+    setupRecyclerView();
     setupSwipeToDeleteHelper(mView.getArtistRecyclerView());
     mView.showContentView();
+  }
+
+  private RecyclerView.Adapter createRecyclerAdapter() {
+    return new ArtistsRecyclerAdapter(mArtists, this);
+  }
+
+  private RecyclerView.LayoutManager createLayoutManager() {
+    return new GridLayoutManager(getActivity(), 2);
+  }
+
+  private void setupRecyclerView(){
+    mAdapter = createRecyclerAdapter();
+
+    RecyclerView recyclerView = mView.getArtistRecyclerView();
+    recyclerView.setLayoutManager(createLayoutManager());
+
+    recyclerView.setHasFixedSize(true);
+
+    mView.getArtistRecyclerView().setAdapter(mAdapter);
   }
 
   private void setupSwipeToDeleteHelper(ViewGroup view) {

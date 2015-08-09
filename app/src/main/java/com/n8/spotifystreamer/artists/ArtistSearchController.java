@@ -17,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import com.n8.n8droid.ViewController;
 
 public interface ArtistSearchController extends ViewController {
-  LinearLayoutManager getLinearLayoutManager();
 
   void onSettingsMenuOptionClicked();
 

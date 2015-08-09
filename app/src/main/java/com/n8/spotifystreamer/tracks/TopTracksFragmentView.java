@@ -115,7 +115,7 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
     }
 
     mTopTracksRecyclerView.addItemDecoration(new DividerItemDecoration(mActivity, DividerItemDecoration.VERTICAL_LIST));
-    mTopTracksRecyclerView.setLayoutManager(mController.getLinearLayoutManager());
+    mTopTracksRecyclerView.setLayoutManager(mController.getLayoutManager());
     mTopTracksRecyclerView.setHasFixedSize(true);
 
     mCollapsingToolbarLayout.setCollapsedTitleTextColor(getDefaultCollapsedTitleColor());

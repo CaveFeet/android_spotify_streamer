@@ -164,11 +164,9 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
   }
 
   private void setupRecyclerView() {
-    mArtistRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL_LIST));
+    // Set a default layout manager
+    mArtistRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-    final LinearLayoutManager manager = mController.getLinearLayoutManager();
-    mArtistRecyclerView.setLayoutManager(manager);
-    mArtistRecyclerView.setHasFixedSize(true);
     mArtistRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
       public void onScrolled(RecyclerView recyclerView, int dx, int dy) {

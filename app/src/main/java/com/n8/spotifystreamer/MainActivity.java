@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.MenuItem;
 
@@ -131,12 +132,14 @@ public class MainActivity extends AppCompatActivity {
         // If using api 22 or better, use a shared element transition.  For some reason api 21
         // devices are displaying some odd behavior with the transition element.
         //
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Fragment fragment = TopTracksFragment.getInstance(event.mArtist);
-            fragment.setSharedElementEnterTransition(TransitionInflater.from(this)
-                .inflateTransition(R.transition.artists_to_tracks_transition));
-            fragment.setSharedElementReturnTransition(TransitionInflater.from(this)
-                .inflateTransition(R.transition.artists_to_tracks_transition));
+
+            Transition transition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.artists_to_tracks_transition);
+
+            fragment.setSharedElementEnterTransition(transition);
+            fragment.setSharedElementReturnTransition(transition);
 
             // Add Fragment B
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
