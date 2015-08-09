@@ -121,6 +121,9 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
           case R.id.main_menu_settings:
             mController.onSettingsMenuOptionClicked();
             return true;
+          case R.id.main_menu_now_playing:
+            mController.onNowPlayingMenuOptionClicked();
+            return true;
           default:
         }
         return false;

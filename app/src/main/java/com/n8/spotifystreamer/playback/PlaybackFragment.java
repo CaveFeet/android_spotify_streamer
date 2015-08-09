@@ -23,6 +23,7 @@ import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
 import com.n8.spotifystreamer.events.PrevTrackEvent;
 import com.n8.spotifystreamer.events.SeekbarChangedEvent;
+import com.n8.spotifystreamer.events.ShowPlaybackFragmentEvent;
 import com.n8.spotifystreamer.events.TrackPausedEvent;
 import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
@@ -135,6 +136,13 @@ public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmen
   @Override
   public void onPrevClicked() {
     sendServiceAction(PlaybackService.ACTION_PREVIOUS);
+  }
+
+  @Subscribe
+  public void onShowPlaybackFragmentEventReceived(ShowPlaybackFragmentEvent event) {
+    if (mIsExpandable && isExpansionEnabled()) {
+      mView.animateUp();
+    }
   }
 
   @Subscribe

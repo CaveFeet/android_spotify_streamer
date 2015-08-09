@@ -21,6 +21,7 @@ import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.PlayAllEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.events.ShowPlaybackFragmentEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackDialogFragment;
 import com.n8.spotifystreamer.playback.PlaybackService;

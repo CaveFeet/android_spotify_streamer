@@ -18,6 +18,8 @@ import com.n8.n8droid.ViewController;
 
 public interface ArtistSearchController extends ViewController {
 
+  void onNowPlayingMenuOptionClicked();
+
   void onSettingsMenuOptionClicked();
 
   void onClearSuggestions();

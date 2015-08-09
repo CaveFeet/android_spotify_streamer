@@ -214,16 +214,7 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
     mHeaderShadowImageView.setVisibility(View.VISIBLE);
   }
 
-  private boolean isFullScreen() {
-    if (getY() == 0) {
-      mFullScreen = true;
-    }else if (getY() == (getHeight() - mYOffset)) {
-      mFullScreen = false;
-    }
-    return mFullScreen;
-  }
-
-  private void animateUp(){
+  void animateUp(){
     mFullScreen = true;
     hideHeaderMediaControls();
     animate()
@@ -255,7 +246,7 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
 
   }
 
-  private void animateDown(){
+  void animateDown(){
     mFullScreen = false;
     showHeaderMediaControls();
     animate()
@@ -284,6 +275,15 @@ public class PlaybackFragmentView extends BaseFragmentView<PlaybackController> {
           }
         })
         .start();
+  }
+
+  private boolean isFullScreen() {
+    if (getY() == 0) {
+      mFullScreen = true;
+    }else if (getY() == (getHeight() - mYOffset)) {
+      mFullScreen = false;
+    }
+    return mFullScreen;
   }
 
   private float getMaxYScroll(){

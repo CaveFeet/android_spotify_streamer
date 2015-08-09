@@ -106,6 +106,9 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
             case R.id.action_share:
               mController.onShareClicked();
               return true;
+            case R.id.main_menu_now_playing:
+              mController.onNowPlayingMenuOptionClicked();
+              return true;
             default:
           }
           return false;

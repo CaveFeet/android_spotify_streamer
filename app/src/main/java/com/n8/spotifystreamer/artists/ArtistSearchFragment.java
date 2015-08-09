@@ -32,6 +32,7 @@ import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
+import com.n8.spotifystreamer.events.ShowPlaybackFragmentEvent;
 import com.n8.spotifystreamer.models.ParcelableArtist;
 import com.n8.spotifystreamer.models.ParcelableArtistPager;
 import com.squareup.otto.Subscribe;
@@ -114,6 +115,11 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   public void onDestroyView() {
     super.onDestroyView();
     BusProvider.getInstance().unregister(this);
+  }
+
+  @Override
+  public void onNowPlayingMenuOptionClicked(){
+    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
   }
 
   @Override

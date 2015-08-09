@@ -4,6 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
+    <item android:id="@+id/main_menu_now_playing"
+          android:title="@string/now_playing"
+          app:showAsAction="never"
+          />
   <item
       android:id="@+id/main_menu_settings"
       android:title="@string/action_settings"

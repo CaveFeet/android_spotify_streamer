@@ -25,6 +25,8 @@ public interface TopTracksController extends ViewController {
 
   void onNavIconClicked();
 
+  void onNowPlayingMenuOptionClicked();
+
   void onSettingsMenuOptionClicked();
 
   RecyclerView.LayoutManager getLayoutManager();

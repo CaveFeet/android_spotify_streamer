@@ -29,6 +29,7 @@ import com.n8.spotifystreamer.SpotifyStreamerApplication;
 import com.n8.spotifystreamer.events.ArtistClickedEvent;
 import com.n8.spotifystreamer.events.CountryCodeSettingChangedEvent;
 import com.n8.spotifystreamer.events.PlayAllEvent;
+import com.n8.spotifystreamer.events.ShowPlaybackFragmentEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.models.ParcelableArtist;
 import com.n8.spotifystreamer.models.ParcelableImage;
@@ -134,6 +135,11 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   @Override
   public void onNavIconClicked() {
     getActivity().onBackPressed();
+  }
+
+  @Override
+  public void onNowPlayingMenuOptionClicked(){
+    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
   }
 
   @Override

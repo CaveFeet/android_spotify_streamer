@@ -46,4 +46,5 @@
   <string name="search_artists">Search artists</string>
   <string name="select_a_track">Select a track</string>
   <string name="preview">Preview</string>
+  <string name="now_playing">Now Playing</string>
 </resources>
