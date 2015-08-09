@@ -27,7 +27,7 @@ import butterknife.InjectView;
  */
 public class CoachmarkFragmentView extends BaseFragmentView<CoachmarkController> {
 
-    private static final int NUMBER_OF_COACHMARKS = 2;
+    private static final int NUMBER_OF_COACHMARKS = 3;
 
     @InjectView(R.id.fragment_coachmark_viewPager)
     ViewPager mViewPager;
@@ -96,6 +96,8 @@ public class CoachmarkFragmentView extends BaseFragmentView<CoachmarkController>
                 view = layoutInflater.inflate(R.layout.coachmark_search, collection, false);
             }else if (position == 1) {
                 view = layoutInflater.inflate(R.layout.coachmark_results, collection, false);
+            }else if (position == 2) {
+                view = layoutInflater.inflate(R.layout.coachmark_playback, collection, false);
             }
 
             ((ViewPager) collection).addView(view,position);

@@ -23,6 +23,8 @@
   <string name="coachmark_results_view_artists">View results of searched artists</string>
   <string name="coachmark_results_dismiss_text">Swipe to dismiss results you are done with</string>
   <string name="coachmark_results_view_artist_tracks_text">Select an artist to view their top 10 tracks</string>
+  <string name="coachmark_playback_preview_a_track">Select a track to preview it</string>
+  <string name="coachmark_playback_preview_all">Preview all tracks in succession</string>
   <string name="dont_show_again">Don\'t show again</string>
   <string name="got_it">Got It</string>
   <string name="share">Share</string>
