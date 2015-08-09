@@ -12,14 +12,12 @@ import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
-import com.n8.n8droid.util.AndroidUtils;
 import com.n8.n8droid.util.UiUtils;
 import com.n8.n8droid.viewcontroller.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
@@ -46,9 +44,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.Image;
-import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 import retrofit.Callback;
 import retrofit.RetrofitError;

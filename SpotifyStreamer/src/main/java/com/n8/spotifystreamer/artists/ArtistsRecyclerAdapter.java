@@ -10,8 +10,6 @@ import com.n8.spotifystreamer.models.ParcelableArtist;
 
 import java.util.List;
 
-import kaaes.spotify.webapi.android.models.Artist;
-
 public class ArtistsRecyclerAdapter extends RecyclerView.Adapter<ArtistViewHolder> {
 
     public interface ArtistClickListener{

@@ -4,11 +4,6 @@ import com.n8.spotifystreamer.models.ParcelableArtist;
 import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.n8.spotifystreamer.models.ParcelableTracks;
 
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Artist;
-import kaaes.spotify.webapi.android.models.Track;
-
 /**
  * Indicates that a track has been clicked.
  */

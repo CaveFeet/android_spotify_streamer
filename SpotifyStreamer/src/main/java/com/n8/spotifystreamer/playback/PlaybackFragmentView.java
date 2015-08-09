@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;

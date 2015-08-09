@@ -6,10 +6,6 @@ import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.n8.spotifystreamer.models.ParcelableTracks;
 import com.n8.spotifystreamer.models.TopTracksPlaylist;
 
-import java.util.List;
-
-import kaaes.spotify.webapi.android.models.Track;
-
 /**
  * Indicates the current state of the playback service.
  */

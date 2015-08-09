@@ -21,7 +21,6 @@ import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;
 import com.n8.spotifystreamer.events.CoachmarksDoneEvent;
 import com.n8.spotifystreamer.events.PlayAllEvent;
 import com.n8.spotifystreamer.events.SearchIntentReceivedEvent;
-import com.n8.spotifystreamer.events.ShowPlaybackFragmentEvent;
 import com.n8.spotifystreamer.events.TrackClickedEvent;
 import com.n8.spotifystreamer.playback.PlaybackDialogFragment;
 import com.n8.spotifystreamer.playback.PlaybackService;
@@ -35,13 +34,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String COACHMARK_FRAGMENT_TAG = "coachmark_fragment_tag";
 
-    private static final String ARTIST_FRAGMENT_TAG = "artist_fragment_tag";
-
     private static final String TRACK_FRAGMENT_TAG = "track_fragment_tag";
 
-    public static final String PLAYBACK_FRAGMENT_TAG = "playback_fragment_tag";
-
     private static final String PREFS_COACHMARK_KEY = "prefs_key_coachmarks";
+
     public static final String TAG_PLAYBACK_DIALOG_FRAGMENT = "playback_dialog_fragment";
 
     protected void onCreate(Bundle savedInstanceState) {

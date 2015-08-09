@@ -23,7 +23,6 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.n8.spotifystreamer.BusProvider;
-import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.events.NextTrackEvent;
@@ -37,7 +36,6 @@ import com.n8.spotifystreamer.events.TrackPlaybackCompleteEvent;
 import com.n8.spotifystreamer.events.TrackStartedEvent;
 import com.n8.spotifystreamer.models.TopTracksPlaylist;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

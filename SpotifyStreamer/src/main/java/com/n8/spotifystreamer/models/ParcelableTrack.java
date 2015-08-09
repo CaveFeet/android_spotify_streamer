@@ -1,14 +1,3 @@
-/*
-COPYRIGHT 1995-2015 ESRI
-
-TRADE SECRETS: ESRI PROPRIETARY AND CONFIDENTIAL 
-Unpublished material - all rights reserved under the Copyright Laws of the United States.
-
-For additional information, contact: Environmental Systems Research Institute, Inc. 
-Attn: Contracts Dept 380 New York Street Redlands, California, USA 92373
-
-email: contracts@esri.com
-*/
 package com.n8.spotifystreamer.models;
 
 import android.os.Bundle;
@@ -21,9 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import kaaes.spotify.webapi.android.models.AlbumSimple;
 import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.TrackSimple;
 
 public class ParcelableTrack extends ParcelableTrackSimple implements Parcelable{
   public ParcelableAlbumSimple album;

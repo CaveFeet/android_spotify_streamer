@@ -1,14 +1,10 @@
 package com.n8.spotifystreamer.playback;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -31,7 +27,6 @@ import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.n8.spotifystreamer.models.ParcelableTracks;
 import com.squareup.otto.Subscribe;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 public class PlaybackFragment extends BaseViewControllerFragment<PlaybackFragmentView> implements PlaybackController,
     SeekBar.OnSeekBarChangeListener {

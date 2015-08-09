@@ -4,8 +4,6 @@ import android.widget.ImageView;
 
 import com.n8.spotifystreamer.models.ParcelableArtist;
 
-import kaaes.spotify.webapi.android.models.Artist;
-
 /**
  * Event posted when the user clicks on an Artist search result
  */

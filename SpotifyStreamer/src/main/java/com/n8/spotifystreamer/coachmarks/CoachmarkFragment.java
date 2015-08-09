@@ -1,6 +1,5 @@
 package com.n8.spotifystreamer.coachmarks;
 
-
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

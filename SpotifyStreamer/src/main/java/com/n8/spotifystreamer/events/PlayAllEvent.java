@@ -1,7 +1,6 @@
 package com.n8.spotifystreamer.events;
 
 import com.n8.spotifystreamer.models.ParcelableArtist;
-import com.n8.spotifystreamer.models.ParcelableTrack;
 import com.n8.spotifystreamer.models.ParcelableTracks;
 
 public class PlayAllEvent {
