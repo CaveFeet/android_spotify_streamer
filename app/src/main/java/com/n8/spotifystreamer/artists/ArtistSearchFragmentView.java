@@ -1,14 +1,3 @@
-/*
-COPYRIGHT 1995-2015 ESRI
-
-TRADE SECRETS: ESRI PROPRIETARY AND CONFIDENTIAL 
-Unpublished material - all rights reserved under the Copyright Laws of the United States.
-
-For additional information, contact: Environmental Systems Research Institute, Inc. 
-Attn: Contracts Dept 380 New York Street Redlands, California, USA 92373
-
-email: contracts@esri.com
-*/
 package com.n8.spotifystreamer.artists;
 
 import android.annotation.TargetApi;
@@ -25,8 +14,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ProgressBar;
 
-import com.n8.n8droid.BaseFragmentView;
-import com.n8.spotifystreamer.DividerItemDecoration;
+import com.n8.n8droid.viewcontroller.BaseFragmentView;
 import com.n8.spotifystreamer.R;
 
 import butterknife.ButterKnife;

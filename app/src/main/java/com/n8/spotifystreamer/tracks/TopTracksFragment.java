@@ -19,8 +19,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
 
-import com.n8.n8droid.AndroidUtils;
-import com.n8.n8droid.BaseViewControllerFragment;
+import com.n8.n8droid.util.AndroidUtils;
+import com.n8.n8droid.util.UiUtils;
+import com.n8.n8droid.viewcontroller.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.ImageUtils;
 import com.n8.spotifystreamer.R;
@@ -308,7 +309,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
             handler.post(new Runnable() {
               @Override
               public void run() {
-                AndroidUtils.showToast(getActivity(), error.getLocalizedMessage());
+                UiUtils.showToast(getActivity(), error.getLocalizedMessage());
               }
             });
           }

@@ -18,7 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.n8.n8droid.BaseFragmentView;
+import com.n8.n8droid.viewcontroller.BaseFragmentView;
 import com.n8.spotifystreamer.R;
 
 import butterknife.ButterKnife;

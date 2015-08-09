@@ -9,8 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/n8Droid/n8droid" />
+            <option value="$PROJECT_DIR$/n8droid" />
           </set>
         </option>
       </GradleProjectSettings>

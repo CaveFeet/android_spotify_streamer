@@ -22,8 +22,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.n8.n8droid.AndroidUtils;
-import com.n8.n8droid.BaseViewControllerFragment;
+import com.n8.n8droid.util.AndroidUtils;
+import com.n8.n8droid.util.UiUtils;
+import com.n8.n8droid.viewcontroller.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
@@ -51,7 +52,8 @@ import retrofit.client.Response;
 /**
  * Fragment that allows user to serach for, and view, artists
  */
-public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearchFragmentView> implements
+public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearchFragmentView>
+    implements
     ArtistSearchController, ArtistsRecyclerAdapter.ArtistClickListener{
 
   private static final String TAG = ArtistSearchFragment.class.getSimpleName();
@@ -256,7 +258,7 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
                 mView.getProgressBar().setVisibility(View.GONE);
 
                 FragmentActivity activity = getActivity();
-                AndroidUtils.showToast(activity, activity.getString(R.string.error_searching_for_artist));
+                UiUtils.showToast(activity, activity.getString(R.string.error_searching_for_artist));
               }
             });
           }

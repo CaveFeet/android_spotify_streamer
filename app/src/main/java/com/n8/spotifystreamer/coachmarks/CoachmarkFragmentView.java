@@ -14,8 +14,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import com.n8.n8droid.BaseFragmentView;
-import com.n8.n8droid.UiUtils;
+import com.n8.n8droid.util.UiUtils;
+import com.n8.n8droid.viewcontroller.BaseFragmentView;
 import com.n8.spotifystreamer.R;
 import com.viewpagerindicator.LinePageIndicator;
 

@@ -14,8 +14,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.SeekBar;
 
-import com.n8.n8droid.BaseViewControllerFragment;
-import com.n8.n8droid.TimeUtils;
+import com.n8.n8droid.util.TimeUtils;
+import com.n8.n8droid.viewcontroller.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.events.NextTrackEvent;

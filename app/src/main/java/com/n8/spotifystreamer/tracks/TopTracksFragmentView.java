@@ -26,8 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.n8.n8droid.BaseFragmentView;
-import com.n8.n8droid.UiUtils;
+import com.n8.n8droid.util.UiUtils;
+import com.n8.n8droid.viewcontroller.BaseFragmentView;
 import com.n8.spotifystreamer.DividerItemDecoration;
 import com.n8.spotifystreamer.R;
 

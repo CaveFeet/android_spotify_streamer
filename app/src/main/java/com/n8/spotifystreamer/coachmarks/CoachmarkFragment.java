@@ -2,14 +2,10 @@ package com.n8.spotifystreamer.coachmarks;
 
 
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.n8.n8droid.BaseViewControllerFragment;
+import com.n8.n8droid.viewcontroller.BaseViewControllerFragment;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.R;
 import com.n8.spotifystreamer.events.CoachmarkShowAgainEvent;

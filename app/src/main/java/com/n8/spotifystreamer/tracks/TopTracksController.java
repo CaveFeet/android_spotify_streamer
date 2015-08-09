@@ -11,11 +11,8 @@ email: contracts@esri.com
 */
 package com.n8.spotifystreamer.tracks;
 
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ShareActionProvider;
-
-import com.n8.n8droid.ViewController;
+import com.n8.n8droid.viewcontroller.ViewController;
 
 public interface TopTracksController extends ViewController {
 
