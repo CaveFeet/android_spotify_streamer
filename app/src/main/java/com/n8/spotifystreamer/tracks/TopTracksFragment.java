@@ -165,6 +165,7 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   public void onArtistClicked(ArtistClickedEvent event) {
     mArtist = event.mArtist;
     mTracks = null;
+
     bindArtist();
   }
 
@@ -245,6 +246,8 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   private void bindTracks(boolean startFromScratch) {
+    mView.mPlayAllButton.setEnabled(true);
+
     if (startFromScratch) {
       mAdapter = new TracksRecyclerAdapter(mTracks, this);
     }

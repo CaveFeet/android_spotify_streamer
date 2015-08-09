@@ -123,6 +123,8 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
 
     mCollapsingToolbarLayout.setCollapsedTitleTextColor(getDefaultCollapsedTitleColor());
     mCollapsingToolbarLayout.setExpandedTitleColor(getDefaultExpandedTitleColor());
+
+    mPlayAllButton.setEnabled(false);
   }
 
   @OnClick(R.id.fragment_top_tracks_play_all_floatingActionButton)
