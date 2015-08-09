@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/SpotifyStreamer/SpotifyStreamer.iml" filepath="$PROJECT_DIR$/SpotifyStreamer/SpotifyStreamer.iml" />
       <module fileurl="file://$PROJECT_DIR$/android_nanodegre_spotify_streamer.iml" filepath="$PROJECT_DIR$/android_nanodegre_spotify_streamer.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/n8droid/n8droid.iml" filepath="$PROJECT_DIR$/n8droid/n8droid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/N8Droid/n8droid.iml" filepath="$PROJECT_DIR$/N8Droid/n8droid.iml" />
     </modules>
   </component>
 </project>
