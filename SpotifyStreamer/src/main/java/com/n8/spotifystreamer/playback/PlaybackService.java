@@ -13,11 +13,17 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.browse.MediaBrowser;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.ImageView;
@@ -25,6 +31,7 @@ import android.widget.ImageView;
 import com.n8.spotifystreamer.BusProvider;
 import com.n8.spotifystreamer.MainActivity;
 import com.n8.spotifystreamer.R;
+import com.n8.spotifystreamer.events.LockScreenControlsSettingChangedEvent;
 import com.n8.spotifystreamer.events.NextTrackEvent;
 import com.n8.spotifystreamer.events.PlaybackProgressEvent;
 import com.n8.spotifystreamer.events.PlaybackServiceStateBroadcastEvent;
@@ -78,8 +85,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
   private int mTrackIndex;
 
-  //private Bitmap mNotificationImage;
-
   private boolean mLockScreenControlsEnabled;
 
   private BroadcastReceiver mLockScreenReceiver;
@@ -102,26 +107,21 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
         mLockScreenControlsEnabled = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(getString
             (R.string.pref_enable_notification_media_controls_key), false);
 
+        if (mMediaPlayer == null) {
+          return;
+        }
+
+        boolean showControls = false;
         if (locked) {
-          if (mMediaPlayer == null) {
-            return;
-          }
-
-          if (mMediaPlayer.isPlaying()) {
-            showPauseNotification(mLockScreenControlsEnabled);
-          } else {
-            showPlayNotification(mLockScreenControlsEnabled);
-          }
+          showControls = mLockScreenControlsEnabled;
         } else {
-          if (mMediaPlayer == null) {
-            return;
-          }
+          showControls = true;
+        }
 
-          if (mMediaPlayer.isPlaying()) {
-            showPauseNotification(true);
-          } else {
-            showPlayNotification(true);
-          }
+        if (mMediaPlayer.isPlaying()) {
+          showPlayNotification(showControls);
+        } else {
+          showPauseNotification(showControls);
         }
       }
     };
@@ -129,8 +129,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_ON));
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
     registerReceiver(mLockScreenReceiver, new IntentFilter(Intent.ACTION_USER_PRESENT));
-
-
   }
 
   @Override
@@ -235,6 +233,20 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
           mMediaPlayer.setVolume(0.1f, 0.1f);
         }
         break;
+    }
+  }
+
+  @Subscribe
+  public void onLockScreenControlsChangedEventReceived(LockScreenControlsSettingChangedEvent event) {
+    mLockScreenControlsEnabled = event.isLockScreenControlsEnabled();
+    if (mMediaPlayer == null) {
+      return;
+    }
+
+    if (mMediaPlayer.isPlaying()) {
+      showPlayNotification(mLockScreenControlsEnabled);
+    } else {
+      showPauseNotification(mLockScreenControlsEnabled);
     }
   }
 
@@ -525,19 +537,6 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
 
       }
     });
-
-//    Picasso.with(this).load(mTopTracksPlaylist.getTrackThumbnailUrl(0, mTrackIndex)).into(imageView, new Callback() {
-//      @Override
-//      public void onSuccess() {
-//        Bitmap image = ImageUtils.drawableToBitmap(imageView.getDrawable());
-//        showPlayNotification(image, showLockScreenControls);
-//      }
-//
-//      @Override
-//      public void onError() {
-//
-//      }
-//    });
   }
 
   private void showPlayNotification(Bitmap bitmap, boolean showLockScreenControls) {
@@ -546,11 +545,12 @@ public class PlaybackService extends Service implements MediaPlayer.OnPreparedLi
     if (showLockScreenControls) {
       builder
           .addAction(android.R.drawable.ic_media_previous, "Previous", createNotificationPendingIntent(ACTION_PREVIOUS))
-          .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPendingIntent(ACTION_PAUSE))
+          .addAction(android.R.drawable.ic_media_pause, "Pause", createNotificationPendingIntent(
+              ACTION_PAUSE))
           .addAction(android.R.drawable.ic_media_next, "Next", createNotificationPendingIntent(ACTION_NEXT))
-              // Apply the media style template
-          .setStyle(new NotificationCompat.MediaStyle()
-                  .setShowActionsInCompactView(1)
+
+          // Apply the media style template
+          .setStyle(new NotificationCompat.MediaStyle().setShowActionsInCompactView(1)
           );
     }
 
