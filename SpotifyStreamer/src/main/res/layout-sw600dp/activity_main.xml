@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:showDividers="middle"
+        >
+
+        <fragment android:name="com.n8.spotifystreamer.artists.ArtistSearchFragment"
+                  android:id="@+id/artist_search_fragment"
+                  android:layout_weight="1"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/accent" />
+
+          <FrameLayout
+              android:layout_width="0dp"
+              android:layout_weight="1"
+              android:layout_height="match_parent"
+              >
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="@dimen/playback_fragment_header_height"
+                >
+              <fragment android:name="com.n8.spotifystreamer.tracks.TopTracksFragment"
+                        android:id="@+id/top_tracks_fragment"
+                        android:layout_weight="1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                  />
+            </FrameLayout>
+
+            <fragment
+                android:name="com.n8.spotifystreamer.playback.PlaybackFragment"
+                android:id="@+id/playback_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+          </FrameLayout>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/main_activity_coachmark_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+</FrameLayout>

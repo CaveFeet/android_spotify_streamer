@@ -1,0 +1,37 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    >
+
+  <FrameLayout
+      android:id="@+id/main_activity_fragment_frame"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:paddingBottom="@dimen/playback_fragment_header_height"
+      >
+      <fragment
+          android:name="com.n8.spotifystreamer.artists.ArtistSearchFragment"
+          android:id="@+id/artist_search_fragment"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          />
+  </FrameLayout>
+
+  <fragment
+      android:name="com.n8.spotifystreamer.playback.PlaybackFragment"
+      android:id="@+id/playback_fragment"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      />
+
+  <FrameLayout
+      android:id="@+id/main_activity_coachmark_frame"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      />
+
+</FrameLayout>
+

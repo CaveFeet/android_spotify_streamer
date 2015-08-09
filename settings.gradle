@@ -1,1 +1,2 @@
-include ':app', ':n8droid'
+include ':SpotifyStreamer', ':n8droid'
+project(':n8droid').projectDir = new File('n8Droid/n8droid')

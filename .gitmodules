@@ -1,0 +1,3 @@
+[submodule "n8Droid"]
+	path = n8Droid
+	url = https://github.com/n8ebel/n8Droid.git

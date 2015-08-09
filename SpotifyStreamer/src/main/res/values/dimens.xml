@@ -1,0 +1,44 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="keyline_0">8dp</dimen>
+    <dimen name="keyline_1">16dp</dimen>
+    <dimen name="keyline_2">32dp</dimen>
+    <dimen name="keyline_3">72dp</dimen>
+
+    <dimen name="toolbar_elevation">4dp</dimen>
+
+    <dimen name="recycler_view_margin">8dp</dimen>
+
+    <dimen name="artist_recycler_view_height">250dp</dimen>
+    <dimen name="artist_recycler_view_width">150dp</dimen>
+
+    <dimen name="track_recycler_view_height">100dp</dimen>
+
+    <dimen name="recycler_view_thumbnail_size">80dp</dimen>
+
+    <dimen name="recycler_view_item_elevation">4dp</dimen>
+
+    <dimen name="top_tracks_header_thumbnail_size">72dp</dimen>
+
+    <dimen name="coachmark_image_size">200dp</dimen>
+    <dimen name="expanded_toolbar_height">200dp</dimen>
+    <dimen name="recycler_view_artist_badge_icon_size">25dp</dimen>
+
+    <dimen name="toolbar_height">?android:attr/actionBarSize</dimen>
+
+    <dimen name="fragment_playback_header_elevation">8dp</dimen>
+    <dimen name="fragment_playback_header_thumbnail_size">50dp</dimen>
+    <dimen name="fragment_playback_spotify_badge_width">100dp</dimen>
+    <dimen name="fragment_playback_media_control_button_size">60dp</dimen>
+    <dimen name="playback_fragment_header_height">80dp</dimen>
+
+    <!-- Seekbar dimens-->
+
+    <dimen name="playback_seekbar_height">30dp</dimen>
+    <!-- This should alwasy be 1/2 of playback_seekbar_height-->
+    <dimen name="playback_seekbar_vertical_margin">-15dp</dimen>
+    <dimen name="playback_seekbar_horizontal_padding">-8dp</dimen>
+
+    <dimen name="playback_fragment_media_controls_container_height">80dp</dimen>
+    <dimen name="overflow_size">40dp</dimen>
+</resources>
