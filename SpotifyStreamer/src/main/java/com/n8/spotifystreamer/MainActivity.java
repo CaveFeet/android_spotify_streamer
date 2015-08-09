@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe
     public void onTrackClicked(TrackClickedEvent event) {
-
         TopTracksPlaylist playlist = new TopTracksPlaylist(event.getArtist(), event.getTracks());
 
         // Create playback intent to send to service with current playback information
@@ -186,8 +185,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void play(@NonNull Intent playbackIntent, boolean playInDialog) {
-        // Send playback intent to the playback service.  The service will be started if not already started.
-        startService(playbackIntent);
 
         // Show playback controls in a dialog
         // TODO remove this after submission.  Only here to strictly satisfy dialog fragment requirement
@@ -198,5 +195,8 @@ public class MainActivity extends AppCompatActivity {
             PlaybackDialogFragment playbackDialogFragment = PlaybackDialogFragment.getInstance();
             playbackDialogFragment.show(getSupportFragmentManager(), TAG_PLAYBACK_DIALOG_FRAGMENT);
         }
+
+        // Send playback intent to the playback service.  The service will be started if not already started.
+        startService(playbackIntent);
     }
 }
