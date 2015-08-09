@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,6 +94,27 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   @Override
   protected void setViewController() {
     mView.setController(getActivity(), this);
+
+    mView.getToolbar().inflateMenu(R.menu.settings_menu);
+    mView.getToolbar().inflateMenu(R.menu.share_menu);
+    mView.getToolbar().setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+          case R.id.main_menu_settings:
+            onSettingsMenuOptionClicked();
+            return true;
+          case R.id.action_share:
+            onShareClicked();
+            return true;
+          case R.id.main_menu_now_playing:
+            onNowPlayingMenuOptionClicked();
+            return true;
+          default:
+        }
+        return false;
+      }
+    });
   }
 
   @Override
@@ -118,30 +140,16 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     }
   }
 
+
+
   @Override
   public void onPlayAllClicked() {
     playAllTracks();
   }
 
   @Override
-  public void onShareClicked() {
-    startActivity(createShareIntent());
-  }
-
-  @Override
   public void onNavIconClicked() {
     getActivity().onBackPressed();
-  }
-
-  @Override
-  public void onNowPlayingMenuOptionClicked(){
-    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
-  }
-
-  @Override
-  public void onSettingsMenuOptionClicked() {
-    Intent intent = new Intent(getActivity(), SettingsActivity.class);
-    startActivity(intent);
   }
 
   @Override
@@ -198,6 +206,19 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
     });
 
     overflowMenu.show();
+  }
+
+  public void onShareClicked() {
+    startActivity(createShareIntent());
+  }
+
+  public void onNowPlayingMenuOptionClicked(){
+    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
+  }
+
+  public void onSettingsMenuOptionClicked() {
+    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+    startActivity(intent);
   }
 
   private void playAllTracks() {
@@ -279,6 +300,10 @@ public class TopTracksFragment extends BaseViewControllerFragment<TopTracksFragm
   }
 
   private void requestTopTracks() {
+    if (mArtist == null) {
+      return;
+    }
+
     final Map<String, Object> map = new HashMap<>();
 
     map.put("country", mCountryCode);

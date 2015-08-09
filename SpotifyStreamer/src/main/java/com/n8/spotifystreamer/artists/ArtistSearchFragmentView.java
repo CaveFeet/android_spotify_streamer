@@ -63,7 +63,6 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
   @Override
   protected void setupView() {
     ButterKnife.inject(this);
-    setuptToolbar();
     setupSearchView();
     setupRecyclerView();
   }
@@ -94,29 +93,6 @@ public class ArtistSearchFragmentView extends BaseFragmentView<ArtistSearchContr
     mArtistRecyclerView.setVisibility(View.VISIBLE);
     mNoContentView.setVisibility(View.GONE);
     mInitialContentView.setVisibility(View.GONE);
-  }
-
-  private void setuptToolbar() {
-    mToolbar.inflateMenu(R.menu.fragment_artist_search_menu);
-    mToolbar.inflateMenu(R.menu.settings_menu);
-    mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-      @Override
-      public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-          case R.id.fragment_artist_search_menu_clear_suggestions:
-            mController.onClearSuggestions();
-            return true;
-          case R.id.main_menu_settings:
-            mController.onSettingsMenuOptionClicked();
-            return true;
-          case R.id.main_menu_now_playing:
-            mController.onNowPlayingMenuOptionClicked();
-            return true;
-          default:
-        }
-        return false;
-      }
-    });
   }
 
   private void setupSearchView() {

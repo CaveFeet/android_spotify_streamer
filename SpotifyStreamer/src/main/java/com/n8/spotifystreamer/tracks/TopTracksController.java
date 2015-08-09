@@ -7,13 +7,7 @@ public interface TopTracksController extends ViewController {
 
   void onPlayAllClicked();
 
-  void onShareClicked();
-
   void onNavIconClicked();
-
-  void onNowPlayingMenuOptionClicked();
-
-  void onSettingsMenuOptionClicked();
 
   RecyclerView.LayoutManager getLayoutManager();
 

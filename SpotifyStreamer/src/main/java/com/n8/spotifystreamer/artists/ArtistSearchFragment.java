@@ -14,8 +14,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -82,16 +84,6 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   }
 
   @Override
-  protected int getLayoutId() {
-    return R.layout.fragment_artist_search;
-  }
-
-  @Override
-  protected void setViewController() {
-    mView.setController(getActivity(), this);
-  }
-
-  @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
     super.onCreateView(inflater, container, savedInstanceState);
 
@@ -112,22 +104,6 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
   public void onDestroyView() {
     super.onDestroyView();
     BusProvider.getInstance().unregister(this);
-  }
-
-  @Override
-  public void onNowPlayingMenuOptionClicked(){
-    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
-  }
-
-  @Override
-  public void onSettingsMenuOptionClicked() {
-    Intent intent = new Intent(getActivity(), SettingsActivity.class);
-    startActivity(intent);
-  }
-
-  @Override
-  public void onClearSuggestions() {
-    clearSearchSuggestions();
   }
 
   @Override
@@ -161,14 +137,6 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     }
   }
 
-  private void showPagingProgress() {
-    mView.getProgressBar().setVisibility(View.VISIBLE);
-    final Handler handler = new Handler();
-
-    mPagingNewResults = true;
-    searchForArtists(null, handler);
-  }
-
   @Subscribe
   public void onSearchIntentReceived(SearchIntentReceivedEvent event) {
     submitQuery(event.getQuery());
@@ -180,6 +148,61 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     if (mCurrentQuery != null && mCurrentQuery.length() > 0) {
       submitQuery(mCurrentQuery);
     }
+  }
+
+  @Override
+  protected int getLayoutId() {
+    return R.layout.fragment_artist_search;
+  }
+
+  @Override
+  protected void setViewController() {
+    mView.setController(getActivity(), this);
+    setupToolbar();
+  }
+
+  private void showPagingProgress() {
+    mView.getProgressBar().setVisibility(View.VISIBLE);
+    final Handler handler = new Handler();
+
+    mPagingNewResults = true;
+    searchForArtists(null, handler);
+  }
+
+  private void onNowPlayingMenuOptionClicked(){
+    BusProvider.getInstance().post(new ShowPlaybackFragmentEvent());
+  }
+
+  private void onSettingsMenuOptionClicked() {
+    Intent intent = new Intent(getActivity(), SettingsActivity.class);
+    startActivity(intent);
+  }
+
+  private void onClearSuggestions() {
+    clearSearchSuggestions();
+  }
+
+  private void setupToolbar() {
+    mView.getToolbar().inflateMenu(R.menu.fragment_artist_search_menu);
+    mView.getToolbar().inflateMenu(R.menu.settings_menu);
+    mView.getToolbar().setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+      @Override
+      public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+          case R.id.fragment_artist_search_menu_clear_suggestions:
+            onClearSuggestions();
+            return true;
+          case R.id.main_menu_settings:
+            onSettingsMenuOptionClicked();
+            return true;
+          case R.id.main_menu_now_playing:
+            onNowPlayingMenuOptionClicked();
+            return true;
+          default:
+        }
+        return false;
+      }
+    });
   }
 
   private void submitQuery(String query) {
@@ -203,7 +226,6 @@ public class ArtistSearchFragment extends BaseViewControllerFragment<ArtistSearc
     searchForArtists(progressDialog, handler);
   }
 
-  @NonNull
   private ProgressDialog createSearchProgressDialog(String query) {
     final ProgressDialog progressDialog = new ProgressDialog(getActivity());
     progressDialog.setTitle(getActivity().getString(R.string.searching_for) + query);

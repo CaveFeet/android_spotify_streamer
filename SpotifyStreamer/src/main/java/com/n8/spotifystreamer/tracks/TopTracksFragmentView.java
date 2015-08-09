@@ -82,26 +82,6 @@ public class TopTracksFragmentView extends BaseFragmentView<TopTracksController>
           mController.onNavIconClicked();
         }
       });
-      mToolbar.inflateMenu(R.menu.settings_menu);
-      mToolbar.inflateMenu(R.menu.share_menu);
-      mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-          switch (item.getItemId()) {
-            case R.id.main_menu_settings:
-              mController.onSettingsMenuOptionClicked();
-              return true;
-            case R.id.action_share:
-              mController.onShareClicked();
-              return true;
-            case R.id.main_menu_now_playing:
-              mController.onNowPlayingMenuOptionClicked();
-              return true;
-            default:
-          }
-          return false;
-        }
-      });
 
     }
 
