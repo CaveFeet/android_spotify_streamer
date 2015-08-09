@@ -9,8 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/N8Droid/n8droid" />
             <option value="$PROJECT_DIR$/SpotifyStreamer" />
+            <option value="$PROJECT_DIR$/n8Droid/n8droid" />
           </set>
         </option>
       </GradleProjectSettings>
