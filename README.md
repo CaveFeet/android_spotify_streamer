@@ -1,5 +1,5 @@
-# android_nanodegre_spotify_streamer
-Project 1 on the Udacity Android Nanodegree
+
+[Preview Video](https://www.youtube.com/watch?v=Ya2LmWmfGGI)
 
 ## Project Setup
 1.  git clone https://github.com/n8ebel/android_nanodegre_spotify_streamer.git
