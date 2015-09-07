@@ -1,5 +1,9 @@
 
-[Preview Video](https://www.youtube.com/watch?v=Ya2LmWmfGGI)
+[Album with screenshots and demo video](https://goo.gl/photos/bdZ9UuEfcpXbTYf37)
+
+[Demo video on YouTube](https://www.youtube.com/watch?v=Ya2LmWmfGGI)
+
+[Blog post](http://n8ebel.github.io/portfolio/2015/09/06/Udacity-Spotify-Streamer/)
 
 ## Project Setup
 1.  git clone https://github.com/n8ebel/android_nanodegre_spotify_streamer.git
